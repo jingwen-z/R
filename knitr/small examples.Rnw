@@ -1,0 +1,75 @@
+############################################ example with global chunk options #################################################
+\documentclass{article}
+
+\begin{document}
+<<setup, include=FALSE, cache=FALSE>>=
+library(knitr)
+# set global chunk options
+opts_chunk$set(echo=FALSE, results='hide', fig.path='myproject/plot-', cache=TRUE)
+#the first item is for hiding the R source code
+#the second one is for hiding the printed results
+@
+
+<<my-label, eval=TRUE, dev='png'>>=
+set.seed(1213)  # for reproducibility
+x = cumsum(rnorm(100))
+mean(x)  # mean of x
+plot(x, type = 'l')  # Brownian motion
+@
+
+\end{document}
+
+############################################# example with local chunk options #################################################
+\documentclass{article}
+
+\begin{document}
+
+Example text outside R code here; we know the value of pi is \Sexpr{pi}.
+<<my-label, eval=TRUE, dev='png'>>=
+set.seed(1213)  # for reproducibility
+x = cumsum(rnorm(100))
+mean(x)  # mean of x
+plot(x, type = 'l')  # Brownian motion
+@
+Other text outside R code here.
+
+<<my-label-2, eval=TRUE, dev='png', echo=FALSE>>= 
+#the fourth item above is for hiding the R source code
+set.seed(1213)  # for reproducibility
+x = cumsum(rnorm(100))
+mean(x)  # mean of x
+plot(x, type = 'l')  # Brownian motion
+@
+
+<<my-label-3, eval=TRUE, dev='png', echo=FALSE,results='hide'>>= 
+#the fifth item above is for hiding the printed results
+#(e.g. you will not see ## [1] -1.939758 above if you use this option)
+set.seed(1213)  # for reproducibility
+x = cumsum(rnorm(100))
+mean(x)  # mean of x
+plot(x, type = 'l')  # Brownian motion
+@
+
+\end{document}
+
+############################################# just small things for exercising #################################################
+\documentclass{article}
+
+\begin{document}
+\title{minimal knitr example to R}
+\author{Jingwen Z.}
+\maketitle this is our workflow:
+<<>>=
+set.seed(99)
+x=1+rnorm(200,3,2)
+mean(x)
+var(x)
+@
+the first three elements of x are \Sexpr{x[1:3]}
+<<>>=
+plot(x,main = "daily retruns of asset X",ylab = "returns",xlab="days")
+abline(lm(x~seq(1,200,1)))
+@
+
+\end{document}
+
