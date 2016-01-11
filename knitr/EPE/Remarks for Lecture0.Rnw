@@ -6,9 +6,6 @@
 \geometry{left=2cm,right=2cm,top=2cm,bottom=2cm}
 \renewcommand{\baselinestretch}{1.3}
 
-
-
-
 \begin{document}
 \title{Remarks for Lecture 0}
 \author{\textbf{Jingwen-Z}\\ Toulouse School of Economics\\ M2 ERNA}
