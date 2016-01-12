@@ -6,6 +6,11 @@
 \geometry{left=2cm,right=2cm,top=2cm,bottom=2cm}
 \renewcommand{\baselinestretch}{1.3}
 
+% package to generate commands with double letters in maths
+\usepackage{dsfont}
+\newcommand{\uns}[1]{\mathds{1}[ #1 ]}
+
+
 \begin{document}
 \title{Remarks for Lecture 0}
 \author{\textbf{Jingwen-Z}\\ Toulouse School of Economics\\ M2 ERNA}
@@ -18,7 +23,7 @@
 
     \href{https://cran.r-project.org/web/packages/gplots/index.html}{\textbf{gplots}}:Various R programming tools for plotting data
 
-    \href{https://cran.r-project.org/web/packages/snowfall/index.html}{\textbf{snowfall}}:Usability wrapper around snow for easier development of parallel R programs. 
+    \href{https://cran.r-project.org/web/packages/snowfall/index.html}{\textbf{snowfall}}: is designed to make setup and usage of snow more easier. It also is made ready to work together with sfCluster, a ressource management and runtime observation tool for R-cluster usage.Usability wrapper around snow for easier development of parallel R programs. 
 
     \href{https://cran.r-project.org/web/packages/ggplot2/index.html}{\textbf{ggplot2}}:An implementation of the grammar of graphics in R.
 
@@ -52,6 +57,7 @@ delta.y.tt <- function(param){return(param["baralpha"]+param["theta"]*param["bar
 @
 
 <<goal,eval=FALSE,results='hide',warning=FALSE,error=FALSE,message=FALSE,fig.cap='Our goal',fig.align='center',out.width='.65\\textwidth',fig.pos='htbp'>>=
+# Example
 R <- 0
 xlim.big <- c(-1.5,0.5)
 xlim.small <- c(-0.15,0.55)
@@ -71,6 +77,7 @@ text(x=c(R,delta.y.tt(param)),y=c(adj),labels=c('R','TT'),pos=2)
 @
     \subsection{page 7}
 <<FPCI,eval=FALSE,results='hide',warning=FALSE,error=FALSE,message=FALSE,fig.cap='FPCI',fig.align='center',out.width='.65\\textwidth',fig.pos='htbp'>>=
+# The Fundamental Problem of Causal Inference: illustration
 plot(1, type="n", xlab="", ylab="", xlim=xlim.small, ylim=c(0, 10))
 abline(v=delta.y.tt(param),col=col.unobs,lty=lty.unobs)
 abline(v=R)
@@ -79,6 +86,7 @@ text(x=c(R,delta.y.tt(param)),y=c(adj),labels=c('R','TT'),pos=2,col=c(col.obs,co
 @
     \subsection{page 13}
 <<param.print,eval=FALSE,results='hide'>>=
+# The parameter values used in the simulations
 library(xtable)
 param.export <- xtable(as.data.frame(param))
 print(param.export)
@@ -106,6 +114,7 @@ Y <- Y1*Ds+Y0*(1-Ds)
 @
 
 <<plot.y1.y0.yB,eval=FALSE,fig.cap='Observed and potential outcomes',fig.subcap=c('Observed outcomes','Potential outcomes'),fig.align='center',out.width='.5\\textwidth',results='hide',fig.pos='htbp'>>=
+# Why is $\Delta_i^Y$ unobserved? Illustration
 plot(yB[Ds==0],y0[Ds==0],pch=1,xlim=c(5,11),ylim=c(5,11),xlab="yB",ylab="Outcomes")
 points(yB[Ds==1],y1[Ds==1],pch=3)
 legend(5,11,c('y|D=0','y|D=1'),pch=c(1,3))
@@ -121,6 +130,7 @@ legend(5,11,c('y0|D=0','y1|D=1','y0|D=1','y1|D=0'),pch=c(1,3,1,3),
 @
     \subsection{page 17}
 <<plot.counter,eval=FALSE,fig.cap='Evolution of average outcomes in the treated and control group',fig.subcap=c('Average outcomes','Individual outcomes'),fig.align='center',out.width='.5\\textwidth',results='hide',fig.pos='htbp'>>=
+# Why is TT Unobserved? Illustration
 x <- c(1,2)
 y11 <- c(mean(yB[Ds==1]),mean(y[Ds==1]))
 y10 <- c(mean(yB[Ds==1]),mean(y0[Ds==1]))
@@ -141,6 +151,7 @@ legend(5,11,c('y0|D=0','y1|D=1','y0|D=1','y1|D=0'),pch=c(1,3,1,3),
 @
     \subsection{page 21}
 <<plot.intuit,eval=FALSE,fig.cap='Evolution of average outcomes in the treated and control group',fig.align='center',out.width='.65\\textwidth',results='hide',fig.pos='htbp'>>=
+# Intuitive Comparisons: Illustration
 x <- c(1,2)
 y11 <- c(mean(yB[Ds==1]),mean(y[Ds==1]))
 y10 <- c(mean(yB[Ds==1]),mean(y0[Ds==1]))
@@ -171,6 +182,7 @@ delta.y.ww <- function(param){
 @
 
 <<sel.bias,eval=FALSE,results='hide',warning=FALSE,error=FALSE,message=FALSE,fig.cap='Selection bias',fig.align='center',out.width='.65\\textwidth',fig.pos='htbp'>>=
+# Selection Bias: Illustration
 plot(1, type="n", xlab="", ylab="", xlim=xlim.big, ylim=c(0, 10))
 abline(v=R)
 abline(v=delta.y.tt(param),col=col.unobs,lty=lty.unobs)
@@ -186,6 +198,7 @@ delta.y.ba <- mean(y[Ds==1])-mean(yB[Ds==1])
 @
 
 <<time.trend.bias,eval=FALSE,results='hide',warning=FALSE,error=FALSE,message=FALSE,fig.cap='Time trend bias',fig.align='center',out.width='.65\\textwidth',fig.pos='htbp'>>=
+# Time Trend Bias: Illustration
 plot(1, type="n", xlab="", ylab="", xlim=xlim.small, ylim=c(0, 10))
 abline(v=R)
 abline(v=delta.y.tt(param),col=col.unobs,lty=lty.unobs)
@@ -195,6 +208,7 @@ text(x=c(R,delta.y.tt(param),delta.y.ba),y=c(adj),labels=c('R','TT','BA'),pos=2,
 @
     \subsection{page 30}
 <<conf.factors.CS,eval=FALSE,fig.cap='Distribution of the confounding factors in the treated and control group',fig.subcap=c('$\\mu_i$','$U_i^B$'),fig.align='center',out.width='.5\\textwidth',results='hide',fig.pos='htbp'>>=
+# Selection Bias and Cross-Sectional Confounders
 hist(mu[Ds==0],col=rgb(0.1,0.1,0.1,0.5),xlim=c(5,11),ylim=c(0,1),xlab="mu",main="",freq=F)
 #right-side dark hist which is untreated
 hist(mu[Ds==1],add=T, col=rgb(0.8,0.8,0.8,0.5),freq=F)
@@ -204,6 +218,7 @@ hist(UB[Ds==1],add=T, col=rgb(0.8,0.8,0.8,0.5),freq=F)
 @
     \subsection{page 31}
 <<sel.bias.pot.out,eval=FALSE,fig.cap='Distribution of $y_i^0$ in the treated and control group',fig.align='center',out.width='.65\\textwidth',results='hide',fig.pos='htbp'>>=
+# Selection Bias and Potential Outcomes
 hist(y0[Ds==0],col=rgb(0.1,0.1,0.1,0.5),xlim=c(5,11),ylim=c(0,1),xlab="y0",main="",freq=F)
 #right-side dark hist
 hist(y0[Ds==1],add=T, col=rgb(0.8,0.8,0.8,0.5),freq=F)
@@ -217,7 +232,6 @@ N <-1000
 mu <- rnorm(N,param["barmu"],sqrt(param["sigma2mu"]))
 UB <- rnorm(N,0,sqrt(param["sigma2U"]))
 yB <- mu + UB 
-YB <- exp(yB)
 Ds <- rep(0,N)
 V <- rnorm(N,param["barmu"],sqrt(param["sigma2mu"]+param["sigma2U"]))
 Ds[V<=log(param["barY"])] <- 1 
@@ -234,11 +248,12 @@ Y <- Y1*Ds+Y0*(1-Ds)
 @
 
 <<no.sel.bias.obs.pot,eval=FALSE,fig.cap='Observed and potential outcomes',fig.subcap=c('Observed outcomes','Potential outcomes'),fig.align='center',out.width='.5\\textwidth',results='hide',fig.pos='htbp'>>=
+# Absence of Selection Bias: Illustration
 plot(V[Ds==0],y0[Ds==0],pch=1,xlim=c(5,11),ylim=c(5,11),xlab="V",ylab="Outcomes")
 points(V[Ds==1],y1[Ds==1],pch=3)
 legend(5,11,c('y|D=0','y|D=1'),pch=c(1,3))
 abline(v=log(param["barY"]),col=col.unobs)
-#Observed outcomes
+
 plot(V[Ds==0],y0[Ds==0],pch=1,xlim=c(5,11),ylim=c(5,11),xlab="V",ylab="Outcomes")
 points(V[Ds==1],y1[Ds==1],pch=3)
 points(V[Ds==0],y1[Ds==0],pch=3,col=col.unobs)
@@ -256,6 +271,7 @@ delta.y.ate <- function(param){
 @
 
 <<no.sel.bias.illus,eval=FALSE,results='hide',warning=FALSE,error=FALSE,message=FALSE,fig.cap='WW identifies TT',fig.align='center',out.width='.65\\textwidth',fig.pos='htbp'>>=
+# Absence of Selection Bias: Illustration
 plot(1, type="n", xlab="", ylab="", xlim=xlim.small, ylim=c(0, 10))
 abline(v=R)
 abline(v=delta.y.ate(param),col=col.unobs,lty=lty.unobs)
@@ -265,6 +281,7 @@ text(x=c(R,delta.y.ate(param),delta.y.ate(param)),y=c(adj),labels=c('R','TT','WW
 @
     \subsection{page 40}
 <<FPSI.illus,eval=FALSE,results='hide',warning=FALSE,error=FALSE,message=FALSE,fig.cap='FPSI',fig.align='center',out.width='.65\\textwidth',fig.pos='htbp'>>=
+# FPSI: Illustration
 plot(1, type="n", xlab="", ylab="", xlim=xlim.small, ylim=c(0, 10))
 abline(v=R)
 abline(v=delta.y.ate(param),col=col.unobs,lty=lty.unobs)
@@ -274,6 +291,7 @@ text(x=c(R,delta.y.ate(param),delta.y.ate(param)),y=c(adj),labels=c('R','TT','E'
 @ 
     \subsection{page 43}
 <<hat.WW.illus,eval=FALSE,results='hide',warning=FALSE,error=FALSE,message=FALSE,fig.cap='Sample Estimator',fig.align='center',out.width='.65\\textwidth',fig.pos='htbp'>>=
+# Illustration
 hat.delta.y.ww <- (1/sum(Ds))*sum(y*Ds)-(1/sum(1-Ds))*sum(y*(1-Ds))
 
 plot(1, type="n", xlab="", ylab="", xlim=xlim.small, ylim=c(0, 10))
@@ -285,5 +303,490 @@ text(x=c(R,delta.y.ate(param),delta.y.ate(param),hat.delta.y.ww),y=c(adj),
      labels=c('R','TT','E',expression(hat('E'))),pos=c(2,2,4),
      col=c(col.obs,col.unobs,col.unobs,col.obs),lty=c(lty.obs,lty.unobs,lty.unobs,lty.obs))
 @
-    
+    \subsection{page 45}
+<<monte.carlo,eval=FALSE,warning=FALSE,error=FALSE,message=FALSE,results='hide',cache=TRUE>>=
+monte.carlo.ww <- function(s,N,param){
+  set.seed(s)
+  mu <- rnorm(N,param["barmu"],sqrt(param["sigma2mu"]))
+  UB <- rnorm(N,0,sqrt(param["sigma2U"]))
+  yB <- mu + UB 
+  YB <- exp(yB)
+  Ds <- rep(0,N)
+  V <- rnorm(N,param["barmu"],sqrt(param["sigma2mu"]+param["sigma2U"]))
+  Ds[V<=log(param["barY"])] <- 1 
+  epsilon <- rnorm(N,0,sqrt(param["sigma2epsilon"]))
+  eta<- rnorm(N,0,sqrt(param["sigma2eta"]))
+  U0 <- param["rho"]*UB + epsilon
+  y0 <- mu +  U0 + param["delta"]
+  alpha <- param["baralpha"]+  param["theta"]*mu + eta
+  y1 <- y0+alpha
+  Y0 <- exp(y0)
+  Y1 <- exp(y1)
+  y <- y1*Ds+y0*(1-Ds)
+  Y <- Y1*Ds+Y0*(1-Ds)
+  return(c((1/sum(Ds))*sum(y*Ds)-(1/sum(1-Ds))*sum(y*(1-Ds)),var(y1[Ds==1]),
+           var(y0[Ds==0]),mean(Ds)))
+}
+
+simuls.ww.N <- function(N,Nsim,param){
+  simuls.ww <- matrix(unlist(lapply(1:Nsim,monte.carlo.ww,N=N,param=param)),
+                      nrow=Nsim,ncol=4,byrow=TRUE)
+  colnames(simuls.ww) <- c('WW','V1','V0','p')
+  return(simuls.ww)
+}
+
+library(snowfall)
+
+sf.simuls.ww.N <- function(N,Nsim,param){
+  sfInit(parallel=TRUE,cpus=8)
+  sim <- matrix(unlist(sfLapply(1:Nsim,monte.carlo.ww,N=N,param=param)),nrow=Nsim,ncol=4,
+                byrow=TRUE)
+  sfStop()
+  colnames(sim) <- c('WW','V1','V0','p')
+  return(sim)
+}
+
+Nsim <- 1000
+#Nsim <- 10
+N.sample <- c(100,1000,10000,100000)
+#N.sample <- c(100,1000,10000)
+
+simuls.ww <- lapply(N.sample,sf.simuls.ww.N,Nsim=Nsim,param=param)
+names(simuls.ww) <- N.sample
+@
+
+<<monte.carlo.hist,dependson='monte.carlo',eval=FALSE,warning=FALSE,error=FALSE,message=FALSE,results='hide',fig.cap='Distribution of the $WW$ estimator over replications of samples of different sizes',fig.align='center',out.width='.65\\textwidth',fig.pos='htbp'>>=
+# Sampling Noise: Illustration
+par(mfrow=c(2,2))
+for (i in 1:length(simuls.ww)){
+  hist(simuls.ww[[i]][,'WW'],main=paste('N=',as.character(N.sample[i])),
+       xlab=expression(hat(Delta^yWW)),xlim=c(-0.15,0.55))
+  abline(v=delta.y.ate(param),col="red")
+}
+@
+    \subsection{page 49}
+<<precision,dependson='monte.carlo',eval=FALSE,results='hide',warning=FALSE,error=FALSE,message=FALSE,fig.cap='Effect of sampling noise on the precision of the WW estimator (99\\% confidence)',fig.align='center',out.width='.65\\textwidth',fig.pos='htbp'>>=
+# What is Sampling Noise? Illustration
+delta <- 0.99
+precision.ww <- function(k){
+  return(2*quantile(abs(simuls.ww[[k]][,'WW']-delta.y.ate(param)),probs=c(delta)))
+}
+precision.ww.N <- sapply(1:length(simuls.ww),precision.ww)
+precision <- as.data.frame(cbind(N.sample,precision.ww.N,rep(delta.y.ate(param),
+                                                             length(simuls.ww))))
+colnames(precision) <- c('N','precision','TT')
+
+library(ggplot2)
+ggplot(precision, aes(x=as.factor(N), y=TT)) +
+  geom_bar(position=position_dodge(), stat="identity", colour='black') +
+  geom_errorbar(aes(ymin=TT-precision/2, ymax=TT+precision/2), width=.2,
+                position=position_dodge(.9),color='red') +
+  xlab("Sample Size") 
+#ggplot() initializes a ggplot object. It can be used to declare the input data frame 
+#for a graphic and to specify the set of plot aesthetics intended to be common throughout 
+#all subsequent layers unless specifically overridden.
+
+#####parameters#####
+#ggplot(data = NULL, mapping = aes(), ..., environment = parent.frame())
+##aes: Generate aesthetic mappings that describe how variables in the data are mapped to visual 
+#properties (aesthetics) of geoms. This function also standardise aesthetic names by performs 
+#partial name matching, converting color to colour, and old style R names to ggplot names 
+#(eg. pch to shape, cex to size)
+
+##geom_bar: There are two types of bar charts, determined by what is mapped to bar height. 
+#By default, geom_bar uses stat="count" which makes the height of the bar proportion to the 
+#number of cases in each group (or if the weight aethetic is supplied, the sum of the weights). 
+#If you want the heights of the bars to represent values in the data, use stat="identity" and 
+#map a variable to the y aesthetic.
+
+##geom_errorbar: Various ways of representing a vertical interval defined by x, ymin and ymax.
+#geom_crossbar #geom_errorbar #geom_linerange #geom_pointrange
+@ 
+    \subsection{page 60}
+<<chebconf,eval=FALSE,results='hide'>>=
+cheb.conf <- function(N,epsilon,v1,v0,p){
+  return(1-(v1/p+v0/(1-p))/(N*epsilon^2))
+}
+
+cheb.conf.1 <- function(k,simuls.ww){
+  return(cheb.conf(as.numeric(names(simuls.ww)[[k]]),
+                   precision$precision[which(precision$N==as.numeric(names(simuls.ww)[[k]]))],
+                   simuls.ww[[k]][1,'V1'],simuls.ww[[k]][1,'V0'],simuls.ww[[k]][1,'p']))
+}
+
+cheb.conf.line <- function(k,N,simuls.ww){
+  return(cheb.conf(as.numeric(N),precision$precision[which(precision$N==N)],
+                   simuls.ww[[as.character(N)]][k,'V1'],simuls.ww[[as.character(N)]][k,'V0'],
+                   simuls.ww[[as.character(N)]][k,'p']))
+}
+
+cheb.conf.mean <- function(k,simuls.ww){
+  return(mean(sapply(1:nrow(simuls.ww[[k]]),cheb.conf.line,simuls.ww=simuls.ww,
+                     N=as.numeric(names(simuls.ww)[[k]]))))
+}
+
+# I compute the precision for the first sample of each draw and the average sample size over draws
+precision$cheb.conf.1 <- sapply(1:length(simuls.ww),cheb.conf.1,simuls.ww=simuls.ww)
+precision$cheb.conf.mean <- sapply(1:length(simuls.ww),cheb.conf.mean,simuls.ww=simuls.ww)
+precision$conf.true <- rep(delta,nrow(precision))
+@
+
+<<conf.cheb,dependson='monte.carlo',eval=FALSE,results='hide',warning=FALSE,error=FALSE,message=FALSE,fig.cap='Confidence',fig.align='center',out.width='.65\\textwidth',fig.pos='htbp'>>=
+# Estimating confidence using Chebyshev: Illustration
+conf.t <- cbind(precision[,c('N','conf.true')],rep('Truth',length(precision$N)))
+colnames(conf.t) <- c('N','Confidence','Method')
+conf.1 <- cbind(precision[,c('N','cheb.conf.1')],rep('Cheb.1',length(precision$N)))
+colnames(conf.1) <- c('N','Confidence','Method')
+conf.mean <- cbind(precision[,c('N','cheb.conf.mean')],rep('Cheb.mean',length(precision$N)))
+colnames(conf.mean) <- c('N','Confidence','Method')
+conf.cheb <- as.data.frame(rbind(conf.t,conf.1,conf.mean))
+conf.cheb$N <- factor(conf.cheb$N,levels=sort(levels(as.factor(conf.cheb$N))))
+
+ggplot(conf.cheb, aes(x=N, y=Confidence,fill=Method)) +
+  geom_bar(position=position_dodge(), stat="identity", colour='black') #+
+#  scale_y_continuous(trans='log10')
+@
+    \subsection{page 64}
+<<chebprec,eval=FALSE,results='hide'>>=
+cheb.prec <- function(N,delta,v1,v0,p){
+  return(2*sqrt((v1/p+v0/(1-p))/(N*(1-delta))))
+}
+
+cheb.prec.1 <- function(k,delta,simuls.ww){
+  return(cheb.prec(as.numeric(names(simuls.ww)[[k]]),delta,simuls.ww[[k]][1,'V1'],
+                   simuls.ww[[k]][1,'V0'],simuls.ww[[k]][1,'p']))
+}
+
+cheb.prec.line <- function(k,delta,simuls.ww,N){
+  return(cheb.prec(as.numeric(N),delta,simuls.ww[[as.character(N)]][k,'V1'],
+                   simuls.ww[[as.character(N)]][k,'V0'],simuls.ww[[as.character(N)]][k,'p']))
+}
+
+cheb.prec.mean <- function(k,delta,simuls.ww){
+  return(mean(sapply(1:nrow(simuls.ww[[k]]),cheb.prec.line,delta=delta,simuls.ww=simuls.ww,
+                     N=as.numeric(names(simuls.ww)[[k]]))))
+}
+
+# I compute the precision for the first sample of each draw and the average sample size over draws
+precision$precision.cheb.1 <- sapply(1:length(simuls.ww),cheb.prec.1,delta=delta,simuls.ww=simuls.ww)
+precision$precision.cheb.mean <- sapply(1:length(simuls.ww),cheb.prec.mean,delta=delta,
+                                        simuls.ww=simuls.ww)
+@ 
+
+<<precision.cheb,dependson='monte.carlo',eval=FALSE,results='hide',warning=FALSE,error=FALSE,message=FALSE,fig.cap='precision of the WW estimator with 99\\% confidence',fig.align='center',out.width='.65\\textwidth',fig.pos='htbp'>>=
+# Estimating sampling noise using Chebyshev: Illustration
+ggplot(precision, aes(x=as.factor(N), y=TT)) +
+  geom_bar(position=position_dodge(), stat="identity", colour='black') +
+  geom_errorbar(aes(ymin=TT-precision/2, ymax=TT+precision/2), width=.2,
+                position=position_dodge(.9),color='red') +
+  geom_errorbar(aes(ymin=TT-precision.cheb.1/2, ymax=TT+precision.cheb.1/2), 
+                width=.2,position=position_dodge(.9),color='blue') +
+  geom_errorbar(aes(ymin=TT-precision.cheb.mean/2, ymax=TT+precision.cheb.mean/2), 
+                width=.2,position=position_dodge(.9),color='green') +
+  xlab("Sample Size") 
+@
+    \subsection{page 65}
+<<chebsamp,eval=FALSE,results='hide'>>=
+cheb.samp <- function(epsilon,delta,v1,v0,p){
+  return((v1/p+v0/(1-p))/(epsilon^2*(1-delta)))
+}
+
+cheb.samp.1 <- function(N,delta,simuls.ww){
+  return(cheb.samp(precision$precision[which(precision$N==N)]/2,delta,
+                   simuls.ww[[as.character(N)]][1,'V1'],simuls.ww[[as.character(N)]][1,'V0'],
+                   simuls.ww[[as.character(N)]][1,'p']))
+}
+
+cheb.samp.line <- function(k,delta,simuls.ww,N){
+  return(cheb.samp(precision$precision[which(precision$N==N)]/2,delta,
+                   simuls.ww[[as.character(N)]][k,'V1'],simuls.ww[[as.character(N)]][k,'V0'],
+                   simuls.ww[[as.character(N)]][k,'p']))
+}
+
+cheb.samp.mean <- function(k,delta,simuls.ww){
+  return(mean(sapply(1:nrow(simuls.ww[[k]]),cheb.samp.line,delta=delta,simuls.ww=simuls.ww,
+                     N=as.numeric(names(simuls.ww)[[k]]))))
+}
+
+# I compute the precision for the first sample of each draw and the average precision over draws
+precision$samp.cheb.1 <- sapply(as.numeric(names(simuls.ww)),cheb.samp.1,delta=delta,
+                                simuls.ww=simuls.ww)
+precision$samp.cheb.mean <- sapply(1:length(simuls.ww),cheb.samp.mean,delta=delta,
+                                   simuls.ww=simuls.ww)
+@
+
+<<sample.cheb,dependson='monte.carlo',eval=FALSE,results='hide',warning=FALSE,error=FALSE,message=FALSE,fig.cap='Sample size',fig.align='center',out.width='.65\\textwidth',fig.pos='htbp'>>=
+# Estimating sample size using Chebyshev: Illustration
+samp.t <- cbind(precision[,c('N','precision')],rep('Truth',length(precision$N)))
+colnames(samp.t) <- c('N','precision','Method')
+samp.1 <- cbind(precision[,c('samp.cheb.1','precision')],rep('Cheb.1',length(precision$N)))
+colnames(samp.1) <- c('N','precision','Method')
+samp.mean <- cbind(precision[,c('samp.cheb.mean','precision')],
+                   rep('Cheb.mean',length(precision$N)))
+colnames(samp.mean) <- c('N','precision','Method')
+sample.size <- as.data.frame(rbind(samp.t,samp.1,samp.mean))
+sample.size$precision <- as.character(round(sample.size$precision,digits=2))
+sample.size$precision <- factor(sample.size$precision,
+                                levels=sort(levels(as.factor(sample.size$precision)),decreasing=T))
+
+ggplot(sample.size, aes(x=precision, y=N,fill=Method)) +
+  geom_bar(position=position_dodge(), stat="identity", colour='black') #+
+#  scale_y_continuous(trans='log10')
+@
+    \subsection{page 87}
+<<asym.monte.carlo.hist,dependson='monte.carlo',eval=FALSE,warning=FALSE,error=FALSE,message=FALSE,results='hide',fig.cap='Distribution of the $WW$ estimator over replications of samples of different sizes with the normal approximation using the first sample',fig.align='center',out.width='.65\\textwidth',fig.pos='htbp'>>=
+# Asymptotic Approximation of Sampling Noise: Illustration
+CLT.se <- function(N,v1,v0,p){
+  return(sqrt((v1/p+v0/(1-p))/N))
+}
+
+par(mfrow=c(2,2))
+for (i in 1:length(simuls.ww)){
+  hist(simuls.ww[[i]][,'WW'],main=paste('N=',as.character(N.sample[i])),
+       xlab=expression(hat(Delta^yWW)),xlim=c(-0.15,0.55),prob=T)
+  curve(dnorm(x, mean=delta.y.ate(param), sd=CLT.se(as.numeric(names(simuls.ww)[[i]]),
+                                                    simuls.ww[[i]][1,'V1'],
+                                                    simuls.ww[[i]][1,'V0'],simuls.ww[[i]][1,'p'])),
+        col="darkblue", lwd=2, add=TRUE, yaxt="n")
+  abline(v=delta.y.ate(param),col="red")
+}
+@ 
+    \subsection{page 90}
+<<CLTconf,eval=FALSE,results='hide'>>=
+CLT.conf <- function(N,epsilon,v1,v0,p){
+  return(2*pnorm(epsilon/sqrt((v1/p+v0/(1-p))/N))-1)
+}
+
+CLT.conf.1 <- function(k,simuls.ww){
+  return(CLT.conf(as.numeric(names(simuls.ww)[[k]]),
+                  precision$precision[which(precision$N==as.numeric(names(simuls.ww)[[k]]))],
+                  simuls.ww[[k]][1,'V1'],simuls.ww[[k]][1,'V0'],simuls.ww[[k]][1,'p']))
+}
+
+CLT.conf.line <- function(k,N,simuls.ww){
+  return(CLT.conf(as.numeric(N),precision$precision[which(precision$N==N)],
+                  simuls.ww[[as.character(N)]][k,'V1'],simuls.ww[[as.character(N)]][k,'V0'],
+                  simuls.ww[[as.character(N)]][k,'p']))
+}
+
+CLT.conf.mean <- function(k,simuls.ww){
+  return(mean(sapply(1:nrow(simuls.ww[[k]]),CLT.conf.line,simuls.ww=simuls.ww,
+                     N=as.numeric(names(simuls.ww)[[k]]))))
+}
+
+# I compute the precision for the first sample of each draw and the average sample size over draws
+precision$CLT.conf.1 <- sapply(1:length(simuls.ww),CLT.conf.1,simuls.ww=simuls.ww)
+precision$CLT.conf.mean <- sapply(1:length(simuls.ww),CLT.conf.mean,simuls.ww=simuls.ww)
+precision$CLT.conf.true <- rep(delta,nrow(precision))
+@
+
+<<conf.CLT,dependson='monte.carlo',eval=FALSE,results='hide',warning=FALSE,error=FALSE,message=FALSE,fig.cap='CLT Estimates of the Confidence Level',fig.align='center',out.width='.65\\textwidth',fig.pos='htbp'>>=
+# Estimating confidence using CLT: Illustration
+conf.t <- cbind(precision[,c('N','conf.true')],rep('Truth',length(precision$N)))
+colnames(conf.t) <- c('N','Confidence','Method')
+conf.1 <- cbind(precision[,c('N','CLT.conf.1')],rep('CLT.1',length(precision$N)))
+colnames(conf.1) <- c('N','Confidence','Method')
+conf.mean <- cbind(precision[,c('N','CLT.conf.mean')],rep('CLT.mean',length(precision$N)))
+colnames(conf.mean) <- c('N','Confidence','Method')
+conf.CLT <- as.data.frame(rbind(conf.t,conf.1,conf.mean))
+conf.CLT$N <- factor(conf.CLT$N,levels=sort(levels(as.factor(conf.CLT$N))))
+
+ggplot(conf.CLT, aes(x=N, y=Confidence,fill=Method)) +
+  geom_bar(position=position_dodge(), stat="identity", colour='black') #+
+#  scale_y_continuous(trans='log10')
+@
+    \subsection{page 92}
+<<CLTprec,eval=FALSE,results='hide'>>=
+CLT.prec <- function(N,delta,v1,v0,p){
+  return(2*qnorm((delta+1)/2)*sqrt((v1/p+v0/(1-p))/N))
+}
+
+CLT.prec.1 <- function(k,delta,simuls.ww){
+  return(CLT.prec(as.numeric(names(simuls.ww)[[k]]),delta,simuls.ww[[k]][1,'V1'],
+                  simuls.ww[[k]][1,'V0'],simuls.ww[[k]][1,'p']))
+}
+
+CLT.prec.line <- function(k,delta,simuls.ww,N){
+  return(CLT.prec(as.numeric(N),delta,simuls.ww[[as.character(N)]][k,'V1'],
+                  simuls.ww[[as.character(N)]][k,'V0'],simuls.ww[[as.character(N)]][k,'p']))
+}
+
+CLT.prec.mean <- function(k,delta,simuls.ww){
+  return(mean(sapply(1:nrow(simuls.ww[[k]]),CLT.prec.line,delta=delta,simuls.ww=simuls.ww,
+                     N=as.numeric(names(simuls.ww)[[k]]))))
+}
+
+# I compute the precision for the first sample of each draw and the average sample size over draws
+precision$precision.CLT.1 <- sapply(1:length(simuls.ww),CLT.prec.1,delta=delta,simuls.ww=simuls.ww)
+precision$precision.CLT.mean <- sapply(1:length(simuls.ww),CLT.prec.mean,delta=delta,simuls.ww=simuls.ww)
+@
+
+<<precision.CLT,dependson='monte.carlo',eval=FALSE,results='hide',warning=FALSE,error=FALSE,message=FALSE,fig.cap='precision of the WW estimator with 99\\% confidence',fig.align='center',out.width='.65\\textwidth',fig.pos='htbp'>>=
+# Estimating precision using CLT: Illustration
+ggplot(precision, aes(x=as.factor(N), y=TT)) +
+  geom_bar(position=position_dodge(), stat="identity", colour='black') +
+  geom_errorbar(aes(ymin=TT-precision/2, ymax=TT+precision/2), width=.2,
+                position=position_dodge(.9),color='red') +
+  geom_errorbar(aes(ymin=TT-precision.CLT.1/2, ymax=TT+precision.CLT.1/2), 
+                width=.2,position=position_dodge(.9),color='blue') +
+  geom_errorbar(aes(ymin=TT-precision.CLT.mean/2, ymax=TT+precision.CLT.mean/2), 
+                width=.2,position=position_dodge(.9),color='green') +
+  xlab("Sample Size") 
+@
+    \subsection{page 94}
+<<CLTsamp,eval=FALSE,results='hide'>>=
+CLT.samp <- function(epsilon,delta,v1,v0,p){
+  return((1/(epsilon^2))*(qnorm((delta+1)/2))^2*(v1/p+v0/(1-p)))
+}
+
+CLT.samp.1 <- function(N,delta,simuls.ww){
+  return(CLT.samp(precision$precision[which(precision$N==N)]/2,delta,
+                  simuls.ww[[as.character(N)]][1,'V1'],simuls.ww[[as.character(N)]][1,'V0'],
+                  simuls.ww[[as.character(N)]][1,'p']))
+}
+
+CLT.samp.line <- function(k,delta,simuls.ww,N){
+  return(CLT.samp(precision$precision[which(precision$N==N)]/2,delta,
+                  simuls.ww[[as.character(N)]][k,'V1'],simuls.ww[[as.character(N)]][k,'V0'],
+                  simuls.ww[[as.character(N)]][k,'p']))
+}
+
+CLT.samp.mean <- function(k,delta,simuls.ww){
+  return(mean(sapply(1:nrow(simuls.ww[[k]]),CLT.samp.line,delta=delta,simuls.ww=simuls.ww,
+                     N=as.numeric(names(simuls.ww)[[k]]))))
+}
+
+# I compute the precision for the first sample of each draw and the average precision over draws
+precision$samp.CLT.1 <- sapply(as.numeric(names(simuls.ww)),CLT.samp.1,delta=delta,
+                               simuls.ww=simuls.ww)
+precision$samp.CLT.mean <- sapply(1:length(simuls.ww),CLT.samp.mean,delta=delta,
+                                  simuls.ww=simuls.ww)
+@
+
+<<sample.CLT,dependson='monte.carlo',eval=FALSE,results='hide',warning=FALSE,error=FALSE,message=FALSE,fig.cap='Sample size using CLT',fig.align='center',out.width='.65\\textwidth',fig.pos='htbp'>>=
+# Estimating sample size using CLT: Illustration
+samp.t <- cbind(precision[,c('N','precision')],rep('Truth',length(precision$N)))
+colnames(samp.t) <- c('N','precision','Method')
+samp.1 <- cbind(precision[,c('samp.CLT.1','precision')],rep('CLT.1',length(precision$N)))
+colnames(samp.1) <- c('N','precision','Method')
+samp.mean <- cbind(precision[,c('samp.CLT.mean','precision')],rep('CLT.mean',length(precision$N)))
+colnames(samp.mean) <- c('N','precision','Method')
+sample.size.CLT <- as.data.frame(rbind(samp.t,samp.1,samp.mean))
+sample.size.CLT$precision <- as.character(round(sample.size.CLT$precision,digits=2))
+sample.size.CLT$precision <- factor(sample.size.CLT$precision,
+                                    levels=sort(levels(as.factor(sample.size.CLT$precision)),
+                                                decreasing=T))
+
+ggplot(sample.size.CLT, aes(x=precision, y=N,fill=Method)) +
+  geom_bar(position=position_dodge(), stat="identity", colour='black') #+
+#  scale_y_continuous(trans='log10')
+@
+    \subsection{preparation for page 98}
+<<standard.prec,eval=FALSE,results='hide'>>=
+delta.p <- 0.95
+standard.error <- function(N,v1,v0,p){
+  return(sqrt((v1/p+v0/(1-p))/N))
+}
+
+standard.error.1 <- function(k,simuls.ww){
+  return(standard.error(as.numeric(names(simuls.ww)[[k]]),simuls.ww[[k]][1,'V1'],
+                        simuls.ww[[k]][1,'V0'],simuls.ww[[k]][1,'p']))
+}
+
+standard.error.line <- function(k,simuls.ww,N){
+  return(standard.error(as.numeric(N),simuls.ww[[as.character(N)]][k,'V1'],
+                        simuls.ww[[as.character(N)]][k,'V0'],simuls.ww[[as.character(N)]][k,'p']))
+}
+
+for (k in (1:length(simuls.ww))){
+  simuls.ww[[k]] <- as.data.frame(simuls.ww[[k]])
+  simuls.ww[[k]]$s.e. <-sapply(1:nrow(simuls.ww[[k]]),standard.error.line,simuls.ww=simuls.ww,
+                               N=as.numeric(names(simuls.ww)[[k]]))
+  simuls.ww[[k]]$t.stat <- simuls.ww[[k]]$WW/simuls.ww[[k]]$s.e.
+  simuls.ww[[k]]$p.value.two.sided <- 2*(1-pnorm(abs(simuls.ww[[k]]$t.stat)))
+  simuls.ww[[k]]$p.value.one.sided <- 1-pnorm(simuls.ww[[k]]$t.stat)
+  simuls.ww[[k]]$C.I.min <- simuls.ww[[k]]$WW-qnorm((1+delta.p)/2)*simuls.ww[[k]]$s.e.
+  simuls.ww[[k]]$C.I.max <- simuls.ww[[k]]$WW+qnorm((1+delta.p)/2)*simuls.ww[[k]]$s.e.
+  simuls.ww[[k]]$precision <- 2*qnorm((1+delta.p)/2)*simuls.ww[[k]]$s.e.
+}
+@
+    \subsection{page 102}
+<<pvalues.CLT,dependson='monte.carlo',eval=FALSE,results='hide',warning=FALSE,error=FALSE,message=FALSE,fig.cap='Two-sided P-values using CLT',fig.align='center',out.width='.65\\textwidth',fig.pos='htbp'>>=
+# Statistically Significant Results Are Biased
+par(mfrow=c(2,2))
+for (i in 1:length(simuls.ww)){
+  plot(simuls.ww[[i]][,'WW'],simuls.ww[[i]][,'p.value.two.sided'],
+       main=paste('N=',as.character(N.sample[i])),xlab=expression(hat(Delta^yWW)),
+       ylab='P-value',xlim=c(-0.15,0.55),ylim=c(0,1))
+  abline(v=delta.y.ate(param),col="red")
+  abline(h=0.05,col="blue")
+  abline(h=0.01,col="blue")
+}
+@
+    \subsection{page 103}
+see code 2170-2178
+
+  \section{Key notions}
+Here is a summary of the suggestions I gave in class on what to include from Lecture 0 in your final report.
+
+\textbf{First, on the FPCI:}
+
+\begin{enumerate}
+  \item generate data with selection rule $\text{D_i & = \uns{y_i^B\leq\bar{y}} }$
+  \item plot potential outcomes and observed outcomes
+  \item Compute individual level treatment effects in the sample
+  \item Compute the average treatment effect on the treated in the sample by taking the average of the individual level treatment effects of the treated
+  \item Compare its value with the theoretical one in the population (using the formula)
+  \item Compute the WW estimator in the sample
+  \item Compute Selection Bias
+  \item Compare its value to the theoretical one in the sample
+  \item Compute the BA estimator in the sample
+  \item Compute its bias
+\end{enumerate}
+
+\textbf{Second, on the FPSI:}
+
+\begin{enumerate}
+  \item generate data with selection rule $\text{D_i & = \uns{V_i\leq\bar{y}} }$
+  \item Plot potential outcoumes and observed outcomes
+  \item Compute Individual level treatment effects in the sample
+  \item Compute TT in the sample
+  \item Compare with the theoretical value in the population
+  \item Compute the WW estimator
+  \item Compute the OLS of beta in $\text{y_i & = \alpha + \beta D_i + U_i}$
+  \item Compare beta and WW (they should be equal)
+  \item Use the CLT formula to estimate the effect of sampling noise on WW with 99\% confidence. For this, estimate the variances of the outcomes of the treated and of the untreated in the sample. Do you find a result similar to mine?
+  \item Estimate sampling noise using the same formula but for a confidence of 95\%. Has sampling noise increased or decreased?
+  \item Use the CLT formula to compute the sample size required to reach the amount of sampling noise that you have derived in question 9 with 99\% confidence. For this, use the variance of $\text{y^B}$ for the treated and untreated as an estimate of the two variances. Do you find a results similar to mine?
+  \item What happens to sample size if you use the same variance (that of $\text{y^B}$ overall)?
+  \item Estimate sample size with a smaller sampling noise but the same level of confidence. Does sampe size increase or decrease?
+  \item Estimate sample size with 95\% confidence for the same values of sampling noise as in questions 11 and 13. Does sample size increase or decrease?
+\end{enumerate}
+
+\textbf{Bonus:}
+
+\begin{enumerate}
+  \item Implement the montecarlo simulations of my slides to gauge the true extent of sampling noise.
+  \item In the simuations, replace the normal shocks by students or Gamma or Cauchy shocks and see what happens to the CLT approximation.
+  \item Use bootstrap (or another resampling procedure) to approximate sampling noise for the WW estimator.
+\end{enumerate}
+
+    \subsection{FPCI}
+      \subsubsection{Rubin Causal Model}
+        \paragraph{Potential Outcomes:}
+\begin{itemize}
+		\item $Y_i^1$: outcome we would observe if unit $i$ was given the treatment
+		\item $Y_i^0$: outcome we would observe if unit $i$ was NOT given the treatment
+\end{itemize}
+
+        \paragraph{Individual Level Causal Effect:}
+\Delta_i^Y & =Y_i^1 -Y^0_i
+
+
+
+
+
+
+
+
 \end{document}
