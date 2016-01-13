@@ -808,7 +808,7 @@ Two very intuitive comparisons:
 
       \subsubsection{Bias of Intuitive Comparisons: Selection Bias}
 \begin{align*}
-  \ \ \ \ \
+  \ \ \ \
   \Delta^Y_{WW} & = \esp{Y_i|D_i=1} - \esp{Y_i|D_i=0} \\
                 & = \esp{Y^1_i|D_i=1} -\esp{Y^0_i|D_i=1} + \esp{Y^0_i|D_i=1} - \esp{Y^0_i|D_i=0} \\
                 & = \Delta^Y_{TT} + \underbrace{\esp{Y^0_i|D_i=1} - \esp{Y^0_i|D_i=0}}_{\text{Selection Bias}}\\
@@ -836,11 +836,11 @@ Two very intuitive comparisons:
   \end{align*}
   
       \subsubsection{How Can We Estimate Sampling Noise?}
-\begin{enumerate}
+\begin{itemize}
   \item Upper bound using Chebyshev's inequality
   \item Approximation using CLT (asymptotic)
   \item Approximation using resampling methods (bootstrap, resampling)
-\end{enumerate}
+\end{itemize}
 
       \subsubsection{Theorem: Chebyshev's Inequality}
 For any random variable $\hat{\theta}$ and constant $\epsilon>0$, we have that:\\
@@ -867,17 +867,14 @@ $\var{Y_i^1|D_i=1}$ and $\var{Y_i^0|D_i=0}$ are finite.
 
       \subsubsection{Where it OLS Makes Sense: WW is OLS!}
 Lemma (WW is OLS) \\
-Under the \emph{Full Rank} Assumption, the OLS coefficient $\beta$ in the following regression: \\
-
+Under the \emph{Full Rank} Assumption, the OLS coefficient $\beta$ in the following regression:\\
 \begin{align*}
 \centerline{Y_i &  = \alpha +  \beta D_i + U_i}
 \end{align*}
-
 is the WW estimator:\\
 
 \begin{align*}
 \centerline{\large\hat{\beta}_{OLS} & = \frac{\frac{1}{N}\sum_{i=1}^N\left(Y_i-\frac{1}{N}\sum_{i=1}^NY_i\right)\left(D_i-\frac{1}{N}\sum_{i=1}^ND_i\right)}{\frac{1}{N}\sum_{i=1}^N\left(D_i-\frac{1}{N}\sum_{i=1}^ND_i\right)^2} & = \hat{\Delta^Y_{WW}}}
-  							
 \end{align*}
 
       \subsubsection{Theorem: Asymptotic Confidence Level of WW}
