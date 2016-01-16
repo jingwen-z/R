@@ -1,0 +1,120 @@
+\documentclass[12pt,a4paper]{book}
+
+<<libraries,eval=TRUE,include=FALSE>>=
+library(MASS)
+library(RColorBrewer)
+library(gplots)
+library(snowfall)
+library(ggplot2)
+library(xtable)
+@
+
+\usepackage{geometry}
+\geometry{left=2cm,right=2cm,top=2cm,bottom=2cm}
+\renewcommand{\baselinestretch}{1.3}
+
+\usepackage{graphicx}
+
+% sous titres
+\usepackage{subfig}
+
+% package to generate commands with double letters in maths
+\usepackage{dsfont}
+\newcommand{\uns}[1]{\mathds{1}[ #1 ]}
+\newcommand{\esp}[1]{\mathbb{E}[ #1 ]}
+\newcommand{\var}[1]{\mathbb{V}[ #1 ]}
+\newcommand\Ind{\protect\mathpalette{\protect\independenT}{\perp}}
+
+
+\begin{document}
+\title{EPE Data Analysis}
+\author{\textbf{Jingwen ZHENG}\\ Toulouse School of Economics\\ M2 ERNA}
+\maketitle
+
+
+  \chapter{The Two Fundamental Problems of Inference}
+    \section{The Fundamental Problem of Causal Inference}  
+
+      \subsection{generate data with selection rule $D_i = \uns{y_i^B\leq\bar{y}}$}
+
+<<param,eval=TRUE,echo=FALSE,results='hide'>>=
+param <- c(7,.77,.1,1700,0.5,0.1,0.05,0.07,0.05,0.01)
+names(param) <- c("barmu","sigma2mu","sigma2U","barY","rho","theta","sigma2epsilon","sigma2eta","delta","baralpha")
+@
+
+<<delta.y.tt,eval=TRUE,echo=FALSE,results='hide'>>=
+delta.y.tt <- function(param){
+  return(param["baralpha"]+param["theta"]*param["barmu"]-param["theta"]*((param["sigma2mu"]*dnorm((log(param["barY"])-param["barmu"])/(sqrt(param["sigma2mu"]+param["sigma2U"]))))/(sqrt(param["sigma2mu"]+param["sigma2U"])*pnorm((log(param["barY"])-param["barmu"])/(sqrt(param["sigma2mu"]+param["sigma2U"]))))))
+}
+@
+
+<<simul,eval=TRUE,echo=FALSE,results='hide'>>=
+set.seed(6789)
+N <-2000
+mu <- rnorm(N,param["barmu"],sqrt(param["sigma2mu"]))
+UB <- rnorm(N,0,sqrt(param["sigma2U"]))
+yB <- mu + UB 
+Ds <- rep(0,N)
+Ds[yB<=log(param["barY"])] <- 1 
+epsilon <- rnorm(N,0,sqrt(param["sigma2epsilon"]))
+eta<- rnorm(N,0,sqrt(param["sigma2eta"]))
+U0 <- param["rho"]*UB + epsilon
+y0 <- mu +  U0 + param["delta"]
+alpha <- param["baralpha"]+  param["theta"]*mu + eta
+y1 <- y0+alpha
+Y0 <- exp(y0)
+Y1 <- exp(y1)
+y <- y1*Ds+y0*(1-Ds)
+Y <- Y1*Ds+Y0*(1-Ds)
+@
+
+      \subsection{plot potential outcomes and observed outcomes}
+<<Pot. and obs. outcomes,eval=TRUE,fig.cap='Potential outcomes and observed outcomes',fig.subcap=c('Potential outcomes','Observed outcomes'),fig.align='center',out.width='.5\\textwidth',echo=FALSE,results='hide',fig.pos='htbp'>>=
+col.obs <- 'black'
+col.unobs <- 'red'
+
+plot(yB[Ds==0],y0[Ds==0],pch=1,xlim=c(5,11),ylim=c(5,11),xlab="yB",ylab="Outcomes")
+points(yB[Ds==1],y1[Ds==1],pch=3)
+points(yB[Ds==0],y1[Ds==0],pch=3,col=col.unobs)
+points(yB[Ds==1],y0[Ds==1],pch=1,col=col.unobs)
+abline(v=log(param["barY"]),col=col.unobs)
+legend(5,11,c('y0|D=0','y1|D=1','y0|D=1','y1|D=0'),pch=c(1,3,1,3),col=c(col.obs,col.obs,col.unobs,col.unobs),ncol=2)
+
+plot(yB[Ds==0],y0[Ds==0],pch=1,xlim=c(5,11),ylim=c(5,11),xlab="yB",ylab="Outcomes")
+points(yB[Ds==1],y1[Ds==1],pch=3)
+legend(5,11,c('y|D=0','y|D=1'),pch=c(1,3))
+abline(v=log(param["barY"]),col=col.unobs)
+@      
+\clearpage
+      
+      \subsection{Compute individual level treatment effects in the sample}
+      
+In order to compute individual level treatment effects in the sample, I use the formula: \\ 
+\centerline{$\Delta_i^Y & =Y_i^1 -Y^0_i$} 
+
+<<ind.tt,eval=TRUE,echo=FALSE>>=
+it<- y1-y0
+@
+
+\noindent{Here, I get the individual level treatment effects is \Sexpr{it[1:2000]}.}
+\clearpage
+
+      \subsection{Compute the average treatment effect on the treated in the sample by taking the average of the individual level treatment effects of the treated}
+  
+<<avg.tt,eval=TRUE,echo=FALSE>>=
+avg.tt<-mean(it)
+@
+By computing the average of the individual level treatment effects of the treated, I get the average treatment effect on the treated in the sample is \textbf{\Sexpr{avg.tt}}.
+
+      \subsection{Compare its value with the theoretical one in the population}
+According to the course, we learnt the theoretical average treatment effect with the following formula:\\
+\centerline{$\Large\Delta_{TT}^y & =\bar{\alpha}+\theta\bar{\mu} -\theta\frac{\sigma^2_{\mu}}{\sqrt{\sigma^2_{\mu}+\sigma^2_{U}}}\frac{\phi\left(\frac{\bar{y}-\bar{\mu}}{\sqrt{\sigma^2_{\mu}+\sigma^2_{U}}}\right)}{\Phi\left(\frac{\bar{y}-\bar{\mu}}{\sqrt{\sigma^2_{\mu}+\sigma^2_{U}}}\right)}$}\\
+
+<<theo.avg.tt,eval=TRUE,echo=FALSE>>=
+theo.avg.tt<-delta.y.tt(param)
+@
+
+\noindent{Thus, I get the theoretical average treatment effect is \textbf{\Sexpr{theo.avg.tt}}.}
+
+
+\end{document}
