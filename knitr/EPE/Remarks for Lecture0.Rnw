@@ -101,9 +101,8 @@ N <-1000
 mu <- rnorm(N,param["barmu"],sqrt(param["sigma2mu"]))
 UB <- rnorm(N,0,sqrt(param["sigma2U"]))
 yB <- mu + UB 
-YB <- exp(yB)
 Ds <- rep(0,N)
-Ds[YB<=param["barY"]] <- 1 
+Ds[yB<=log(param["barY"])] <- 1 
 epsilon <- rnorm(N,0,sqrt(param["sigma2epsilon"]))
 eta<- rnorm(N,0,sqrt(param["sigma2eta"]))
 U0 <- param["rho"]*UB + epsilon
