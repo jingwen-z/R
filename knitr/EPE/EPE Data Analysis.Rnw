@@ -15,11 +15,15 @@ library(xtable)
 
 \usepackage{graphicx}
 
+%The bm package defines a command \bm which makes its argument bold. The argument may be any maths object from a single symbol to an expression.
+\usepackage{bm}
+
 % sous titres
 \usepackage{subfig}
 
 % package to generate commands with double letters in maths
 \usepackage{dsfont}
+\usepackage{amsfonts}
 \newcommand{\uns}[1]{\mathds{1}[ #1 ]}
 \newcommand{\esp}[1]{\mathbb{E}[ #1 ]}
 \newcommand{\var}[1]{\mathbb{V}[ #1 ]}
@@ -48,16 +52,16 @@ delta.y.tt <- function(param){
 }
 @
 
-<<simul,eval=TRUE,echo=FALSE,results='hide'>>=
+<<data.FPCI,eval=TRUE,echo=FALSE,results='hide'>>=
 set.seed(6789)
-N <-2000
-mu <- rnorm(N,param["barmu"],sqrt(param["sigma2mu"]))
-UB <- rnorm(N,0,sqrt(param["sigma2U"]))
+NC <-2000
+mu <- rnorm(NC,param["barmu"],sqrt(param["sigma2mu"]))
+UB <- rnorm(NC,0,sqrt(param["sigma2U"]))
 yB <- mu + UB 
-Ds <- rep(0,N)
+Ds <- rep(0,NC)
 Ds[yB<=log(param["barY"])] <- 1 
-epsilon <- rnorm(N,0,sqrt(param["sigma2epsilon"]))
-eta<- rnorm(N,0,sqrt(param["sigma2eta"]))
+epsilon <- rnorm(NC,0,sqrt(param["sigma2epsilon"]))
+eta<- rnorm(NC,0,sqrt(param["sigma2eta"]))
 U0 <- param["rho"]*UB + epsilon
 y0 <- mu +  U0 + param["delta"]
 alpha <- param["baralpha"]+  param["theta"]*mu + eta
@@ -69,20 +73,20 @@ Y <- Y1*Ds+Y0*(1-Ds)
 @
 
       \subsection{plot potential outcomes and observed outcomes}
-<<Pot. and obs. outcomes,eval=TRUE,fig.cap='Potential outcomes and observed outcomes',fig.subcap=c('Potential outcomes','Observed outcomes'),fig.align='center',out.width='.5\\textwidth',echo=FALSE,results='hide',fig.pos='htbp'>>=
+<<Pot.obs.out.FPCI,eval=TRUE,fig.cap='Potential outcomes and observed outcomes',fig.subcap=c('Potential outcomes','Observed outcomes'),fig.align='center',out.width='.5\\textwidth',echo=FALSE,results='hide',fig.pos='htbp'>>=
 col.obs <- 'black'
 col.unobs <- 'red'
 
-plot(yB[Ds==0],y0[Ds==0],pch=1,xlim=c(5,11),ylim=c(5,11),xlab="yB",ylab="Outcomes")
+plot(yB[Ds==0],y0[Ds==0],pch=1,xlim=c(4,11),ylim=c(4,11),xlab="yB",ylab="Outcomes")
 points(yB[Ds==1],y1[Ds==1],pch=3)
 points(yB[Ds==0],y1[Ds==0],pch=3,col=col.unobs)
 points(yB[Ds==1],y0[Ds==1],pch=1,col=col.unobs)
 abline(v=log(param["barY"]),col=col.unobs)
-legend(5,11,c('y0|D=0','y1|D=1','y0|D=1','y1|D=0'),pch=c(1,3,1,3),col=c(col.obs,col.obs,col.unobs,col.unobs),ncol=2)
+legend(4,11,c('y0|D=0','y1|D=1','y0|D=1','y1|D=0'),pch=c(1,3,1,3),col=c(col.obs,col.obs,col.unobs,col.unobs),ncol=2)
 
-plot(yB[Ds==0],y0[Ds==0],pch=1,xlim=c(5,11),ylim=c(5,11),xlab="yB",ylab="Outcomes")
+plot(yB[Ds==0],y0[Ds==0],pch=1,xlim=c(4,11),ylim=c(4,11),xlab="yB",ylab="Outcomes")
 points(yB[Ds==1],y1[Ds==1],pch=3)
-legend(5,11,c('y|D=0','y|D=1'),pch=c(1,3))
+legend(4,11,c('y|D=0','y|D=1'),pch=c(1,3))
 abline(v=log(param["barY"]),col=col.unobs)
 @      
 \clearpage
@@ -90,13 +94,13 @@ abline(v=log(param["barY"]),col=col.unobs)
       \subsection{Compute individual level treatment effects in the sample}
       
 In order to compute individual level treatment effects in the sample, I use the formula: \\ 
-\centerline{$\Delta_i^Y & =Y_i^1 -Y^0_i$} 
+\centerline{$\Delta_i^Y =Y_i^1 -Y^0_i$} 
 
-<<ind.tt,eval=TRUE,echo=FALSE>>=
+<<ind.tt.NC,eval=TRUE,echo=FALSE>>=
 it<- y1-y0
 @
 
-\noindent{Here, I get the individual level treatment effects is \Sexpr{it[1:2000]}.}
+\noindent{Here, I get the individual level treatment effects is \Sexpr{it[1:NC]}.}
 \clearpage
 
       \subsection{Compute the average treatment effect on the treated in the sample by taking the average of the individual level treatment effects of the treated}
@@ -108,13 +112,155 @@ By computing the average of the individual level treatment effects of the treate
 
       \subsection{Compare its value with the theoretical one in the population}
 According to the course, we learnt the theoretical average treatment effect with the following formula:\\
-\centerline{$\Large\Delta_{TT}^y & =\bar{\alpha}+\theta\bar{\mu} -\theta\frac{\sigma^2_{\mu}}{\sqrt{\sigma^2_{\mu}+\sigma^2_{U}}}\frac{\phi\left(\frac{\bar{y}-\bar{\mu}}{\sqrt{\sigma^2_{\mu}+\sigma^2_{U}}}\right)}{\Phi\left(\frac{\bar{y}-\bar{\mu}}{\sqrt{\sigma^2_{\mu}+\sigma^2_{U}}}\right)}$}\\
+\centerline{$\Large\Delta_{TT}^y =\bar{\alpha}+\theta\bar{\mu} -\theta\displaystyle\frac{\sigma^2_{\mu}}{\sqrt{\sigma^2_{\mu}+\sigma^2_{U}}}\frac{\displaystyle\phi\left(\frac{\bar{y}-\bar{\mu}}{\sqrt{\sigma^2_{\mu}+\sigma^2_{U}}}\right)}{\displaystyle\Phi\left(\frac{\bar{y}-\bar{\mu}}{\sqrt{\sigma^2_{\mu}+\sigma^2_{U}}}\right)}$}\\
 
 <<theo.avg.tt,eval=TRUE,echo=FALSE>>=
 theo.avg.tt<-delta.y.tt(param)
 @
 
-\noindent{Thus, I get the theoretical average treatment effect is \textbf{\Sexpr{theo.avg.tt}}.}
+\noindent{Thus, I get the theoretical average treatment effect is \textbf{\Sexpr{theo.avg.tt}}, which is smaller than the value of last question.}
+
+      \subsection{Compute the WW estimator in the sample}
+In order to compute the WW estimator in the sample, I use the formula:\\
+\centerline{$\Delta^Y_{WW} = \esp{Y_i|D_i=1} - \esp{Y_i|D_i=0}$}
+
+<<WW.esti,eval=TRUE,echo=FALSE>>=
+WW.esti<-mean(y[Ds==1])-mean(y[Ds==0])
+@
+
+\noindent{Here, I get the WW estimator in the sample is $\bm{\Sexpr{WW.esti}}$.}
+
+      \subsection{Compute Selection Bias}
+According to the course, we get that $\Delta^Y_{WW} = \Delta^Y_{TT} + \Delta^Y_{SB}$, so $\Delta^Y_{SB} = \Delta^Y_{WW} - \Delta^Y_{TT}$ . 
+
+<<SB,eval=TRUE,echo=FALSE>>=
+SB<-abs(WW.esti-avg.tt)
+@
+
+\noindent{With the $\Delta^Y_{TT}$ and $\Delta^Y_{WW}$ that I got before, I can get the Selecton Bias is $\bm{\Sexpr{SB}}$.}
+
+      \subsection{Compare its value to the theoretical one in the sample}
+According to the course, we learnt the theoretical selection bias with the following formula:\\ \\
+\centerline{$\Large\Delta_{SB}^y = -\displaystyle\frac{\sigma^2_{\mu}+\rho\sigma^2_{U}}{\sqrt{\sigma^2_{\mu}+\sigma^2_{U}}}\left(\frac{\displaystyle\phi\left(\frac{\bar{y}-\bar{\mu}}{\sqrt{\sigma^2_{\mu}+\sigma^2_{U}}}\right)}{\displaystyle\Phi\left(\frac{\bar{y}-\bar{\mu}}{\sqrt{\sigma^2_{\mu}+\sigma^2_{U}}}\right)}+\frac{\displaystyle\phi\left(\frac{\bar{y}-\bar{\mu}}{\sqrt{\sigma^2_{\mu}+\sigma^2_{U}}}\right)}{1-\displaystyle\Phi\left(\frac{\bar{y}-\bar{\mu}}{\sqrt{\sigma^2_{\mu}+\sigma^2_{U}}}\right)}\right)$} \\
+
+<<WW.SB,eval=TRUE,echo=FALSE,results='hide'>>=
+delta.y.sb <- function(param){
+  return(-(param["sigma2mu"]+param["rho"]*param["sigma2U"])/sqrt(param["sigma2mu"]+param["sigma2U"])*dnorm((log(param["barY"])-param["barmu"])/(sqrt(param["sigma2mu"]+param["sigma2U"])))*(1/pnorm((log(param["barY"])-param["barmu"])/(sqrt(param["sigma2mu"]+param["sigma2U"])))+1/(1-pnorm((log(param["barY"])-param["barmu"])/(sqrt(param["sigma2mu"]+param["sigma2U"]))))))
+}
+@
+
+<<theo.SB,eval=TRUE,echo=FALSE>>=
+theo.SB<-abs(delta.y.sb(param))
+@
+
+\noindent{Thus, I get the theoretical average treatment effect is $\bm{\Sexpr{theo.SB}}$, which is smaller than the value of last question.}
+\clearpage
+
+      \subsection{Compute the BA estimator in the sample}
+In order to compute the BA estimator in the sample, I use the formula:\\
+\centerline{$\Delta^Y_{BA} = \esp{Y_i|D_i=1} - \esp{Y_i^B|D_i=1}$}
+
+<<BA.esti,eval=TRUE,echo=FALSE>>=
+BA.esti<-mean(y[Ds==1])-mean(yB[Ds==1])
+@
+
+\noindent{Here, I get the BA estimator in the sample is $\bm{\Sexpr{BA.esti}}$.}
+
+      \subsection{Compute its bias}
+According to the course, we get that $\Delta^Y_{BA} = \Delta^Y_{TT} + \Delta^Y_{TB}$, so $\Delta^Y_{TB} = \Delta^Y_{BA} - \Delta^Y_{TT}$ . 
+
+<<TB,eval=TRUE,echo=FALSE>>=
+TB<-BA.esti-avg.tt
+@
+
+\noindent{With the $\Delta^Y_{TT}$ and $\Delta^Y_{BA}$ that I got before, I can get the Time Trend Bias is $\bm{\Sexpr{TB}}$.}
+
+
+  \section{The Fundamental Problem of Statistical Inference}
+    
+    \subsection{Generate data with selection rule $D_i = \uns{V_i\leq\bar{y}}$}
+<<param.FPSI,eval=TRUE,echo=FALSE,results='hide'>>=
+paramS <- c(5,.45,.3,600,0.8,0.06,0.05,0.2,0.05,0.1)
+names(paramS) <- c("barmu","sigma2mu","sigma2U","barY","rho","theta","sigma2epsilon","sigma2eta","delta","baralpha")
+@
+
+<<data.FPSI,eval=TRUE,echo=FALSE,results='hide'>>=
+data.FPSI<-set.seed(8778)
+NS <-1500
+mu <- rnorm(NS,paramS["barmu"],sqrt(paramS["sigma2mu"]))
+UB <- rnorm(NS,0,sqrt(paramS["sigma2U"]))
+V <- mu + UB 
+Ds <- rep(0,NS)
+Ds[V<=log(paramS["barY"])] <- 1 
+epsilon <- rnorm(NS,0,sqrt(paramS["sigma2epsilon"]))
+eta<- rnorm(NS,0,sqrt(paramS["sigma2eta"]))
+U0 <- paramS["rho"]*UB + epsilon
+y0 <- mu +  U0 + paramS["delta"]
+alpha <- paramS["baralpha"]+  paramS["theta"]*mu + eta
+y1 <- y0+alpha
+Y0 <- exp(y0)
+Y1 <- exp(y1)
+y <- y1*Ds+y0*(1-Ds)
+Y <- Y1*Ds+Y0*(1-Ds)
+@
+
+      \subsection{Plot potential outcomes and observed outcomes}
+<<Pot.obs.out.FPSI,eval=TRUE,fig.cap='Potential outcomes and observed outcomes',fig.subcap=c('Potential outcomes','Observed outcomes'),fig.align='center',out.width='.5\\textwidth',echo=FALSE,results='hide',fig.pos='htbp'>>=
+col.obs <- 'black'
+col.unobs <- 'red'
+
+plot(V[Ds==0],y0[Ds==0],pch=1,xlim=c(2,10),ylim=c(2,10),xlab="V",ylab="Outcomes")
+points(V[Ds==1],y1[Ds==1],pch=3)
+points(V[Ds==0],y1[Ds==0],pch=3,col=col.unobs)
+points(V[Ds==1],y0[Ds==1],pch=1,col=col.unobs)
+abline(v=log(paramS["barY"]),col=col.unobs)
+legend(2,10,c('y0|D=0','y1|D=1','y0|D=1','y1|D=0'),pch=c(1,3,1,3),col=c(col.obs,col.obs,col.unobs,col.unobs),ncol=2)
+
+plot(V[Ds==0],y0[Ds==0],pch=1,xlim=c(2,10),ylim=c(2,10),xlab="V",ylab="Outcomes")
+points(V[Ds==1],y1[Ds==1],pch=3)
+legend(2,10,c('y|D=0','y|D=1'),pch=c(1,3))
+abline(v=log(paramS["barY"]),col=col.unobs)
+@
+
+      \subsection{Compute Individual level treatment effects in the sample}
+In order to compute individual level treatment effects in the sample, I use the formula: \\ 
+\centerline{$\Delta_i^Y =Y_i^1 -Y^0_i$} 
+
+<<ind.tt.NS,eval=TRUE,echo=FALSE>>=
+its<- y1-y0
+@
+
+\noindent{Here, I get the individual level treatment effects are \\ \Sexpr{its[1:NS]}}
+
+      \subsection{Compute TT in the sample}
+<<avg.tt.NS,eval=TRUE,echo=FALSE>>=
+avg.tts<-mean(it)
+@
+By computing the average of the individual level treatment effects of the treated, I get the value of TT is \textbf{\Sexpr{avg.tts}}.
+
+      \subsection{Compare with the theoretical value in the population}
+According to the course, we learnt the theoretical average treatment effect with the following formula:\\
+\centerline{$\Large\Delta_{TT}^y =\bar{\alpha}+\theta\bar{\mu} -\theta\displaystyle\frac{\sigma^2_{\mu}}{\sqrt{\sigma^2_{\mu}+\sigma^2_{U}}}\frac{\displaystyle\phi\left(\frac{\bar{y}-\bar{\mu}}{\sqrt{\sigma^2_{\mu}+\sigma^2_{U}}}\right)}{\displaystyle\Phi\left(\frac{\bar{y}-\bar{\mu}}{\sqrt{\sigma^2_{\mu}+\sigma^2_{U}}}\right)}$}\\
+
+<<theo.avg.tts,eval=TRUE,echo=FALSE>>=
+theo.avg.tts<-delta.y.tt(paramS)
+@
+
+\noindent{Thus, I get the theoretical average treatment effect is \textbf{\Sexpr{theo.avg.tts}}, which is smaller than the value of last question.}
+
+      \subsection{Compute the WW estimator}
+In order to compute the WW estimator in the sample, I use the formula:\\
+\centerline{$\Delta^Y_{WW} = \esp{Y_i|D_i=1} - \esp{Y_i|D_i=0}$}
+
+<<WW.estiS,eval=TRUE,echo=FALSE>>=
+WW.estiS<-mean(y[Ds==1])-mean(y[Ds==0])
+@
+
+\noindent{Here, I get the WW estimator in the sample is $\bm{\Sexpr{WW.estiS}}$.}
+
+      \subsection{Compute the OLS of beta in $y_i = \alpha + \beta D_i + U_i$}
+According to the course, we learn the formula as following:\\ \\
+\centerline{$\Large\hat{\beta}_{OLS} = \displaystyle\frac{\frac{1}{N}\sum_{i=1}^N\left(Y_i-\frac{1}{N}\sum_{i=1}^NY_i\right)\left(D_i-\frac{1}{N}\sum_{i=1}^ND_i\right)}{\frac{1}{N}\sum_{i=1}^N\left(D_i-\frac{1}{N}\sum_{i=1}^ND_i\right)^2}$}
 
 
 \end{document}
