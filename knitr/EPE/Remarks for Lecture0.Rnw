@@ -750,7 +750,7 @@ Here is a summary of the suggestions I gave in class on what to include from Lec
 
 \begin{enumerate}
   \item generate data with selection rule $\text{D_i & = \uns{V_i\leq\bar{y}} }$
-  \item Plot potential outcoumes and observed outcomes
+  \item Plot potential outcomes and observed outcomes
   \item Compute Individual level treatment effects in the sample
   \item Compute TT in the sample
   \item Compare with the theoretical value in the population
