@@ -262,5 +262,27 @@ WW.estiS<-mean(y[Ds==1])-mean(y[Ds==0])
 According to the course, we learn the formula as following:\\ \\
 \centerline{$\Large\hat{\beta}_{OLS} = \displaystyle\frac{\frac{1}{N}\sum_{i=1}^N\left(Y_i-\frac{1}{N}\sum_{i=1}^NY_i\right)\left(D_i-\frac{1}{N}\sum_{i=1}^ND_i\right)}{\frac{1}{N}\sum_{i=1}^N\left(D_i-\frac{1}{N}\sum_{i=1}^ND_i\right)^2}$}
 
+<<btols,eval=TRUE,echo=FALSE>>=
+a<-y-sum(y)/NS
+b<-Ds-sum(Ds)/NS
+betaOLS<-(sum(a*b)/NS)/(sum(b^2)/NS)
+@
+
+\noindent{Thus, I get the value of $\hat{\beta}_{OLS}$ is $\bm{\Sexpr{betaOLS}}$, which is the same as WW.}
+
+      \subsection{Use the CLT formula to estimate the effect of sampling noise on WW with 99\% confidence. For this, estimate the variances of the outcomes of the treated and of the untreated in the sample. Do you find a result similar to mine?}
+
+According to the course, we learnt the CLT formula to estimate the effect of sampling noise on WW: \\
+\centerline{$\displaystyle\tilde{\epsilon} = \Phi^{-1}\left(\displaystyle\frac{\delta+1}{2}\right)\displaystyle\frac{1}{\sqrt{N}}\sqrt{\displaystyle\frac{\var{Y_i^1|D_i=1}}{\Pr(D_i=1)}+\displaystyle\frac{\var{Y_i^0|D_i=0}}{1-\Pr(D_i=1)}}$} \\
+
+\noindent{In order to compute the value of $\tilde{\epsilon}$, I firstly compute $\var{Y_i^1|D_i=1}$ and $\var{Y_i^0|D_i=0}$.}
+
+<<vars,eval=TRUE,echo=FALSE>>=
+var1<-var(y[Ds==1])
+var0<-var(y[Ds==0])
+@
+
+\noindent{According to R, I get $\var{Y_i^1|D_i=1}=\Sexpr{var1}$ and $\var{Y_i^0|D_i=0}=\Sexpr{var0}$.}
+
 
 \end{document}
