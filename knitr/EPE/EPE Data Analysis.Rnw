@@ -284,5 +284,135 @@ var0<-var(y[Ds==0])
 
 \noindent{According to R, I get $\var{Y_i^1|D_i=1}=\Sexpr{var1}$ and $\var{Y_i^0|D_i=0}=\Sexpr{var0}$.}
 
+<<probas,eval=TRUE,echo=FALSE>>=
+proba1<-length(Ds[Ds==1])/NS
+@
+
+\noindent{Moreover, I get $\Pr(D_i=1)=\Sexpr{proba1}$.}
+
+<<tilde.epsilon.WW,eval=TRUE,echo=FALSE>>=
+tilde.epsilon.WW<-qnorm((0.99+1)/2)*(1/NS)*sqrt((var1/proba1)+(var0/(1-proba1)))
+@
+\noindent{Finally, I estimate the effect of sampling noise on WW with 99\% confidence is $\bm{\Sexpr{tilde.epsilon.WW}}$. }
+
+\noindent{In order to show the effect of sampling noise better, I do the graph as following:}
+\clearpage
+
+<<monte.carlo,eval=TRUE,echo=FALSE,warning=FALSE,error=FALSE,message=FALSE,results='hide',cache=TRUE>>=
+monte.carlo.ww <- function(s,N,param){
+  set.seed(s)
+  mu <- rnorm(N,param["barmu"],sqrt(param["sigma2mu"]))
+  UB <- rnorm(N,0,sqrt(param["sigma2U"]))
+  yB <- mu + UB 
+  YB <- exp(yB)
+  Ds <- rep(0,N)
+  V <- rnorm(N,param["barmu"],sqrt(param["sigma2mu"]+param["sigma2U"]))
+  Ds[V<=log(param["barY"])] <- 1 
+  epsilon <- rnorm(N,0,sqrt(param["sigma2epsilon"]))
+  eta<- rnorm(N,0,sqrt(param["sigma2eta"]))
+  U0 <- param["rho"]*UB + epsilon
+  y0 <- mu +  U0 + param["delta"]
+  alpha <- param["baralpha"]+  param["theta"]*mu + eta
+  y1 <- y0+alpha
+  Y0 <- exp(y0)
+  Y1 <- exp(y1)
+  y <- y1*Ds+y0*(1-Ds)
+  Y <- Y1*Ds+Y0*(1-Ds)
+  return(c((1/sum(Ds))*sum(y*Ds)-(1/sum(1-Ds))*sum(y*(1-Ds)),var(y1[Ds==1]),var(y0[Ds==0]),mean(Ds)))
+}
+
+
+simuls.ww.N <- function(N,Nsim,param){
+  simuls.ww <- matrix(unlist(lapply(1:Nsim,monte.carlo.ww,N=N,param=param)),
+                      nrow=Nsim,ncol=4,byrow=TRUE)
+  colnames(simuls.ww) <- c('WW','V1','V0','p')
+  return(simuls.ww)
+}
+
+library(snowfall)
+
+sf.simuls.ww.N <- function(N,Nsim,param){
+  sfInit(parallel=TRUE,cpus=8)
+  sim <- matrix(unlist(sfLapply(1:Nsim,monte.carlo.ww,N=N,param=param)),nrow=Nsim,ncol=4,byrow=TRUE)
+  sfStop()
+  colnames(sim) <- c('WW','V1','V0','p')
+  return(sim)
+}
+
+Nsim <- 1000
+N.sample <- c(100,1000,10000,100000)
+
+simuls.ww <- lapply(N.sample,sf.simuls.ww.N,Nsim=Nsim,param=param)
+names(simuls.ww) <- N.sample
+@
+
+<<delta.y.ate,eval=TRUE,echo=FALSE,results='hide'>>=
+delta.y.ate <- function(paramS){
+  return(paramS["baralpha"]+paramS["theta"]*paramS["barmu"])
+}
+@
+
+<<precision,dependson='monte.carlo',eval=TRUE,echo=FALSE,results='hide',echo=FALSE,warning=FALSE,error=FALSE,message=FALSE,fig.cap='Effect of sampling noise on the precision of the WW estimator (99\\% confidence)',fig.align='center',out.width='.65\\textwidth',fig.pos='htbp'>>=
+delta <- 0.99
+precision.ww <- function(k){
+  return(2*quantile(abs(simuls.ww[[k]][,'WW']-delta.y.ate(paramS)),probs=c(delta)))
+}
+precision.ww.N <- sapply(1:length(simuls.ww),precision.ww)
+precision <- as.data.frame(cbind(N.sample,precision.ww.N,rep(delta.y.ate(paramS),length(simuls.ww))))
+colnames(precision) <- c('N','precision','TT')
+@
+
+<<CLTprec,eval=TRUE,echo=FALSE,results='hide'>>=
+CLT.prec <- function(N,delta,v1,v0,p){
+  return(2*qnorm((delta+1)/2)*sqrt((v1/p+v0/(1-p))/N))
+}
+
+CLT.prec.1 <- function(k,delta,simuls.ww){
+  return(CLT.prec(as.numeric(names(simuls.ww)[[k]]),delta,simuls.ww[[k]][1,'V1'],simuls.ww[[k]][1,'V0'],simuls.ww[[k]][1,'p']))
+}
+
+CLT.prec.line <- function(k,delta,simuls.ww,N){
+  return(CLT.prec(as.numeric(N),delta,simuls.ww[[as.character(N)]][k,'V1'],simuls.ww[[as.character(N)]][k,'V0'],simuls.ww[[as.character(N)]][k,'p']))
+}
+
+CLT.prec.mean <- function(k,delta,simuls.ww){
+  return(mean(sapply(1:nrow(simuls.ww[[k]]),CLT.prec.line,delta=delta,simuls.ww=simuls.ww,N=as.numeric(names(simuls.ww)[[k]]))))
+}
+
+# I compute the precision for the first sample of each draw and the average sample size over draws
+precision$precision.CLT.1 <- sapply(1:length(simuls.ww),CLT.prec.1,delta=delta,simuls.ww=simuls.ww)
+precision$precision.CLT.mean <- sapply(1:length(simuls.ww),CLT.prec.mean,delta=delta,simuls.ww=simuls.ww)
+@
+
+<<precision.CLT,dependson='monte.carlo',eval=TRUE,echo=FALSE,results='hide',echo=FALSE,warning=FALSE,error=FALSE,message=FALSE,fig.cap='sampling noise of the WW estimator with 99\\% confidence',fig.align='center',out.width='.65\\textwidth',fig.pos='htbp'>>=
+library(ggplot2)
+library(gplots)
+
+ggplot(precision, aes(x=as.factor(N), y=TT)) +
+  geom_bar(position=position_dodge(), stat="identity", colour='black') +
+  geom_errorbar(aes(ymin=TT-precision/2, ymax=TT+precision/2), width=.2,position=position_dodge(.9),color='red') +
+  geom_errorbar(aes(ymin=TT-precision.CLT.1/2, ymax=TT+precision.CLT.1/2), width=.2,position=position_dodge(.9),color='blue') +
+  geom_errorbar(aes(ymin=TT-precision.CLT.mean/2, ymax=TT+precision.CLT.mean/2), width=.2,position=position_dodge(.9),color='green') +
+  xlab("Sample Size") 
+@
+
+\noindent{Hmmm, this graph doesn't look that nice, but in fact the graph below is what I really get in R, I don't understand why it's not the same as what it's shown in R.}
+\clearpage
+
+\begin{figure}
+\centering
+\includegraphics[scale=0.45]{Rplot}
+\caption{sampling noise of the WW estimator with 99\% confidence}
+\end{figure}
+
+\noindent{Well, this time the result is similar to yours.}
+
+      \subsection{Estimate sampling noise using the same formula but for a confidence of 95\%. Has sampling noise increased or decreased?}
+      
+<<tilde.epsilon.WW.95,eval=TRUE,echo=FALSE>>=
+tilde.epsilon.WW.95<-qnorm((0.95+1)/2)*(1/NS)*sqrt((var1/proba1)+(var0/(1-proba1)))
+@
+\noindent{With the formula that I showed in the last question, I estimate the effect of sampling noise on WW with 95\% confidence is $\bm{\Sexpr{tilde.epsilon.WW.95}}$, which means the sampling noise has decreased.}
+
 
 \end{document}
