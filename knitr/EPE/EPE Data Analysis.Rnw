@@ -329,7 +329,6 @@ simuls.ww.N <- function(N,Nsim,param){
   return(simuls.ww)
 }
 
-library(snowfall)
 
 sf.simuls.ww.N <- function(N,Nsim,param){
   sfInit(parallel=TRUE,cpus=8)
@@ -385,8 +384,6 @@ precision$precision.CLT.mean <- sapply(1:length(simuls.ww),CLT.prec.mean,delta=d
 @
 
 <<precision.CLT,dependson='monte.carlo',eval=TRUE,echo=FALSE,results='hide',echo=FALSE,warning=FALSE,error=FALSE,message=FALSE,fig.cap='sampling noise of the WW estimator with 99\\% confidence',fig.align='center',out.width='.65\\textwidth',fig.pos='htbp'>>=
-library(ggplot2)
-library(gplots)
 
 ggplot(precision, aes(x=as.factor(N), y=TT)) +
   geom_bar(position=position_dodge(), stat="identity", colour='black') +
