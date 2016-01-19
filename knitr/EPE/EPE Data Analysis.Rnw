@@ -31,10 +31,13 @@ library(xtable)
 
 
 \begin{document}
+
+
 \title{EPE Data Analysis}
 \author{\textbf{Jingwen ZHENG}\\ Toulouse School of Economics\\ M2 ERNA}
 \maketitle
 
+\tableofcontents
 
   \chapter{The Two Fundamental Problems of Inference}
     \section{The Fundamental Problem of Causal Inference}  
