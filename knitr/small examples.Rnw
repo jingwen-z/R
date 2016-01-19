@@ -1,4 +1,4 @@
-############################################ example with global chunk options #################################################
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% example with global chunk options %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \documentclass{article}
 
 \begin{document}
@@ -19,7 +19,7 @@ plot(x, type = 'l')  # Brownian motion
 
 \end{document}
 
-############################################# example with local chunk options #################################################
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% example with local chunk options %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \documentclass{article}
 
 \begin{document}
@@ -52,7 +52,7 @@ plot(x, type = 'l')  # Brownian motion
 
 \end{document}
 
-############################################# just small things for exercising #################################################
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% just small things for exercising %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \documentclass{article}
 
 \begin{document}
