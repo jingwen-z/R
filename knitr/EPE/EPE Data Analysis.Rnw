@@ -488,9 +488,9 @@ ggplot(sample.size.CLT, aes(x=precision, y=N,fill=Method)) +
 N.bis<-(1/(tilde.epsilon.WW^2))*(qnorm((0.99+1)/2))^2*((var(yB)/proba1)+(var(yB)/(1-proba1)))
 @
 
-\noindent{If I use the same variance $\var{y^B}$, then the sample size is $\bm{\Sexpr{N.bis}}$, which means the sample size increases.}
+\noindent{If I use the same variance $\var{y^B}$, then the sample size is $\bm{\Sexpr{N.bis}}$, which means the sample size decreases.}
 
-      \subsection{Estimate sample size with a smaller sampling noise but the same level of confidence. Does sampe size increase or decrease?}
+      \subsection{Estimate sample size with a smaller sampling noise but the same level of confidence. Does sample size increase or decrease?}
 
 The sampling noise in 1.2.10 is $\Sexpr{tilde.epsilon.WW}$, now I suppose a smaller sampling noise $\bm{0.002087}$. Then I will estimate sample size with this new smaller sampling noise and the same level of confidence 99\%.}
 
