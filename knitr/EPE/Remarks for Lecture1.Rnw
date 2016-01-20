@@ -1,5 +1,15 @@
 \documentclass{article}
 
+<<libraries,eval=FALSE,include=FALSE>>=
+library(MASS)
+library(RColorBrewer)
+library(gplots)
+library(snowfall)
+library(ggplot2)
+library(xtable)
+library(sandwich)
+@
+
 \usepackage{hyperref}
 \usepackage{url}
 \usepackage{geometry}
@@ -18,15 +28,17 @@
     \href{https://cran.r-project.org/web/packages/sandwich/sandwich.pdf}{\textbf{sandwich}}: Model-robust standard error estimators for cross-sectional, time series, and longitudinal data.
     
   \section{Codes}
-    \subsection{preparation}
-    
+    \subsection{page 10}
+   
 <<param,eval=FALSE,results='hide'>>=
+# Illustration: to do 
 param <- c(8,.5,.28,1500,0.9,0.01,0.05,0.05,0.05,0.1)
 names(param) <- c("barmu","sigma2mu","sigma2U","barY","rho","theta","sigma2epsilon","sigma2eta",
                   "delta","baralpha")
 @
 
 <<delta.y.tt,eval=FALSE,results='hide'>>=
+# Illustration: to do
 delta.y.tt <- function(param){
   return(param["baralpha"]+param["theta"]*param["barmu"]-param["theta"]*
            ((param["sigma2mu"]*dnorm((log(param["barY"])-param["barmu"])/
@@ -38,6 +50,7 @@ delta.y.tt <- function(param){
 @
 
 <<delta.y.ate,eval=FALSE,results='hide'>>=
+# Illustration: to do
 delta.y.ate <- function(param){
   return(param["baralpha"]+param["theta"]*param["barmu"])
 }
@@ -63,8 +76,6 @@ Y1 <- exp(y1)
 y <- y1*Ds+y0*(1-Ds)
 Y <- Y1*Ds+Y0*(1-Ds)
 @
-    
-    \subsection{page 10}
 
 <<plot.ols.estim.step.0,eval=FALSE,results='hide',fig.cap='Step 0',fig.align='center',out.width='.65\\textwidth',fig.pos='htbp'>>=
 # How Can We Estimate TT Using SO and PFF?-Step 0
@@ -97,6 +108,280 @@ points(yB[Ds==0],ols.reg.0$fitted.values,col='blue')
 abline(v=log(param["barY"]),col=col.unobs)
 legend(5,11,c('y0|D=0','y0|D=1',expression(hat('y0|D=0'))),pch=c(1,1,1),
        col=c(col.obs,col.unobs,'blue'),ncol=2)
+@
+
+    \subsection{page 12}
+
+<<ols.reg.0.pred,eval=FALSE,results='hide'>>=
+y.pred <- ols.reg.0$coef[[1]]+ols.reg.0$coef[[2]]*yB[Ds==1]
+@
+
+<<plot.ols.estim.step.2,eval=FALSE,results='hide',fig.cap='Step 2',fig.align='center',out.width='.65\\textwidth',fig.pos='htbp'>>=
+# How Can We Estimate TT Using SO and PFF?-Step 2
+plot(yB[Ds==0],y0[Ds==0],pch=1,xlim=c(5,11),ylim=c(5,11),xlab="yB",ylab="Outcomes")
+points(yB[Ds==1],y0[Ds==1],pch=1,col=col.unobs)
+points(yB[Ds==0],ols.reg.0$fitted.values,col='blue')
+points(yB[Ds==1],y.pred,pch=3,col='blue')
+abline(v=log(param["barY"]),col=col.unobs)
+legend(5,11,c('y0|D=0','y0|D=1',expression(hat('y0|D=0')),expression(hat('y0|D=1'))),
+       pch=c(1,1,1,3),col=c(col.obs,col.unobs,'blue','blue'),ncol=2)
+@
+
+    \subsection{page 13}
+
+<<plot.ols.estim.step.3,eval=FALSE,results='hide',fig.cap='Step 3',fig.align='center',out.width='.65\\textwidth',fig.pos='htbp'>>=
+# How Can We Estimate TT Using SO and PFF?-Step 3
+plot(yB[Ds==0],y0[Ds==0],pch=1,xlim=c(5,11),ylim=c(5,11),xlab="yB",ylab="Outcomes")
+points(yB[Ds==1],y0[Ds==1],pch=1,col=col.unobs)
+points(yB[Ds==0],ols.reg.0$fitted.values,col='blue')
+points(yB[Ds==1],y.pred,col='blue')
+points(yB[Ds==1],y[Ds==1],pch=3,col='black')
+abline(v=log(param["barY"]),col=col.unobs)
+legend(5,11,c('y0|D=0','y0|D=1','y1|D=1',expression(hat('y0|D=0')),expression(hat('y0|D=1'))),
+       pch=c(1,1,3,1,3),col=c(col.obs,col.unobs,col.obs,'blue','blue'),ncol=2)
+@
+
+    \subsection{page 14}
+
+<<ww.ols,eval=FALSE,results='hide'>>=
+ww.ols <- mean(y[Ds==1]-y.pred)
+@
+
+<<plot.ols.estim.step.4,eval=FALSE,results='hide',fig.cap='Step 4',fig.align='center',out.width='.65\\textwidth',fig.pos='htbp'>>=
+# How Can We Estimate TT Using SO and PFF?-Step 4
+plot(1, type="n", xlab="", ylab="", xlim=xlim.small, ylim=c(0, 10))
+abline(v=delta.y.tt(param),col=col.unobs,lty=lty.unobs)
+abline(v=ww.ols,col=col.obs,lty=lty.obs)
+text(x=c(delta.y.tt(param),ww.ols),y=c(adj),labels=c('TT',expression(hat('E'))),pos=c(4,2),
+     col=c(col.unobs,col.obs),lty=c(lty.unobs,lty.obs))
+@
+
+    \subsection{page 20}
+    
+<<ww.ols.direct,eval=FALSE,results='hide'>>=
+yB.Ds <-(yB-mean(yB[Ds==1]))*Ds
+ols.direct <- lm(y~yB+Ds+yB.Ds)
+ww.ols.direct <- ols.direct$coef[[3]]
+@
+
+<<plot.ols.estim.direct,eval=FALSE,results='hide',fig.cap='Direct OLS Estimation',fig.align='center',out.width='.65\\textwidth',fig.pos='htbp'>>=
+plot(1, type="n", xlab="", ylab="", xlim=xlim.small, ylim=c(0, 10))
+abline(v=delta.y.tt(param),col=col.unobs,lty=lty.unobs)
+abline(v=ww.ols.direct,col=col.obs,lty=lty.obs)
+text(x=c(delta.y.tt(param),ww.ols.direct),y=c(adj),labels=c('TT',expression(hat('E'))),
+     pos=c(4,2),col=c(col.unobs,col.obs),lty=c(lty.unobs,lty.obs))
+@
+
+    \subsection{page 23}
+
+<<monte.carlo.ols,eval=FALSE,warning=FALSE,error=FALSE,message=FALSE,results='hide',cache=TRUE>>=
+# Illustration: to do
+monte.carlo.ols <- function(s,N,param){
+  set.seed(s)
+  mu <- rnorm(N,param["barmu"],sqrt(param["sigma2mu"]))
+  UB <- rnorm(N,0,sqrt(param["sigma2U"]))
+  yB <- mu + UB 
+  YB <- exp(yB)
+  Ds <- rep(0,N)
+  Ds[YB<=param["barY"]] <- 1 
+  epsilon <- rnorm(N,0,sqrt(param["sigma2epsilon"]))
+  eta<- rnorm(N,0,sqrt(param["sigma2eta"]))
+  U0 <- param["rho"]*UB + epsilon
+  y0 <- mu +  U0 + param["delta"]
+  alpha <- param["baralpha"]+  param["theta"]*mu + eta
+  y1 <- y0+alpha
+  Y0 <- exp(y0)
+  Y1 <- exp(y1)
+  y <- y1*Ds+y0*(1-Ds)
+  Y <- Y1*Ds+Y0*(1-Ds)
+  yB.Ds <-(yB-mean(yB[Ds==1]))*Ds
+  ols.direct <- lm(y~yB+Ds+yB.Ds)
+  ols.simple <- lm(y~yB+Ds)
+  return(c(ols.simple$coef[3],ols.direct$coef[3],sqrt(vcov(ols.direct)[3,3]),
+           sqrt(vcovHC(ols.direct,type='HC0')[3,3]),sqrt(vcovHC(ols.direct,type='HC1')[3,3]),
+           sqrt(vcovHC(ols.direct,type='HC2')[3,3]),sqrt(vcovHC(ols.direct,type='HC3')[3,3])))
+}
+# library(sandwich) is needed for codes "vcov()"
+
+simuls.ols.N <- function(N,Nsim,param){
+  simuls.ols <- matrix(unlist(lapply(1:Nsim,monte.carlo.ols,N=N,param=param)),
+                       nrow=Nsim,ncol=7,byrow=TRUE)
+  colnames(simuls.ols) <- c('OLS.simple','OLS.direct','Homo','HC0','HC1','HC2','HC3')
+  return(simuls.ols)
+}
+
+# library(snowfall) is needed for sfInit
+
+sf.simuls.ols.N <- function(N,Nsim,param){
+  sfInit(parallel=TRUE,cpus=8)
+  sfLibrary(sandwich)
+  sim <- matrix(unlist(sfLapply(1:Nsim,monte.carlo.ols,N=N,param=param)),
+                nrow=Nsim,ncol=7,byrow=TRUE)
+  sfStop()
+  colnames(sim) <- c('OLS.simple','OLS.direct','Homo','HC0','HC1','HC2','HC3')
+  return(sim)
+}
+
+Nsim <- 1000
+#Nsim <- 10
+N.sample <- c(100,1000,10000,100000)
+#N.sample <- c(100,1000,10000)
+
+simuls.ols <- lapply(N.sample,sf.simuls.ols.N,Nsim=Nsim,param=param)
+names(simuls.ols) <- N.sample
+@
+
+<<monte.carlo.hist.ols,dependson='monte.carlo.ols',eval=FALSE,warning=FALSE,error=FALSE,message=FALSE,results='hide',fig.cap='Distribution of the $OLS$ estimator over replications of samples of different sizes',fig.align='center',out.width='.65\\textwidth',fig.pos='htbp'>>=
+# Sampling Noise with OLS: Illustration
+par(mfrow=c(2,2))
+for (i in 1:length(simuls.ols)){
+  hist(simuls.ols[[i]][,'OLS.direct'],main=paste('N=',as.character(N.sample[i])),
+       xlab=expression(hat(Delta^yOLS)),xlim=c(-0.15,0.55))
+  abline(v=delta.y.tt(param),col="red")
+}
+@
+
+    \subsection{page 30}
+    
+<<precision.ols,dependson='monte.carlo.ols',eval=FALSE,results='hide',warning=FALSE,error=FALSE,message=FALSE,fig.cap='precision of the OLS estimator with 99\\% confidence',fig.align='center',out.width='.65\\textwidth',fig.pos='htbp'>>=
+# Precision of OLS
+delta <- 0.99
+precision.ols <- function(k){
+  return(2*quantile(abs(simuls.ols[[k]][,'OLS.direct']-delta.y.tt(param)),probs=c(delta)))
+}
+precision.ols.N <- sapply(1:length(simuls.ols),precision.ols)
+
+mean.ols.prec <- function(k,HC,delta=delta){
+  return(2*(qnorm((delta+1)/2))*mean(simuls.ols[[k]][,HC]))
+}
+mean.ols.prec.homo <- sapply(1:length(simuls.ols),mean.ols.prec,HC='Homo',delta=delta)
+mean.ols.prec.HC0 <- sapply(1:length(simuls.ols),mean.ols.prec,HC='HC0',delta=delta)
+mean.ols.prec.HC1 <- sapply(1:length(simuls.ols),mean.ols.prec,HC='HC1',delta=delta)
+mean.ols.prec.HC2 <- sapply(1:length(simuls.ols),mean.ols.prec,HC='HC2',delta=delta)
+mean.ols.prec.HC3 <- sapply(1:length(simuls.ols),mean.ols.prec,HC='HC3',delta=delta)
+
+precision.ols <- as.data.frame(cbind(N.sample,precision.ols.N,mean.ols.prec.homo,
+                                     mean.ols.prec.HC0,mean.ols.prec.HC1,mean.ols.prec.HC2,
+                                     mean.ols.prec.HC3,rep(delta.y.tt(param),length(simuls.ols))))
+colnames(precision.ols) <- c('N','precision','Homo','HC0','HC1','HC2','HC3','TT')
+# library(ggplot2) should be used here
+ggplot(precision.ols, aes(x=as.factor(N), y=TT)) +
+  geom_bar(position=position_dodge(), stat="identity", colour='black') +
+  geom_errorbar(aes(ymin=TT-precision/2, ymax=TT+precision/2), width=.2,
+                position=position_dodge(.9),color='red') +
+  geom_errorbar(aes(ymin=TT-Homo/2, ymax=TT+Homo/2), width=.2,
+                position=position_dodge(.9),color='blue') +
+  geom_errorbar(aes(ymin=TT-HC0/2, ymax=TT+HC0/2), width=.2,
+                position=position_dodge(.9),color='green') +
+  geom_errorbar(aes(ymin=TT-HC1/2, ymax=TT+HC1/2), width=.2,
+                position=position_dodge(.9),color='yellow') +
+  geom_errorbar(aes(ymin=TT-HC2/2, ymax=TT+HC2/2), width=.2,
+                position=position_dodge(.9),color='orange') +
+  geom_errorbar(aes(ymin=TT-HC3/2, ymax=TT+HC3/2), width=.2,
+                position=position_dodge(.9),color='purple') +
+  xlab("Sample Size") 
+@
+
+    \subsection{page 33}
+
+<<param.nonlin,eval=FALSE,results='hide'>>=
+# Illustration: to do
+param <- c(param,0.1,7.98)
+names(param) <- c("barmu","sigma2mu","sigma2U","barY","rho","theta","sigma2epsilon",
+                  "sigma2eta","delta","baralpha","gamma","baryB")
+@
+
+<<simul.nonlin,eval=FALSE,results='hide'>>=
+# Illustration: to do
+set.seed(1234)
+N <-1000
+mu <- rnorm(N,param["barmu"],sqrt(param["sigma2mu"]))
+UB <- rnorm(N,0,sqrt(param["sigma2U"]))
+yB <- mu + UB 
+YB <- exp(yB)
+Ds <- rep(0,N)
+Ds[YB<=param["barY"]] <- 1 
+epsilon <- rnorm(N,0,sqrt(param["sigma2epsilon"]))
+eta<- rnorm(N,0,sqrt(param["sigma2eta"]))
+U0 <- param["rho"]*UB + epsilon
+y0 <- mu +  U0 + param["delta"] + param["gamma"]*(yB-param["baryB"])^2
+alpha <- param["baralpha"]+  param["theta"]*mu + eta
+y1 <- y0+alpha
+Y0 <- exp(y0)
+Y1 <- exp(y1)
+y <- y1*Ds+y0*(1-Ds)
+Y <- Y1*Ds+Y0*(1-Ds)
+@
+
+<<plot.nonlin,eval=FALSE,results='hide',fig.cap='Non linear',fig.align='center',out.width='.65\\textwidth',fig.pos='htbp'>>=
+# Nonlinear Relationship Between Outcomes and Confounders-Non linear
+plot(yB[Ds==0],y0[Ds==0],pch=1,xlim=c(5,11),ylim=c(5,11),xlab="yB",ylab="Outcomes")
+points(yB[Ds==1],y0[Ds==1],pch=1,col=col.unobs)
+abline(v=log(param["barY"]),col=col.unobs)
+legend(5,11,c('y0|D=0','y0|D=1'),pch=c(1,1),col=c(col.obs,col.unobs),ncol=1)
+@
+
+    \subsection{page 34}
+
+<<ols.reg.0.nonlin,eval=FALSE,results='hide'>>=
+ols.reg.0 <- lm(y[Ds==0]~yB[Ds==0])
+summary(ols.reg.0)
+@
+
+<<plot.ols.estim.step.1.nonlin,eval=FALSE,results='hide',fig.cap='Step 1',fig.align='center',out.width='.65\\textwidth',fig.pos='htbp'>>=
+# Specification Bias-Step 1
+plot(yB[Ds==0],y0[Ds==0],pch=1,xlim=c(5,11),ylim=c(5,11),xlab="yB",ylab="Outcomes")
+points(yB[Ds==1],y0[Ds==1],pch=1,col=col.unobs)
+points(yB[Ds==0],ols.reg.0$fitted.values,col='blue')
+abline(v=log(param["barY"]),col=col.unobs)
+legend(5,11,c('y0|D=0','y0|D=1',expression(hat('y0|D=0'))),pch=c(1,1,1),
+       col=c(col.obs,col.unobs,'blue'),ncol=2)
+@
+
+    \subsection{page 35}
+
+<<ols.reg.0.pred.nonlin,eval=FALSE,results='hide'>>=
+y.pred <- ols.reg.0$coef[[1]]+ols.reg.0$coef[[2]]*yB[Ds==1]
+@
+
+<<plot.ols.estim.step.2.nonlin,eval=FALSE,results='hide',fig.cap='Step 2',fig.align='center',out.width='.65\\textwidth',fig.pos='htbp'>>=
+# Specification Bias-Step 2
+plot(yB[Ds==0],y0[Ds==0],pch=1,xlim=c(5,11),ylim=c(5,11),xlab="yB",ylab="Outcomes")
+points(yB[Ds==1],y0[Ds==1],pch=1,col=col.unobs)
+points(yB[Ds==0],ols.reg.0$fitted.values,col='blue')
+points(yB[Ds==1],y.pred,pch=3,col='blue')
+abline(v=log(param["barY"]),col=col.unobs)
+legend(5,11,c('y0|D=0','y0|D=1',expression(hat('y0|D=0')),expression(hat('y0|D=1'))),
+       pch=c(1,1,1,3),col=c(col.obs,col.unobs,'blue','blue'),ncol=2)
+@
+
+  \subsection{page 36}
+  
+<<plot.ols.estim.step.3.nonlin,eval=FALSE,results='hide',fig.cap='Step 3',fig.align='center',out.width='.65\\textwidth',fig.pos='htbp'>>=
+# Specification Bias-Step 3
+plot(yB[Ds==0],y0[Ds==0],pch=1,xlim=c(5,11),ylim=c(5,11),xlab="yB",ylab="Outcomes")
+points(yB[Ds==1],y0[Ds==1],pch=1,col=col.unobs)
+points(yB[Ds==0],ols.reg.0$fitted.values,col='blue')
+points(yB[Ds==1],y.pred,col='blue')
+points(yB[Ds==1],y[Ds==1],pch=3,col='black')
+abline(v=log(param["barY"]),col=col.unobs)
+legend(5,11,c('y0|D=0','y0|D=1','y1|D=1',expression(hat('y0|D=0')),expression(hat('y0|D=1'))),
+       pch=c(1,1,3,1,3),col=c(col.obs,col.unobs,col.obs,'blue','blue'),ncol=2)
+@
+
+  \subsection{page 37}
+
+<<ww.ols.nonlin,eval=FALSE,results='hide'>>=
+ww.ols <- mean(y[Ds==1]-y.pred)
+@
+
+<<plot.ols.estim.step.4.nonlin,eval=FALSE,results='hide',fig.cap='Step 4',fig.align='center',out.width='.65\\textwidth',fig.pos='htbp'>>=
+# Specification Bias-Step 3
+plot(1, type="n", xlab="", ylab="", xlim=xlim.small, ylim=c(0, 10))
+abline(v=delta.y.tt(param),col=col.unobs,lty=lty.unobs)
+abline(v=ww.ols,col=col.obs,lty=lty.obs)
+text(x=c(delta.y.tt(param),ww.ols),y=c(adj),labels=c('TT',expression(hat('E'))),
+     pos=c(4,2),col=c(col.unobs,col.obs),lty=c(lty.unobs,lty.obs))
 @
 
 
