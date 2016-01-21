@@ -384,5 +384,377 @@ text(x=c(delta.y.tt(param),ww.ols),y=c(adj),labels=c('TT',expression(hat('E'))),
      pos=c(4,2),col=c(col.unobs,col.obs),lty=c(lty.unobs,lty.obs))
 @
 
+    \subsection{page 41}
+
+<<plot.fail.com.supp,eval=FALSE,results='hide',fig.cap='Failure of Common Support',fig.align='center',out.width='.65\\textwidth',fig.pos='htbp'>>=
+par(mar=c(5,4,4,5))
+plot(yB[Ds==0],y0[Ds==0],pch=1,xlim=c(5,11),ylim=c(5,11),xlab="yB",ylab="Outcomes")
+points(yB[Ds==1],y[Ds==1],pch=3,col='blue')
+abline(v=log(param["barY"]),col=col.unobs)
+legend(5,10.5,c('y0|D=0','y1|D=1','D'),pch=c(1,3,2),col=c(col.obs,'blue',col.unobs),ncol=1)
+par(new=TRUE)
+plot(yB,Ds,pch=2,col=col.unobs,xlim=c(5,11),xaxt="n",yaxt="n",xlab="",ylab="")
+axis(4)
+mtext("D",side=4,line=3)
+@
+
+    \subsection{page 43}
+
+<<simul.com.supp,eval=FALSE,results='hide'>>=
+# Illustration: to do
+set.seed(1234)
+mu <- rnorm(N,param["barmu"],sqrt(param["sigma2mu"]))
+UB <- rnorm(N,0,sqrt(param["sigma2U"]))
+yB <- mu + UB 
+YB <- exp(yB)
+Ds <- rep(0,N)
+V <- rnorm(N,0,sqrt(param["sigma2mu"]+param["sigma2U"]))
+Ds[yB+V<=log(param["barY"])] <- 1 
+epsilon <- rnorm(N,0,sqrt(param["sigma2epsilon"]))
+eta<- rnorm(N,0,sqrt(param["sigma2eta"]))
+U0 <- param["rho"]*UB + epsilon
+y0 <- mu +  U0 + param["delta"] + param["gamma"]*(yB-param["baryB"])^2
+alpha <- param["baralpha"]+  param["theta"]*mu + eta
+y1 <- y0+alpha
+Y0 <- exp(y0)
+Y1 <- exp(y1)
+y <- y1*Ds+y0*(1-Ds)
+Y <- Y1*Ds+Y0*(1-Ds)
+@
+
+<<plot.com.supp,eval=FALSE,results='hide',fig.cap='Common Support Holds',fig.align='center',out.width='.65\\textwidth',fig.pos='htbp'>>=
+par(mar=c(5,4,4,5))
+plot(yB[Ds==0],y0[Ds==0],pch=1,xlim=c(5,11),ylim=c(5,11),xlab="yB",ylab="Outcomes")
+points(yB[Ds==1],y[Ds==1],pch=3,col='blue')
+legend(5,10.5,c('y0|D=0','y1|D=1','D'),pch=c(1,3,2),col=c(col.obs,'blue',col.unobs),ncol=1)
+par(new=TRUE)
+plot(yB,Ds,pch=2,col=col.unobs,xlim=c(5,11),xaxt="n",yaxt="n",xlab="",ylab="")
+axis(4)
+mtext("D",side=4,line=3)
+@
+
+    \subsection{page 54}
+
+<<LLR,eval=FALSE,results='hide',cache=TRUE>>=
+# preparation
+llr <- function(y,x,gridx,bw,kernel){
+  if (kernel=='uniform'){
+    K <- function(u){
+      K.u <- 0
+      if (abs(u)<=.5){K.u <- 1}
+      return(K.u)
+    }
+  }
+  if (kernel=='triangular'){
+    K <- function(u){
+      K.u <- 0
+      if (abs(u)<=.5){K.u <- 2*(1-2*abs(u))}
+      return(K.u)
+    }
+  }
+  if (kernel=='epanechnikov'){
+    K <- function(u){
+      K.u <- 0
+      if (abs(u)<=.5){K.u <- (3/2)*(1-4*u^2)}
+      return(K.u)
+    }
+  }
+  if (kernel=='quartic'){
+    K <- function(u){
+      K.u <- 0
+      if (abs(u)<=.5){K.u <- (15/8)*(1-4*u^2)^2}
+      return(K.u)
+    }
+  }
+  if (kernel=='gaussian'){
+    K <- function(u){
+      return(exp(-0.5*u^2)/(sqrt(2*pi)))
+    }
+  }
+  K.vec <- Vectorize(K)
+  y0.hat <- rep(0,length(gridx))  
+  for (i in (1:length(gridx))){
+    x.i <- gridx[i]-x
+    weights.i <- K.vec((x.i)/bw)
+    ols.i <- lm(y~x.i,weights=weights.i)
+    y0.hat[i] <- ols.i$coefficients[1]
+  }
+  return(y0.hat)
+}
+
+kernel <- 'gaussian'
+bw <- 1
+y0.llr <- llr(y[Ds==0],yB[Ds==0],yB[Ds==1],bw=bw,kernel=kernel)    
+@
+
+<<plot.LLR.step.0,dependson='LLR',eval=FALSE,results='hide',fig.cap='Step 0',fig.align='center',out.width='.65\\textwidth',fig.pos='htbp'>>=
+# LLR Matching-Step 0
+plot(yB[Ds==0],y0[Ds==0],pch=1,xlim=c(5,11),ylim=c(5,11),xlab="yB",ylab="Outcomes")
+points(yB[Ds==1],y0[Ds==1],pch=1,col=col.unobs)
+legend(5,11,c('y0|D=0','y0|D=1'),pch=c(1,1),col=c(col.obs,col.unobs),ncol=1)
+@
+
+    \subsection{page 55}
+
+<<plot.LLR.step.1,dependson='LLR',eval=FALSE,results='hide',fig.cap='Step 1',fig.align='center',out.width='.65\\textwidth',fig.pos='htbp'>>=
+# LLR Matching-Step 1
+plot(yB[Ds==0],y0[Ds==0],pch=1,xlim=c(5,11),ylim=c(5,11),xlab="yB",ylab="Outcomes")
+points(yB[Ds==1],y0[Ds==1],pch=1,col=col.unobs)
+points(yB[Ds==1],y0.llr,col='blue')
+legend(5,11,c('y0|D=0','y0|D=1',expression(hat(y0))),pch=c(1,1,1),
+       col=c(col.obs,col.unobs,'blue'),ncol=2)
+@
+
+    \subsection{page 56}
+
+<<plot.LLR.step.2,dependson='LLR',eval=FALSE,results='hide',fig.cap='Step 2',fig.align='center',out.width='.65\\textwidth',fig.pos='htbp'>>=
+# LLR Matching-Step 2
+plot(yB[Ds==0],y0[Ds==0],pch=1,xlim=c(5,11),ylim=c(5,11),xlab="yB",ylab="Outcomes")
+points(yB[Ds==1],y0[Ds==1],pch=1,col=col.unobs)
+points(yB[Ds==1],y0.llr,col='blue')
+points(yB[Ds==1],y[Ds==1],pch=3)
+legend(5,11,c('y0|D=0','y0|D=1',expression(hat(y0)),'y|D=1'),pch=c(1,1,1,3),
+       col=c(col.obs,col.unobs,'blue',col.obs),ncol=2)
+@
+
+    \subsection{page 57}
+
+<<ww.llr,dependson='LLR',eval=FALSE,results='hide'>>=
+ww.llr <- mean(y[Ds==1]-y0.llr)
+@
+
+<<plot.LLR.step.3,dependson='LLR',eval=FALSE,results='hide',fig.cap='Step 3',fig.align='center',out.width='.65\\textwidth',fig.pos='htbp'>>=
+# LLR Matching-Step 3(with bandwidth=1)
+plot(1, type="n", xlab="", ylab="", xlim=xlim.small, ylim=c(0, 10))
+abline(v=delta.y.tt.com.supp(param),col=col.unobs,lty=lty.unobs)
+abline(v=ww.llr,col=col.obs,lty=lty.obs)
+text(x=c(delta.y.tt.com.supp(param),ww.llr),y=c(adj),
+     labels=c('TT',expression(hat('E'))),
+     pos=c(2,4),col=c(col.unobs,col.obs),lty=c(lty.unobs,lty.obs))
+@
+
+    \subsection{page 58}
+
+<<llr.matching,eval=FALSE,results='hide',cache=TRUE>>=
+llr.match <- function(y,D,x,bw,kernel){
+  y0.llr <- llr(y[D==0],x[D==0],x[D==1],bw=bw,kernel=kernel)
+  return(mean(y[D==1]-y0.llr))
+}
+bw <- 0.5
+ww.llr.alt <- llr.match(y,Ds,yB,bw=bw,kernel=kernel)
+@
+
+<<plot.LLR.step.3.alternate,dependson='llr.matching',eval=FALSE,results='hide',fig.cap='Step 3',fig.align='center',out.width='.65\\textwidth',fig.pos='htbp'>>=
+# LLR Matching-Step 3(with bandwidth=0.5)
+plot(1, type="n", xlab="", ylab="", xlim=xlim.small, ylim=c(0, 10))
+abline(v=delta.y.tt.com.supp(param),col=col.unobs,lty=lty.unobs)
+abline(v=ww.llr.alt,col=col.obs,lty=lty.obs)
+text(x=c(delta.y.tt.com.supp(param),ww.llr.alt),y=c(adj),
+     labels=c('TT',expression(hat('E'))),
+     pos=c(4,2),col=c(col.unobs,col.obs),lty=c(lty.unobs,lty.obs))
+@
+
+    \subsection{page 59}
+
+<<LLR.step.1.alt,eval=FALSE,results='hide',cache=TRUE>>=
+y0.llr.alt <- llr(y[Ds==0],yB[Ds==0],yB[Ds==1],bw=bw,kernel=kernel)
+@
+
+<<plot.LLR.step.1.alt,dependson='LLR.step.1.alt',eval=FALSE,results='hide',fig.cap='Step 1',fig.align='center',out.width='.65\\textwidth',fig.pos='htbp'>>=
+# LLR Matching-Step 1(with bandwidth=0.5)
+plot(yB[Ds==0],y0[Ds==0],pch=1,xlim=c(5,11),ylim=c(5,11),
+     xlab="yB",ylab="Outcomes")
+points(yB[Ds==1],y0[Ds==1],pch=1,col=col.unobs)
+points(yB[Ds==1],y0.llr.alt,col='blue')
+legend(5,11,c('y0|D=0','y0|D=1',expression(hat(y0))),pch=c(1,1,1),
+       col=c(col.obs,col.unobs,'blue'),ncol=2)
+@
+
+    \subsection{page 60}
+
+<<monte.carlo.llr,eval=FALSE,warning=FALSE,error=FALSE,message=FALSE,results='hide',cache=TRUE>>=
+monte.carlo.llr <- function(s,N,param,bw,kernel){
+  set.seed(s)
+  mu <- rnorm(N,param["barmu"],sqrt(param["sigma2mu"]))
+  UB <- rnorm(N,0,sqrt(param["sigma2U"]))
+  yB <- mu + UB 
+  YB <- exp(yB)
+  Ds <- rep(0,N)
+  V <- rnorm(N,0,sqrt(param["sigma2mu"]+param["sigma2U"]))
+  Ds[yB+V<=log(param["barY"])] <- 1 
+  epsilon <- rnorm(N,0,sqrt(param["sigma2epsilon"]))
+  eta<- rnorm(N,0,sqrt(param["sigma2eta"]))
+  U0 <- param["rho"]*UB + epsilon
+  y0 <- mu +  U0 + param["delta"] + param["gamma"]*(yB-param["baryB"])^2
+  alpha <- param["baralpha"]+  param["theta"]*mu + eta
+  y1 <- y0+alpha
+  Y0 <- exp(y0)
+  Y1 <- exp(y1)
+  y <- y1*Ds+y0*(1-Ds)
+  Y <- Y1*Ds+Y0*(1-Ds)
+  ww.llr <- llr.match(y,Ds,yB,bw=bw,kernel=kernel)
+  return(ww.llr)
+}
+
+simuls.llr.N <- function(N,Nsim,param,bw,kernel){
+  simuls.llr <- matrix(unlist(lapply(1:Nsim,monte.carlo.llr,N=N,
+                                     param=param,bw=bw,kernel=kernel)),
+                       nrow=Nsim,ncol=1,byrow=TRUE)
+  colnames(simuls.llr) <- c('LLR')
+  return(simuls.llr)
+}
+
+sf.simuls.llr.N <- function(N,Nsim,param,bw,kernel){
+  sfInit(parallel=TRUE,cpus=8)
+  sfExport('llr.match','llr')
+  sim.llr <- matrix(unlist(sfLapply(1:Nsim,monte.carlo.llr,N=N,param=param,
+                                    bw=bw,kernel=kernel)),nrow=Nsim,ncol=1,byrow=TRUE)
+  sfStop()
+  colnames(sim.llr) <- c('LLR')
+  return(sim.llr)
+}
+
+Nsim <- 1000
+#Nsim <- 10
+#N.sample <- c(100,1000,10000,100000)
+#N.sample <- c(100,1000,10000)
+N.sample <- c(100,1000)
+#simuls.llr <- lapply(N.sample,simuls.llr.N,Nsim=Nsim,param=param,bw=bw,kernel=kernel)
+simuls.llr <- lapply(N.sample,sf.simuls.llr.N,Nsim=Nsim,param=param,bw=bw,kernel=kernel)
+names(simuls.llr) <- N.sample
+@
+
+<<monte.carlo.hist.llr,dependson='monte.carlo.llr',eval=FALSE,warning=FALSE,error=FALSE,message=FALSE,results='hide',fig.cap='Distribution of the $LLR$ estimator over replications of samples of different sizes',fig.align='center',out.width='.65\\textwidth',fig.pos='htbp'>>=
+par(mfrow=c(2,2))
+for (i in 1:length(simuls.llr)){
+  hist(simuls.llr[[i]][,'LLR'],main=paste('N=',as.character(N.sample[i])),
+       xlab=expression(hat(Delta^yLLR)),xlim=c(-0.15,0.55))
+  abline(v=delta.y.tt.com.supp(param),col="red")
+}
+@
+
+    \subsection{page 62}
+
+<<trimming,eval=FALSE,results='hide'>>=
+# preparation
+# density function estimated at one point
+dens.fun.point <- function(n,x,gridx,bw,kernel){
+  return(density(x,n=1,from=gridx[n],to=gridx[n],bw=bw,kernel=kernel)[[2]])
+}
+
+dens.fun <- function(x,gridx,bw,kernel){
+  return(sapply(1:length(gridx), dens.fun.point, x=x, gridx=gridx, bw=bw, kernel=kernel))
+}
+dens.yB.D0 <- dens.fun(yB[Ds==0],yB[Ds==1],bw=bw.nrd(yB[Ds==0]),kernel='b')
+dens.yB.D1 <- dens.fun(yB[Ds==1],yB[Ds==1],bw=bw.nrd(yB[Ds==1]),kernel='b')
+
+com.supp <- function(x,gridx,t,bw,kernel){
+  dens.x <- dens.fun(x=x,gridx=gridx,bw=bw,kernel=kernel)
+  return(ifelse(dens.x<=quantile(dens.x,t),0,1))
+}
+
+t<- 0.05
+com.supp.yB <- com.supp(yB[Ds==0],yB[Ds==1],t=t,bw=bw.nrd(yB[Ds==0]),kernel='b')
+@
+
+<<plot.trimming,eval=FALSE,results='hide',fig.cap='Trimming and Common Support',fig.align='center',out.width='.65\\textwidth',fig.pos='htbp'>>=
+par(mar=c(5,4,4,5))
+plot(yB[Ds==1],dens.yB.D0,pch=1,xlim=c(5,11),ylim=c(0,0.6),xlab="yB",ylab="density")
+points(yB[Ds==1],dens.yB.D1,pch=3)
+legend(5,0.59,c('fyB|D=0','fyB|D=1','Common Support'),pch=c(1,3,2),
+       col=c(col.obs,col.obs,col.unobs),ncol=1)
+par(new=TRUE)
+plot(yB[Ds==1],com.supp.yB,pch=2,col=col.unobs,xlim=c(5,11),ylim=c(0,1),
+     xaxt="n",yaxt="n",xlab="",ylab="")
+axis(4)
+mtext("Common Support",side=4,line=3)
+@
+
+    \subsection{page 63}
+
+<<LLR.trim,eval=FALSE,results='hide',cache=TRUE>>=
+#preparation
+llr.match.trim <- function(y,D,x,t,bw,kernel){
+  com.supp.x <- com.supp(x[D==0],x[D==1],t=t,bw=bw.nrd(x[D==0]),kernel='b')
+  y0.llr <- llr(y[D==0],x[D==0],x[D==1][com.supp.x==1],bw=bw,kernel=kernel)
+  return(mean(y[D==1][com.supp.x==1]-y0.llr))
+}
+ww.llr.trim <- llr.match.trim(y,Ds,yB,t=t,bw=bw,kernel=kernel)
+@
+
+<<plot.LLR.trimming,dependson='LLR.trim',eval=FALSE,results='hide',fig.cap='LLR Matching with Trimming',fig.align='center',out.width='.65\\textwidth',fig.pos='htbp'>>=
+plot(1, type="n", xlab="", ylab="", xlim=xlim.small, ylim=c(0, 10))
+abline(v=delta.y.tt.com.supp(param),col=col.unobs,lty=lty.unobs)
+abline(v=ww.llr.trim,col=col.obs,lty=lty.obs)
+text(x=c(delta.y.tt.com.supp(param),ww.llr.trim),y=c(adj),
+     labels=c('TT',expression(hat('E'))),pos=c(4,2),col=c(col.unobs,col.obs),
+     lty=c(lty.unobs,lty.obs))
+@
+
+    \subsection{page 64}
+<<monte.carlo.llr.trim,eval=FALSE,warning=FALSE,error=FALSE,message=FALSE,results='hide',cache=TRUE>>=
+monte.carlo.llr.trim <- function(s,N,param,t,bw,kernel){
+  set.seed(s)
+  mu <- rnorm(N,param["barmu"],sqrt(param["sigma2mu"]))
+  UB <- rnorm(N,0,sqrt(param["sigma2U"]))
+  yB <- mu + UB 
+  YB <- exp(yB)
+  Ds <- rep(0,N)
+  V <- rnorm(N,0,sqrt(param["sigma2mu"]+param["sigma2U"]))
+  Ds[yB+V<=log(param["barY"])] <- 1 
+  epsilon <- rnorm(N,0,sqrt(param["sigma2epsilon"]))
+  eta<- rnorm(N,0,sqrt(param["sigma2eta"]))
+  U0 <- param["rho"]*UB + epsilon
+  y0 <- mu +  U0 + param["delta"] + param["gamma"]*(yB-param["baryB"])^2
+  alpha <- param["baralpha"]+  param["theta"]*mu + eta
+  y1 <- y0+alpha
+  Y0 <- exp(y0)
+  Y1 <- exp(y1)
+  y <- y1*Ds+y0*(1-Ds)
+  Y <- Y1*Ds+Y0*(1-Ds)
+  ww.llr <- llr.match.trim(y,Ds,yB,t=t,bw=bw,kernel=kernel)
+  return(ww.llr)
+}
+
+simuls.llr.trim.N <- function(N,Nsim,param,t,bw,kernel){
+  simuls.llr.trim <- matrix(unlist(lapply(1:Nsim,monte.carlo.llr.trim,
+                                          N=N,param=param,t=t,bw=bw,kernel=kernel)),
+                            nrow=Nsim,ncol=1,byrow=TRUE)
+  colnames(simuls.llr.trim) <- c('LLR Trim')
+  return(simuls.llr.trim)
+}
+
+sf.simuls.llr.trim.N <- function(N,Nsim,param,t,bw,kernel){
+  sfInit(parallel=TRUE,cpus=8)
+  sfExport('llr.match.trim','llr','dens.fun.point','dens.fun','com.supp')
+  sim.llr.trim <- matrix(unlist(sfLapply(1:Nsim,monte.carlo.llr.trim,
+                                         N=N,param=param,t=t,bw=bw,kernel=kernel)),
+                         nrow=Nsim,ncol=1,byrow=TRUE)
+  sfStop()
+  colnames(sim.llr.trim) <- c('LLR Trim')
+  return(sim.llr.trim)
+}
+
+Nsim <- 1000
+#Nsim <- 10
+#N.sample <- c(100,1000,10000,100000)
+#N.sample <- c(100,1000,10000)
+N.sample <- c(100)
+#simuls.llr.trim <- lapply(N.sample,simuls.llr.trim.N,Nsim=Nsim,
+#                         param=param,t=t,bw=bw,kernel=kernel)
+simuls.llr.trim <- lapply(N.sample,sf.simuls.llr.trim.N,Nsim=Nsim,
+                          param=param,t=t,bw=bw,kernel=kernel)
+names(simuls.llr.trim) <- N.sample
+@
+
+<<monte.carlo.hist.llr.trim,dependson='monte.carlo.llr.trim',eval=FALSE,warning=FALSE,error=FALSE,message=FALSE,results='hide',fig.cap='Distribution of the trimmed $LLR$ estimator over replications of samples of different sizes',fig.align='center',out.width='.65\\textwidth',fig.pos='htbp'>>=
+par(mfrow=c(2,2))
+for (i in 1:length(simuls.llr.trim)){
+  hist(simuls.llr.trim[[i]][,'LLR Trim'],main=paste('N=',as.character(N.sample[i])),
+       xlab=expression(hat(Delta^yLLRTrim)),xlim=c(-0.15,0.55))
+  abline(v=delta.y.tt.com.supp(param),col="red")
+}
+@
+
 
 \end{document}
