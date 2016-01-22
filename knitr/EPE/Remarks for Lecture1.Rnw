@@ -756,5 +756,90 @@ for (i in 1:length(simuls.llr.trim)){
 }
 @
 
+    \subsection{page 66}
+
+<<llr.bw.cv,eval=FALSE,results='hide',cache=TRUE>>=
+# prepa
+MSE.llr <- function(bw,y,D,x,kernel){
+  MSE <- 0
+  for (i in (1:length(y[D==0]))){
+    MSE <- MSE + (y[D==0][i]-llr(y[D==0][-i],x[D==0][-i],x[D==0][i],bw=bw,kernel=kernel))^2
+  }
+  return(MSE)
+}
+MSE.test <- MSE.llr(bw=1,y,Ds,yB,kernel='gaussian')
+MSE.grid <- seq(0.1,1,by=.1)
+MSE.grid.test <- sapply(MSE.grid,MSE.llr,y=y,D=Ds,x=yB,kernel='gaussian')
+
+#sfInit(parallel=TRUE,cpus=8)
+#sfExport('llr.match.trim','llr','dens.fun.point','dens.fun','com.supp','MSE.llr')
+#MSE.grid.test <- sfSapply(MSE.grid,MSE.llr,y=y,D=Ds,x=yB,kernel='gaussian')
+#sfStop()
+@
+
+<<plot.LLR.CV,dependson='llr.bw.cv',eval=FALSE,results='hide',fig.cap='MSE as a function of Bandwidth for LLR in the untreated sample',fig.align='center',out.width='.65\\textwidth',fig.pos='htbp'>>=
+plot(MSE.grid[2:10],MSE.grid.test[2:10], xlab="Bandwidth", ylab="MSE")
+@
+
+    \subsection{page 71}
+
+<<prop.score,eval=FALSE,results='hide'>>=
+probit.Ds <- glm(Ds~yB, family=binomial(link="probit"))
+pscore <- predict(probit.Ds,type="response")
+@
+
+<<plot.pscore,eval=FALSE,results='hide',fig.cap='Propensity score as a function of yB',fig.align='center',out.width='.65\\textwidth',fig.pos='htbp'>>=
+plot(yB,pscore, xlab="yB", ylab="Propensity score")
+@
+
+    \subsection{page 72}
+
+<<plot.pscore.y,eval=FALSE,results='hide',fig.cap='Propensity score and outcomes',fig.align='center',out.width='.65\\textwidth',fig.pos='htbp'>>=
+plot(pscore[Ds==0],y[Ds==0], ylab="Outcomes", xlab="Propensity score",
+     xlim=c(0,1),ylim=c(5,11))
+points(pscore[Ds==1],y[Ds==1],pch=3,col='blue')
+points(pscore[Ds==1],y0[Ds==1],pch=1,col=col.unobs)
+legend(0.7,11,c('y0|D=0','y1|D=1','y0|D=1'),pch=c(1,3,1),
+       col=c(col.obs,'blue',col.unobs),ncol=1)
+@
+
+    \subsection{page 73}
+
+<<LLR.trim.pscore,eval=FALSE,results='hide',cache=TRUE>>=
+MSE.grid.pscore <- seq(0.02,0.1,by=.02)
+MSE.pscore <- sapply(MSE.grid.pscore,MSE.llr,y=y,D=Ds,x=pscore,kernel='gaussian')
+bw <- MSE.grid.pscore[MSE.pscore==min(MSE.pscore)]
+ww.llr.trim.pscore <- llr.match.trim(y,Ds,pscore,t=t,bw=bw,kernel=kernel)
+@
+
+<<plot.LLR.trimming.pscore,dependson='LLR.trim.pscore',eval=FALSE,results='hide',fig.cap='LLR Matching on the Propensity Score',fig.align='center',out.width='.65\\textwidth',fig.pos='htbp'>>=
+plot(1, type="n", xlab="", ylab="", xlim=xlim.small, ylim=c(0, 10))
+abline(v=delta.y.tt.com.supp(param),col=col.unobs,lty=lty.unobs)
+abline(v=ww.llr.trim.pscore,col=col.obs,lty=lty.obs)
+text(x=c(delta.y.tt.com.supp(param),ww.llr.trim.pscore),y=c(adj),
+     labels=c('TT',expression(hat('E'))),pos=c(4,2),col=c(col.unobs,col.obs),
+     lty=c(lty.unobs,lty.obs))
+@
+
+  \section{Key notions}
+Here is a set of stuff that I would find useful to do:
+
+\begin{enumerate}
+  \item Compute the OLS estimators (step by step and direct) and compare their values with the theoretical TT.
+  \item Compute the robust standard errors and sampling noise.
+  \item Compute the LLR estimator on the sample with common support. For that, 
+  1) estimate the propensity score; 2)common support and trimming; 3)LLR matching on the trimmed sample
+  \item Compute the standard errors and sampling noise using the bootstrap.
+\end{enumerate}
+
+\noindent{\textbf{Bonus:}}
+
+\begin{enumerate}
+  \item What happens when the variance of the Vi error term decreases? Does the impact of trimming become clearer?
+  \item Use on of the other matching estimators and compute estimated TT and sampling noise. Compare with LLR Matching.
+  \item Use the formula for the semiparametric efficiency bound to estimate sampling noise. Is it close to the bootstrap result?
+  \item Use the bootstrap for Nearest Neighbor: is the resulting estimate of sampling noise different from the one returned by the Abadie and Imbens s.e.? By the bootstrap for LLR? By the efficiency bound?
+\end{enumerate}
+
 
 \end{document}
