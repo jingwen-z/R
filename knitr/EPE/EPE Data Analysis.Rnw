@@ -526,5 +526,100 @@ N.12<-(1/(0.002087^2))*(qnorm((0.95+1)/2))^2*((varyB1/proba1)+(varyB0/(1-proba1)
 \vspace{.5em}
 \noindent{Comparing the results above, we can easily observe that for the same confidence level, sample size decreases with sampling noise; for the same sampling noise, sample size increases  with confidence level.}
 
+  \chapter{Observational Methods of Causal Inference}
+    \section{Parametric Observational Methods: OLS}
+    
+      \subsection{Compute the OLS estimators (step by step and direct) and compare their values with the theoretical TT.}
+
+I firstly compute the OLS estimator step by step (by graphs)
+
+% preparing data
+<<simul.ols.estim,eval=TRUE,echo=FALSE,results='hide'>>=
+set.seed(2345)
+NO <-1500
+mu <- rnorm(NO,param["barmu"],sqrt(param["sigma2mu"]))
+UB <- rnorm(NO,0,sqrt(param["sigma2U"]))
+yB <- mu + UB 
+YB <- exp(yB)
+Ds <- rep(0,NO)
+Ds[YB<=param["barY"]] <- 1 
+epsilon <- rnorm(NO,0,sqrt(param["sigma2epsilon"]))
+eta<- rnorm(NO,0,sqrt(param["sigma2eta"]))
+U0 <- param["rho"]*UB + epsilon
+y0 <- mu +  U0 + param["delta"]
+alpha <- param["baralpha"]+  param["theta"]*mu + eta
+y1 <- y0+alpha
+Y0 <- exp(y0)
+Y1 <- exp(y1)
+y <- y1*Ds+y0*(1-Ds)
+Y <- Y1*Ds+Y0*(1-Ds)
+@
+
+<<plot.ols.estim.step.0-1,eval=TRUE,fig.cap='compute the OLS estimator step by step',fig.subcap=c('Step 0','Step 1'),fig.align='center',out.width='.5\\textwidth',echo=FALSE,results='hide',fig.pos='htbp'>>=
+# Step 0
+col.obs <- 'black'
+col.unobs <- 'red'
+lty.obs <- 1
+lty.unobs <- 2
+xlim.big <- c(-1.5,0.5)
+xlim.small <- c(-0.15,0.55)
+adj <- 0
+
+plot(yB[Ds==0],y0[Ds==0],pch=1,xlim=c(4,10),ylim=c(4,10),xlab="yB",ylab="Outcomes")
+points(yB[Ds==1],y0[Ds==1],pch=1,col=col.unobs)
+abline(v=log(param["barY"]),col=col.unobs)
+legend(4,10,c('y0|D=0','y0|D=1'),pch=c(1,1),col=c(col.obs,col.unobs),ncol=1)
+
+# Step 1
+ols.reg.0 <- lm(y[Ds==0]~yB[Ds==0])
+summary(ols.reg.0)
+
+plot(yB[Ds==0],y0[Ds==0],pch=1,xlim=c(4,10),ylim=c(4,10),xlab="yB",ylab="Outcomes")
+points(yB[Ds==1],y0[Ds==1],pch=1,col=col.unobs)
+points(yB[Ds==0],ols.reg.0$fitted.values,col='blue')
+abline(v=log(param["barY"]),col=col.unobs)
+legend(4,10,c('y0|D=0','y0|D=1',expression(hat('y0|D=0'))),pch=c(1,1,1),col=c(col.obs,col.unobs,'blue'),ncol=2)
+@      
+
+<<plot.ols.estim.step.2-3,eval=TRUE,fig.cap='compute the OLS estimator step by step',fig.subcap=c('Step 2','Step 3'),fig.align='center',out.width='.5\\textwidth',echo=FALSE,results='hide',fig.pos='htbp'>>=
+# Step 2
+y.pred <- ols.reg.0$coef[[1]]+ols.reg.0$coef[[2]]*yB[Ds==1]
+
+plot(yB[Ds==0],y0[Ds==0],pch=1,xlim=c(4,10),ylim=c(4,10),xlab="yB",ylab="Outcomes")
+points(yB[Ds==1],y0[Ds==1],pch=1,col=col.unobs)
+points(yB[Ds==0],ols.reg.0$fitted.values,col='blue')
+points(yB[Ds==1],y.pred,pch=3,col='blue')
+abline(v=log(param["barY"]),col=col.unobs)
+legend(4,10,c('y0|D=0','y0|D=1',expression(hat('y0|D=0')),expression(hat('y0|D=1'))),pch=c(1,1,1,3),col=c(col.obs,col.unobs,'blue','blue'),ncol=2)
+
+# Step 3
+plot(yB[Ds==0],y0[Ds==0],pch=1,xlim=c(4,10),ylim=c(4,10),xlab="yB",ylab="Outcomes")
+points(yB[Ds==1],y0[Ds==1],pch=1,col=col.unobs)
+points(yB[Ds==0],ols.reg.0$fitted.values,col='blue')
+points(yB[Ds==1],y.pred,col='blue')
+points(yB[Ds==1],y[Ds==1],pch=3,col='black')
+abline(v=log(param["barY"]),col=col.unobs)
+legend(4,10,c('y0|D=0','y0|D=1','y1|D=1',expression(hat('y0|D=0')),expression(hat('y0|D=1'))),pch=c(1,1,3,1,3),col=c(col.obs,col.unobs,col.obs,'blue','blue'),ncol=2)
+@
+
+% Step 4
+<<ww.ols,eval=TRUE,echo=FALSE,results='hide'>>=
+#ww.ols <- mean(y[Ds==1]-y.pred)
+@
+
+<<plot.ols.estim.step.4,eval=TRUE,echo=FALSE,results='hide',fig.cap='Step 4',fig.align='center',out.width='.65\\textwidth',fig.pos='htbp'>>=
+#plot(1, type="n", xlab="", ylab="", xlim=xlim.small, ylim=c(0, 10))
+#abline(v=delta.y.tt(param),col=col.unobs,lty=lty.unobs)
+#abline(v=ww.ols,col=col.obs,lty=lty.obs)
+#text(x=c(delta.y.tt(param),ww.ols),y=c(adj),labels=c('TT',expression(hat('E'))),pos=c(4,2),col=c(col.unobs,col.obs),lty=c(lty.unobs,lty.obs))
+@
+
+% since it cannot export the same graph of step 4 as it did in R, I insert the gragh.
+\begin{figure}
+\centering
+\includegraphics[scale=0.45]{olsestim}
+\caption{Step 4}
+\end{figure}
+
 
 \end{document}
