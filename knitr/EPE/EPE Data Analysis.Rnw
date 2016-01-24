@@ -187,21 +187,21 @@ names(paramS) <- c("barmu","sigma2mu","sigma2U","barY","rho","theta","sigma2epsi
 <<data.FPSI,eval=TRUE,echo=FALSE,results='hide'>>=
 data.FPSI<-set.seed(8778)
 NS <-1500
-mu <- rnorm(NS,paramS["barmu"],sqrt(paramS["sigma2mu"]))
-UB <- rnorm(NS,0,sqrt(paramS["sigma2U"]))
-V <- mu + UB 
-Ds <- rep(0,NS)
-Ds[V<=log(paramS["barY"])] <- 1 
-epsilon <- rnorm(NS,0,sqrt(paramS["sigma2epsilon"]))
-eta<- rnorm(NS,0,sqrt(paramS["sigma2eta"]))
-U0 <- paramS["rho"]*UB + epsilon
-y0 <- mu +  U0 + paramS["delta"]
-alpha <- paramS["baralpha"]+  paramS["theta"]*mu + eta
-y1 <- y0+alpha
-Y0 <- exp(y0)
-Y1 <- exp(y1)
-y <- y1*Ds+y0*(1-Ds)
-Y <- Y1*Ds+Y0*(1-Ds)
+mus <- rnorm(NS,paramS["barmu"],sqrt(paramS["sigma2mu"]))
+UBs <- rnorm(NS,0,sqrt(paramS["sigma2U"]))
+V <- mus + UBs 
+Dss <- rep(0,NS)
+Dss[V<=log(paramS["barY"])] <- 1 
+epsilons <- rnorm(NS,0,sqrt(paramS["sigma2epsilon"]))
+etas<- rnorm(NS,0,sqrt(paramS["sigma2eta"]))
+U0s <- paramS["rho"]*UBs + epsilons
+y0s <- mus +  U0s + paramS["delta"]
+alphas <- paramS["baralpha"]+  paramS["theta"]*mus + etas
+y1s <- y0s+alphas
+Y0s <- exp(y0s)
+Y1s <- exp(y1s)
+ys <- y1s*Dss+y0s*(1-Dss)
+Ys <- Y1s*Dss+Y0s*(1-Dss)
 @
 
       \subsection{Plot potential outcomes and observed outcomes}
@@ -209,15 +209,15 @@ Y <- Y1*Ds+Y0*(1-Ds)
 col.obs <- 'black'
 col.unobs <- 'red'
 
-plot(V[Ds==0],y0[Ds==0],pch=1,xlim=c(2,10),ylim=c(2,10),xlab="V",ylab="Outcomes")
-points(V[Ds==1],y1[Ds==1],pch=3)
-points(V[Ds==0],y1[Ds==0],pch=3,col=col.unobs)
-points(V[Ds==1],y0[Ds==1],pch=1,col=col.unobs)
+plot(V[Dss==0],y0s[Dss==0],pch=1,xlim=c(2,10),ylim=c(2,10),xlab="V",ylab="Outcomes")
+points(V[Dss==1],y1s[Dss==1],pch=3)
+points(V[Dss==0],y1s[Dss==0],pch=3,col=col.unobs)
+points(V[Dss==1],y0s[Dss==1],pch=1,col=col.unobs)
 abline(v=log(paramS["barY"]),col=col.unobs)
 legend(2,10,c('y0|D=0','y1|D=1','y0|D=1','y1|D=0'),pch=c(1,3,1,3),col=c(col.obs,col.obs,col.unobs,col.unobs),ncol=2)
 
-plot(V[Ds==0],y0[Ds==0],pch=1,xlim=c(2,10),ylim=c(2,10),xlab="V",ylab="Outcomes")
-points(V[Ds==1],y1[Ds==1],pch=3)
+plot(V[Dss==0],y0s[Dss==0],pch=1,xlim=c(2,10),ylim=c(2,10),xlab="V",ylab="Outcomes")
+points(V[Dss==1],y1s[Dss==1],pch=3)
 legend(2,10,c('y|D=0','y|D=1'),pch=c(1,3))
 abline(v=log(paramS["barY"]),col=col.unobs)
 @
@@ -227,14 +227,14 @@ In order to compute individual level treatment effects in the sample, I use the 
 \centerline{$\Delta_i^Y =Y_i^1 -Y^0_i$} 
 
 <<ind.tt.NS,eval=TRUE,echo=FALSE>>=
-its<- y1-y0
+its<- y1s-y0s
 @
 
 \noindent{Here, I get the individual level treatment effects are \\ \Sexpr{its[1:NS]}}
 
       \subsection{Compute TT in the sample}
 <<avg.tt.NS,eval=TRUE,echo=FALSE>>=
-avg.tts<-mean(it)
+avg.tts<-mean(its)
 @
 By computing the average of the individual level treatment effects of the treated, I get the value of TT is \textbf{\Sexpr{avg.tts}}.
 
@@ -253,7 +253,7 @@ In order to compute the WW estimator in the sample, I use the formula:\\
 \centerline{$\Delta^Y_{WW} = \esp{Y_i|D_i=1} - \esp{Y_i|D_i=0}$}
 
 <<WW.estiS,eval=TRUE,echo=FALSE>>=
-WW.estiS<-mean(y[Ds==1])-mean(y[Ds==0])
+WW.estiS<-mean(ys[Dss==1])-mean(ys[Dss==0])
 @
 
 \noindent{Here, I get the WW estimator in the sample is $\bm{\Sexpr{WW.estiS}}$.}
@@ -263,8 +263,8 @@ According to the course, we learn the formula as following:\\ \\
 \centerline{$\Large\hat{\beta}_{OLS} = \displaystyle\frac{\frac{1}{N}\sum_{i=1}^N\left(Y_i-\frac{1}{N}\sum_{i=1}^NY_i\right)\left(D_i-\frac{1}{N}\sum_{i=1}^ND_i\right)}{\frac{1}{N}\sum_{i=1}^N\left(D_i-\frac{1}{N}\sum_{i=1}^ND_i\right)^2}$}
 
 <<btols,eval=TRUE,echo=FALSE>>=
-a<-y-sum(y)/NS
-b<-Ds-sum(Ds)/NS
+a<-ys-sum(ys)/NS
+b<-Dss-sum(Dss)/NS
 betaOLS<-(sum(a*b)/NS)/(sum(b^2)/NS)
 @
 
@@ -278,14 +278,14 @@ According to the course, we learnt the CLT formula to estimate the effect of sam
 \noindent{In order to compute the value of $\tilde{\epsilon}$, I firstly compute $\var{Y_i^1|D_i=1}$ and $\var{Y_i^0|D_i=0}$.}
 
 <<vars,eval=TRUE,echo=FALSE>>=
-var1<-var(y[Ds==1])
-var0<-var(y[Ds==0])
+var1<-var(ys[Dss==1])
+var0<-var(ys[Dss==0])
 @
 
 \noindent{According to R, I get $\var{Y_i^1|D_i=1}=\Sexpr{var1}$ and $\var{Y_i^0|D_i=0}=\Sexpr{var0}$.}
 
 <<probas,eval=TRUE,echo=FALSE>>=
-proba1<-length(Ds[Ds==1])/NS
+proba1<-length(Dss[Dss==1])/NS
 @
 
 \noindent{Moreover, I get $\Pr(D_i=1)=\Sexpr{proba1}$.}
