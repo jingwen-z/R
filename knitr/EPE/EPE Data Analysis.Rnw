@@ -537,22 +537,22 @@ I firstly compute the OLS estimator step by step (by graphs)
 <<simul.ols.estim,eval=TRUE,echo=FALSE,results='hide'>>=
 set.seed(2345)
 NO <-1500
-mu <- rnorm(NO,param["barmu"],sqrt(param["sigma2mu"]))
-UB <- rnorm(NO,0,sqrt(param["sigma2U"]))
-yB <- mu + UB 
-YB <- exp(yB)
-Ds <- rep(0,NO)
-Ds[YB<=param["barY"]] <- 1 
-epsilon <- rnorm(NO,0,sqrt(param["sigma2epsilon"]))
-eta<- rnorm(NO,0,sqrt(param["sigma2eta"]))
-U0 <- param["rho"]*UB + epsilon
-y0 <- mu +  U0 + param["delta"]
-alpha <- param["baralpha"]+  param["theta"]*mu + eta
-y1 <- y0+alpha
-Y0 <- exp(y0)
-Y1 <- exp(y1)
-y <- y1*Ds+y0*(1-Ds)
-Y <- Y1*Ds+Y0*(1-Ds)
+muo <- rnorm(NO,param["barmu"],sqrt(param["sigma2mu"]))
+UBo <- rnorm(NO,0,sqrt(param["sigma2U"]))
+yBo <- muo + UBo 
+YBo <- exp(yBo)
+Dso <- rep(0,NO)
+Dso[YBo<=param["barY"]] <- 1 
+epsilono <- rnorm(NO,0,sqrt(param["sigma2epsilon"]))
+etao<- rnorm(NO,0,sqrt(param["sigma2eta"]))
+U0o <- param["rho"]*UBo + epsilono
+y0o <- muo +  U0o + param["delta"]
+alphao <- param["baralpha"]+  param["theta"]*muo + etao
+y1o <- y0o+alphao
+Y0o <- exp(y0o)
+Y1o <- exp(y1o)
+yo <- y1o*Dso+y0o*(1-Dso)
+Yo <- Y1o*Dso+Y0o*(1-Dso)
 @
 
 <<plot.ols.estim.step.0-1,eval=TRUE,fig.cap='compute the OLS estimator step by step',fig.subcap=c('Step 0','Step 1'),fig.align='center',out.width='.5\\textwidth',echo=FALSE,results='hide',fig.pos='htbp'>>=
@@ -565,18 +565,18 @@ xlim.big <- c(-1.5,0.5)
 xlim.small <- c(-0.15,0.55)
 adj <- 0
 
-plot(yB[Ds==0],y0[Ds==0],pch=1,xlim=c(4,10),ylim=c(4,10),xlab="yB",ylab="Outcomes")
-points(yB[Ds==1],y0[Ds==1],pch=1,col=col.unobs)
+plot(yBo[Dso==0],y0o[Dso==0],pch=1,xlim=c(4,10),ylim=c(4,10),xlab="yB",ylab="Outcomes")
+points(yBo[Dso==1],y0o[Dso==1],pch=1,col=col.unobs)
 abline(v=log(param["barY"]),col=col.unobs)
 legend(4,10,c('y0|D=0','y0|D=1'),pch=c(1,1),col=c(col.obs,col.unobs),ncol=1)
 
 # Step 1
-ols.reg.0 <- lm(y[Ds==0]~yB[Ds==0])
+ols.reg.0 <- lm(yo[Dso==0]~yBo[Dso==0])
 summary(ols.reg.0)
 
-plot(yB[Ds==0],y0[Ds==0],pch=1,xlim=c(4,10),ylim=c(4,10),xlab="yB",ylab="Outcomes")
-points(yB[Ds==1],y0[Ds==1],pch=1,col=col.unobs)
-points(yB[Ds==0],ols.reg.0$fitted.values,col='blue')
+plot(yBo[Dso==0],y0o[Dso==0],pch=1,xlim=c(4,10),ylim=c(4,10),xlab="yB",ylab="Outcomes")
+points(yBo[Dso==1],y0o[Dso==1],pch=1,col=col.unobs)
+points(yBo[Dso==0],ols.reg.0$fitted.values,col='blue')
 abline(v=log(param["barY"]),col=col.unobs)
 legend(4,10,c('y0|D=0','y0|D=1',expression(hat('y0|D=0'))),pch=c(1,1,1),col=c(col.obs,col.unobs,'blue'),ncol=2)
 @      
@@ -584,28 +584,28 @@ legend(4,10,c('y0|D=0','y0|D=1',expression(hat('y0|D=0'))),pch=c(1,1,1),col=c(co
 
 <<plot.ols.estim.step.2-3,eval=TRUE,fig.cap='compute the OLS estimator step by step',fig.subcap=c('Step 2','Step 3'),fig.align='center',out.width='.5\\textwidth',echo=FALSE,results='hide',fig.pos='htbp'>>=
 # Step 2
-y.pred <- ols.reg.0$coef[[1]]+ols.reg.0$coef[[2]]*yB[Ds==1]
+y.pred <- ols.reg.0$coef[[1]]+ols.reg.0$coef[[2]]*yBo[Dso==1]
 
-plot(yB[Ds==0],y0[Ds==0],pch=1,xlim=c(4,10),ylim=c(4,10),xlab="yB",ylab="Outcomes")
-points(yB[Ds==1],y0[Ds==1],pch=1,col=col.unobs)
-points(yB[Ds==0],ols.reg.0$fitted.values,col='blue')
-points(yB[Ds==1],y.pred,pch=3,col='blue')
+plot(yBo[Dso==0],y0o[Dso==0],pch=1,xlim=c(4,10),ylim=c(4,10),xlab="yB",ylab="Outcomes")
+points(yBo[Dso==1],y0o[Dso==1],pch=1,col=col.unobs)
+points(yBo[Dso==0],ols.reg.0$fitted.values,col='blue')
+points(yBo[Dso==1],y.pred,pch=3,col='blue')
 abline(v=log(param["barY"]),col=col.unobs)
 legend(4,10,c('y0|D=0','y0|D=1',expression(hat('y0|D=0')),expression(hat('y0|D=1'))),pch=c(1,1,1,3),col=c(col.obs,col.unobs,'blue','blue'),ncol=2)
 
 # Step 3
-plot(yB[Ds==0],y0[Ds==0],pch=1,xlim=c(4,10),ylim=c(4,10),xlab="yB",ylab="Outcomes")
-points(yB[Ds==1],y0[Ds==1],pch=1,col=col.unobs)
-points(yB[Ds==0],ols.reg.0$fitted.values,col='blue')
-points(yB[Ds==1],y.pred,col='blue')
-points(yB[Ds==1],y[Ds==1],pch=3,col='black')
+plot(yBo[Dso==0],y0o[Dso==0],pch=1,xlim=c(4,10),ylim=c(4,10),xlab="yB",ylab="Outcomes")
+points(yBo[Dso==1],y0o[Dso==1],pch=1,col=col.unobs)
+points(yBo[Dso==0],ols.reg.0$fitted.values,col='blue')
+points(yBo[Dso==1],y.pred,col='blue')
+points(yBo[Dso==1],yo[Dso==1],pch=3,col='black')
 abline(v=log(param["barY"]),col=col.unobs)
 legend(4,10,c('y0|D=0','y0|D=1','y1|D=1',expression(hat('y0|D=0')),expression(hat('y0|D=1'))),pch=c(1,1,3,1,3),col=c(col.obs,col.unobs,col.obs,'blue','blue'),ncol=2)
 @
 
 % Step 4
 <<ww.ols,eval=TRUE,echo=FALSE,results='hide'>>=
-#ww.ols <- mean(y[Ds==1]-y.pred)
+ww.ols <- mean(yo[Dso==1]-y.pred)
 @
 
 <<plot.ols.estim.step.4,eval=TRUE,echo=FALSE,results='hide',fig.cap='Step 4',fig.align='center',out.width='.65\\textwidth',fig.pos='htbp'>>=
@@ -620,6 +620,53 @@ legend(4,10,c('y0|D=0','y0|D=1','y1|D=1',expression(hat('y0|D=0')),expression(ha
 \centering
 \includegraphics[height=7.5cm]{olsestim}
 \caption{Step 4}
+\end{figure}
+
+\clearpage
+
+\noindent{Then, I'll compute the OLS estimator directly.\\
+According to the course, I get the following assumptions:\\
+\textbf{Selection on Observables}\\
+We assume that there exists a known set of observable covariates $X_i$ such that:\\
+\centerline{$\esp{Y_i^0|X_i,D_i=1} = \esp{Y_i^0|X_i,D_i=0}$}\\
+And \textbf{Parametric Functional Form}\\
+We assume that there exists a known set of observable covariates $X_i$ such that:\\
+\centerline{$\esp{Y_i^0|X_i} = \alpha_0+\beta_0'X_i$}\\
+According to these two assumptions, we get the following theorem:\\
+\textbf{Identification of TT using OLS}\\
+Under Selection on Observables and Parametric Functional Form, TT is identified using the WW comparison adjusted by the OLS projection.\\
+\centerline{$\Delta^Y_{WWOLS(X)} = \Delta^Y_{TT}$}}\\
+
+<<tt,eval=TRUE,echo=FALSE>>=
+tt<-mean(y1o-y0o)
+@
+\noindent{According to R, I get $\bm{\Delta^Y_{TT}=\Sexpr{tt}}$, which means $\bm{\Delta^Y_{WWOLS(X)}=\Sexpr{tt}}$.}
+
+\noindent{Moreover, thanks to another assumption \textbf{Parametric functional form for the Treated} and theorem \textbf{WWOLS is OLS}, I get\\
+\centerline{$\hat{\delta}_{OLS} = \hat{\Delta^Y_{WWOLS(X)}}$}}
+
+\noindent{So I get the OLS estimator $\bm{\hat{\delta}_{OLS} = \hat{\Delta^Y_{WWOLS(X)}}=\Sexpr{tt}$.}
+
+\noindent{Furthermore, I get the following graph:}
+
+<<ww.ols.direct,eval=TRUE,echo=FALSE,results='hide'>>=
+yB.Ds <-(yBo-mean(yBo[Dso==1]))*Dso
+ols.direct <- lm(yo~yBo+Dso+yB.Ds)
+ww.ols.direct <- ols.direct$coef[[3]]
+@
+
+<<plot.ols.estim.direct,eval=TRUE,echo=FALSE,results='hide',fig.cap='Direct OLS Estimation',fig.align='center',out.width='.65\\textwidth',fig.pos='htbp'>>=
+#plot(1, type="n", xlab="", ylab="", xlim=xlim.small, ylim=c(0, 10))
+#abline(v=delta.y.tt(param),col=col.unobs,lty=lty.unobs)
+#abline(v=ww.ols.direct,col=col.obs,lty=lty.obs)
+#text(x=c(delta.y.tt(param),ww.ols.direct),y=c(adj),labels=c('TT',expression(hat('E'))),pos=c(4,2),col=c(col.unobs,col.obs),lty=c(lty.unobs,lty.obs))
+@
+
+% since it cannot export the same graph as it did in R, I insert the gragh.
+\begin{figure}[htb]
+\centering
+\includegraphics[height=10cm]{DirectOLS}
+\caption{Direct OLS Estimation}
 \end{figure}
 
 \clearpage
