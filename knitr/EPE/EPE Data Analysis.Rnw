@@ -580,6 +580,7 @@ points(yB[Ds==0],ols.reg.0$fitted.values,col='blue')
 abline(v=log(param["barY"]),col=col.unobs)
 legend(4,10,c('y0|D=0','y0|D=1',expression(hat('y0|D=0'))),pch=c(1,1,1),col=c(col.obs,col.unobs,'blue'),ncol=2)
 @      
+\clearpage
 
 <<plot.ols.estim.step.2-3,eval=TRUE,fig.cap='compute the OLS estimator step by step',fig.subcap=c('Step 2','Step 3'),fig.align='center',out.width='.5\\textwidth',echo=FALSE,results='hide',fig.pos='htbp'>>=
 # Step 2
@@ -615,11 +616,13 @@ legend(4,10,c('y0|D=0','y0|D=1','y1|D=1',expression(hat('y0|D=0')),expression(ha
 @
 
 % since it cannot export the same graph of step 4 as it did in R, I insert the gragh.
-\begin{figure}
+\\begin{figure}[htb]
 \centering
-\includegraphics[scale=0.45]{olsestim}
+\includegraphics[height=7.5cm]{olsestim}
 \caption{Step 4}
 \end{figure}
+
+\clearpage
 
 
 \end{document}
