@@ -7,6 +7,7 @@ library(gplots)
 library(snowfall)
 library(ggplot2)
 library(xtable)
+library(sandwich)
 @
 
 \usepackage{geometry}
@@ -670,6 +671,113 @@ ww.ols.direct <- ols.direct$coef[[3]]
 \end{figure}
 
 \clearpage
+
+\noindent{Now I compare their values with the theoretical TT.\\
+According to the course, we learnt the theoretical TT with the following formula:\\
+\centerline{$\Large\Delta_{TT}^y =\bar{\alpha}+\theta\bar{\mu} -\theta\displaystyle\frac{\sigma^2_{\mu}}{\sqrt{\sigma^2_{\mu}+\sigma^2_{U}}}\frac{\displaystyle\phi\left(\frac{\bar{y}-\bar{\mu}}{\sqrt{\sigma^2_{\mu}+\sigma^2_{U}}}\right)}{\displaystyle\Phi\left(\frac{\bar{y}-\bar{\mu}}{\sqrt{\sigma^2_{\mu}+\sigma^2_{U}}}\right)}$}}
+
+<<theo.tt,eval=TRUE,echo=FALSE>>=
+theo.tt<-delta.y.tt(param)
+@
+
+\noindent{Thus, I get the theoretical TT is \textbf{\Sexpr{theo.tt}}, which is smaller than the value that I calculated just now.}
+
+      \subsection{Compute the robust standard errors and sampling noise.}
+
+I first compute the robust standard errors with sandwich package in R.
+
+<<ww.ols.direct.HC1,eval=TRUE,echo=FALSE>>=
+ols.direct.HC1 <- vcovHC(ols.direct,type='HC1')
+@
+
+\noindent{The robust standard error using HC1 is thus $\bm{\Sexpr{sqrt(ols.direct.HC1[3,3])}}$.\\
+Then, I'll compute the sampling noise and show it in the following graph.}
+
+<<monte.carlo.ols,eval=TRUE,echo=FALSE,warning=FALSE,error=FALSE,message=FALSE,results='hide',cache=TRUE>>=
+monte.carlo.ols <- function(s,N,param){
+  set.seed(s)
+  mu <- rnorm(N,param["barmu"],sqrt(param["sigma2mu"]))
+  UB <- rnorm(N,0,sqrt(param["sigma2U"]))
+  yB <- mu + UB 
+  YB <- exp(yB)
+  Ds <- rep(0,N)
+  Ds[YB<=param["barY"]] <- 1 
+  epsilon <- rnorm(N,0,sqrt(param["sigma2epsilon"]))
+  eta<- rnorm(N,0,sqrt(param["sigma2eta"]))
+  U0 <- param["rho"]*UB + epsilon
+  y0 <- mu +  U0 + param["delta"]
+  alpha <- param["baralpha"]+  param["theta"]*mu + eta
+  y1 <- y0+alpha
+  Y0 <- exp(y0)
+  Y1 <- exp(y1)
+  y <- y1*Ds+y0*(1-Ds)
+  Y <- Y1*Ds+Y0*(1-Ds)
+  yB.Ds <-(yB-mean(yB[Ds==1]))*Ds
+  ols.direct <- lm(y~yB+Ds+yB.Ds)
+  ols.simple <- lm(y~yB+Ds)
+  return(c(ols.simple$coef[3],ols.direct$coef[3],sqrt(vcov(ols.direct)[3,3]),sqrt(vcovHC(ols.direct,type='HC0')[3,3]),sqrt(vcovHC(ols.direct,type='HC1')[3,3]),sqrt(vcovHC(ols.direct,type='HC2')[3,3]),sqrt(vcovHC(ols.direct,type='HC3')[3,3])))
+}
+
+simuls.ols.N <- function(N,Nsim,param){
+  simuls.ols <- matrix(unlist(lapply(1:Nsim,monte.carlo.ols,N=N,param=param)),nrow=Nsim,ncol=7,byrow=TRUE)
+  colnames(simuls.ols) <- c('OLS.simple','OLS.direct','Homo','HC0','HC1','HC2','HC3')
+  return(simuls.ols)
+}
+
+sf.simuls.ols.N <- function(N,Nsim,param){
+  sfInit(parallel=TRUE,cpus=8)
+  sfLibrary(sandwich)
+  sim <- matrix(unlist(sfLapply(1:Nsim,monte.carlo.ols,N=N,param=param)),nrow=Nsim,ncol=7,byrow=TRUE)
+  sfStop()
+  colnames(sim) <- c('OLS.simple','OLS.direct','Homo','HC0','HC1','HC2','HC3')
+  return(sim)
+}
+
+Nsim <- 1000
+#Nsim <- 10
+N.sample <- c(100,1000,10000,100000)
+#N.sample <- c(100,1000,10000)
+
+simuls.ols <- lapply(N.sample,sf.simuls.ols.N,Nsim=Nsim,param=param)
+names(simuls.ols) <- N.sample
+@
+
+<<monte.carlo.hist.ols,dependson='monte.carlo.ols',eval=TRUE,echo=FALSE,warning=FALSE,error=FALSE,message=FALSE,results='hide',fig.cap='Distribution of the $OLS$ estimator over replications of samples of different sizes',fig.align='center',out.width='.65\\textwidth',fig.pos='htbp'>>=
+par(mfrow=c(2,2))
+for (i in 1:length(simuls.ols)){
+  hist(simuls.ols[[i]][,'OLS.direct'],main=paste('N=',as.character(N.sample[i])),xlab=expression(hat(Delta^yOLS)),xlim=c(0.1,1.25))
+  abline(v=delta.y.tt(param),col="red")
+}
+@
+
+<<precision.ols,dependson='monte.carlo.ols',eval=TRUE,echo=FALSE,results='hide',echo=FALSE,warning=FALSE,error=FALSE,message=FALSE,fig.cap='precision of the OLS estimator with 99\\% confidence',fig.align='center',out.width='.65\\textwidth',fig.pos='htbp'>>=
+delta <- 0.99
+precision.ols <- function(k){
+  return(2*quantile(abs(simuls.ols[[k]][,'OLS.direct']-delta.y.tt(param)),probs=c(delta)))
+}
+precision.ols.N <- sapply(1:length(simuls.ols),precision.ols)
+
+mean.ols.prec <- function(k,HC,delta=delta){
+  return(2*(qnorm((delta+1)/2))*mean(simuls.ols[[k]][,HC]))
+}
+mean.ols.prec.homo <- sapply(1:length(simuls.ols),mean.ols.prec,HC='Homo',delta=delta)
+mean.ols.prec.HC0 <- sapply(1:length(simuls.ols),mean.ols.prec,HC='HC0',delta=delta)
+mean.ols.prec.HC1 <- sapply(1:length(simuls.ols),mean.ols.prec,HC='HC1',delta=delta)
+mean.ols.prec.HC2 <- sapply(1:length(simuls.ols),mean.ols.prec,HC='HC2',delta=delta)
+mean.ols.prec.HC3 <- sapply(1:length(simuls.ols),mean.ols.prec,HC='HC3',delta=delta)
+
+precision.ols <- as.data.frame(cbind(N.sample,precision.ols.N,mean.ols.prec.homo,mean.ols.prec.HC0,mean.ols.prec.HC1,mean.ols.prec.HC2,mean.ols.prec.HC3,rep(delta.y.tt(param),length(simuls.ols))))
+colnames(precision.ols) <- c('N','precision','Homo','HC0','HC1','HC2','HC3','TT')
+ggplot(precision.ols, aes(x=as.factor(N), y=TT)) +
+  geom_bar(position=position_dodge(), stat="identity", colour='black') +
+  geom_errorbar(aes(ymin=TT-precision/2, ymax=TT+precision/2), width=.2,position=position_dodge(.9),color='red') +
+  geom_errorbar(aes(ymin=TT-Homo/2, ymax=TT+Homo/2), width=.2,position=position_dodge(.9),color='blue') +
+  geom_errorbar(aes(ymin=TT-HC0/2, ymax=TT+HC0/2), width=.2,position=position_dodge(.9),color='green') +
+  geom_errorbar(aes(ymin=TT-HC1/2, ymax=TT+HC1/2), width=.2,position=position_dodge(.9),color='yellow') +
+  geom_errorbar(aes(ymin=TT-HC2/2, ymax=TT+HC2/2), width=.2,position=position_dodge(.9),color='orange') +
+  geom_errorbar(aes(ymin=TT-HC3/2, ymax=TT+HC3/2), width=.2,position=position_dodge(.9),color='purple') +
+  xlab("Sample Size") 
+@
 
 
 \end{document}
