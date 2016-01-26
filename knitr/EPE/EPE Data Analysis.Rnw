@@ -527,6 +527,7 @@ N.12<-(1/(0.002087^2))*(qnorm((0.95+1)/2))^2*((varyB1/proba1)+(varyB0/(1-proba1)
 \vspace{.5em}
 \noindent{Comparing the results above, we can easily observe that for the same confidence level, sample size decreases with sampling noise; for the same sampling noise, sample size increases  with confidence level.}
 
+
   \chapter{Observational Methods of Causal Inference}
     \section{Parametric Observational Methods: OLS}
     
@@ -609,11 +610,11 @@ legend(4,10,c('y0|D=0','y0|D=1','y1|D=1',expression(hat('y0|D=0')),expression(ha
 ww.ols <- mean(yo[Dso==1]-y.pred)
 @
 
-<<plot.ols.estim.step.4,eval=TRUE,echo=FALSE,results='hide',fig.cap='Step 4',fig.align='center',out.width='.65\\textwidth',fig.pos='htbp'>>=
-#plot(1, type="n", xlab="", ylab="", xlim=xlim.small, ylim=c(0, 10))
-#abline(v=delta.y.tt(param),col=col.unobs,lty=lty.unobs)
-#abline(v=ww.ols,col=col.obs,lty=lty.obs)
-#text(x=c(delta.y.tt(param),ww.ols),y=c(adj),labels=c('TT',expression(hat('E'))),pos=c(4,2),col=c(col.unobs,col.obs),lty=c(lty.unobs,lty.obs))
+<<plot.ols.estim.step.4,eval=FALSE,echo=FALSE,results='hide',fig.cap='Step 4',fig.align='center',out.width='.65\\textwidth',fig.pos='htbp'>>=
+plot(1, type="n", xlab="", ylab="", xlim=xlim.small, ylim=c(0, 10))
+abline(v=delta.y.tt(param),col=col.unobs,lty=lty.unobs)
+abline(v=ww.ols,col=col.obs,lty=lty.obs)
+text(x=c(delta.y.tt(param),ww.ols),y=c(adj),labels=c('TT',expression(hat('E'))),pos=c(4,2),col=c(col.unobs,col.obs),lty=c(lty.unobs,lty.obs))
 @
 
 % since it cannot export the same graph of step 4 as it did in R, I insert the gragh.
@@ -656,11 +657,11 @@ ols.direct <- lm(yo~yBo+Dso+yB.Ds)
 ww.ols.direct <- ols.direct$coef[[3]]
 @
 
-<<plot.ols.estim.direct,eval=TRUE,echo=FALSE,results='hide',fig.cap='Direct OLS Estimation',fig.align='center',out.width='.65\\textwidth',fig.pos='htbp'>>=
-#plot(1, type="n", xlab="", ylab="", xlim=xlim.small, ylim=c(0, 10))
-#abline(v=delta.y.tt(param),col=col.unobs,lty=lty.unobs)
-#abline(v=ww.ols.direct,col=col.obs,lty=lty.obs)
-#text(x=c(delta.y.tt(param),ww.ols.direct),y=c(adj),labels=c('TT',expression(hat('E'))),pos=c(4,2),col=c(col.unobs,col.obs),lty=c(lty.unobs,lty.obs))
+<<plot.ols.estim.direct,eval=FALSE,echo=FALSE,results='hide',fig.cap='Direct OLS Estimation',fig.align='center',out.width='.65\\textwidth',fig.pos='htbp'>>=
+plot(1, type="n", xlab="", ylab="", xlim=xlim.small, ylim=c(0, 10))
+abline(v=delta.y.tt(param),col=col.unobs,lty=lty.unobs)
+abline(v=ww.ols.direct,col=col.obs,lty=lty.obs)
+text(x=c(delta.y.tt(param),ww.ols.direct),y=c(adj),labels=c('TT',expression(hat('E'))),pos=c(4,2),col=c(col.unobs,col.obs),lty=c(lty.unobs,lty.obs))
 @
 
 % since it cannot export the same graph as it did in R, I insert the gragh.
@@ -749,8 +750,9 @@ for (i in 1:length(simuls.ols)){
   abline(v=delta.y.tt(param),col="red")
 }
 @
+\clearpage
 
-<<precision.ols,dependson='monte.carlo.ols',eval=TRUE,echo=FALSE,results='hide',echo=FALSE,warning=FALSE,error=FALSE,message=FALSE,fig.cap='precision of the OLS estimator with 99\\% confidence',fig.align='center',out.width='.65\\textwidth',fig.pos='htbp'>>=
+<<precision.ols,dependson='monte.carlo.ols',eval=FALSE,echo=FALSE,results='hide',echo=FALSE,warning=FALSE,error=FALSE,message=FALSE,fig.cap='precision of the OLS estimator with 99\\% confidence',fig.align='center',out.width='.65\\textwidth',fig.pos='htbp'>>=
 delta <- 0.99
 precision.ols <- function(k){
   return(2*quantile(abs(simuls.ols[[k]][,'OLS.direct']-delta.y.tt(param)),probs=c(delta)))
@@ -778,6 +780,14 @@ ggplot(precision.ols, aes(x=as.factor(N), y=TT)) +
   geom_errorbar(aes(ymin=TT-HC3/2, ymax=TT+HC3/2), width=.2,position=position_dodge(.9),color='purple') +
   xlab("Sample Size") 
 @
+
+\noindent{As what happened before, it exports different graph from what it actually did in R, I insert the
+right gragh.}
+\begin{figure}[htb]
+\centering
+\includegraphics[height=10cm]{precols}
+\caption{precision of the OLS estimator with 99\% confidence}
+\end{figure}
 
 
 \end{document}
