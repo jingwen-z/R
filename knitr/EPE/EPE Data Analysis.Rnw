@@ -750,6 +750,7 @@ for (i in 1:length(simuls.ols)){
   abline(v=delta.y.tt(param),col="red")
 }
 @
+\noindent{When sample size is 100, the sampling noise is big. With the increasing of sample size, the sampling noise becomes much smaller.}
 \clearpage
 
 <<precision.ols,dependson='monte.carlo.ols',eval=FALSE,echo=FALSE,results='hide',echo=FALSE,warning=FALSE,error=FALSE,message=FALSE,fig.cap='precision of the OLS estimator with 99\\% confidence',fig.align='center',out.width='.65\\textwidth',fig.pos='htbp'>>=
@@ -788,6 +789,133 @@ right gragh.}
 \includegraphics[height=10cm]{precols}
 \caption{precision of the OLS estimator with 99\% confidence}
 \end{figure}
+
+  \section{Nonparametric Observational Methods: Matching}
+    \subsection{Compute the LLR estimator on the sample with common support.}
+
+For that, I will do the following step by step:
+\begin{enumerate}
+  \item estimate the propensity score
+  \item common support and trimming
+  \item LLR matching on the trimmed sample
+\end{enumerate}
+\clearpage
+
+\noindent{\textbf{estimate the propensity score}}
+
+<<propen.score,eval=TRUE,echo=FALSE>>=
+propen.score<-length(Dso[Dso==1])/NO
+@
+\noindent{According to R, I get the propensity score is $\bm{\Sexpr{propen.score}}$.}
+
+\noindent{\textbf{common support and trimming}}
+<<simul.com.supp,eval=TRUE,echo=FALSE,results='hide'>>=
+set.seed(2345)
+NO <-1500
+muo <- rnorm(NO,param["barmu"],sqrt(param["sigma2mu"]))
+UBo <- rnorm(NO,0,sqrt(param["sigma2U"]))
+yBo <- muo + UBo 
+YBo <- exp(yBo)
+Dso <- rep(0,NO)
+Vo <- rnorm(NO,0,sqrt(param["sigma2mu"]+param["sigma2U"]))
+Dso[yBo+Vo<=log(param["barY"])] <- 1 
+epsilono <- rnorm(NO,0,sqrt(param["sigma2epsilon"]))
+etao<- rnorm(NO,0,sqrt(param["sigma2eta"]))
+U0o <- param["rho"]*UBo + epsilono
+y0o <- muo +  U0o + param["delta"]
+alphao <- param["baralpha"]+  param["theta"]*muo + etao
+y1o <- y0o+alphao
+Y0o <- exp(y0o)
+Y1o <- exp(y1o)
+yo <- y1o*Dso+y0o*(1-Dso)
+Yo <- Y1o*Dso+Y0o*(1-Dso)
+@
+
+<<plot.com.supp,eval=TRUE,echo=FALSE,results='hide',fig.align='center',out.width='.65\\textwidth',fig.pos='htbp'>>=
+par(mar=c(4,3,2,3),oma=c(0.5,0,0.5,0))
+plot(yBo[Dso==0],y0o[Dso==0],pch=1,xlim=c(4,10.5),ylim=c(4,10.5),xlab="yB",ylab="Outcomes")
+points(yBo[Dso==1],yo[Dso==1],pch=3,col='blue')
+legend(4,10.3,c('y0|D=0','y1|D=1','D'),pch=c(1,3,2),col=c(col.obs,'blue',col.unobs),ncol=1)
+par(new=TRUE)
+plot(yBo,Dso,pch=2,col=col.unobs,xlim=c(4,10.5),xaxt="n",yaxt="n",xlab="",ylab="")
+axis(4)
+mtext("D",side=4,line=3)
+@
+
+\noindent{\textbf{Remark:}\ Set or Query Graphical Parameters\\
+par {graphics}:par can be used to set or query graphical parameters. Parameters can be set by specifying them as arguments to par in tag = value form, or by passing them as a list of tagged values.\\
+\textbf{par(..., no.readonly = FALSE)}\\
+\emph{mar}-A numerical vector of the form c(bottom, left, top, right) which gives the number of lines of margin to be specified on the four sides of the plot. The default is c(5, 4, 4, 2) + 0.1.\\
+\emph{oma}-A vector of the form c(bottom, left, top, right) giving the size of the outer margins in lines of text.}
+\clearpage
+
+\noindent{\textbf{LLR matching on the trimmed sample}}
+<<LLR,eval=TRUE,echo=FALSE,results='hide',cache=TRUE>>=
+llr <- function(y,x,gridx,bw,kernel){
+  if (kernel=='uniform'){
+    K <- function(u){
+      K.u <- 0
+      if (abs(u)<=.5){K.u <- 1}
+      return(K.u)
+    }
+  }
+  if (kernel=='triangular'){
+    K <- function(u){
+      K.u <- 0
+      if (abs(u)<=.5){K.u <- 2*(1-2*abs(u))}
+      return(K.u)
+    }
+  }
+  if (kernel=='epanechnikov'){
+    K <- function(u){
+      K.u <- 0
+      if (abs(u)<=.5){K.u <- (3/2)*(1-4*u^2)}
+      return(K.u)
+    }
+  }
+  if (kernel=='quartic'){
+    K <- function(u){
+      K.u <- 0
+      if (abs(u)<=.5){K.u <- (15/8)*(1-4*u^2)^2}
+      return(K.u)
+    }
+  }
+  if (kernel=='gaussian'){
+    K <- function(u){
+      return(exp(-0.5*u^2)/(sqrt(2*pi)))
+    }
+  }
+  K.vec <- Vectorize(K)
+  y0.hat <- rep(0,length(gridx))  
+  for (i in (1:length(gridx))){
+    x.i <- gridx[i]-x
+    weights.i <- K.vec((x.i)/bw)
+    ols.i <- lm(y~x.i,weights=weights.i)
+    y0.hat[i] <- ols.i$coefficients[1]
+  }
+  return(y0.hat)
+}
+
+kernel <- 'gaussian'
+bw <- 1
+y0.llr <- llr(yo[Dso==0],yBo[Dso==0],yBo[Dso==1],bw=bw,kernel=kernel)    
+@
+
+<<plot.LLR.step.0,dependson='LLR',eval=TRUE,echo=FALSE,results='hide',fig.cap='Step 0',fig.align='center',out.width='.51\\textwidth',out.height='.5\\textwidth',fig.width=5.5,fig.height=5.7,fig.pos='htp'>>=
+par(mar=c(4,3,2,3),oma=c(0.3,0,0.3,0))
+plot(yBo[Dso==0],y0o[Dso==0],pch=1,xlim=c(4,10.5),ylim=c(4,10.5),xlab="yB",ylab="Outcomes")
+points(yBo[Dso==1],y0o[Dso==1],pch=1,col=col.unobs)
+legend(4,10.5,c('y0|D=0','y0|D=1'),pch=c(1,1),col=c(col.obs,col.unobs),ncol=1)
+@
+
+<<plot.LLR.step.1,dependson='LLR',eval=TRUE,echo=FALSE,results='hide',fig.cap='Step 1',fig.align='center',out.width='.51\\textwidth',out.height='.5\\textwidth',fig.width=5.5,fig.height=5.7,fig.pos='hb'>>=
+par(mar=c(4,3,2,3),oma=c(0.3,0,0.3,0))
+plot(yBo[Dso==0],y0o[Dso==0],pch=1,xlim=c(4,10.5),ylim=c(4,10.5),xlab="yB",ylab="Outcomes")
+points(yBo[Dso==1],y0o[Dso==1],pch=1,col=col.unobs)
+points(yBo[Dso==1],y0.llr,col='blue')
+legend(4,10.5,c('y0|D=0','y0|D=1',expression(hat(y0))),pch=c(1,1,1),col=c(col.obs,col.unobs,'blue'),ncol=2)
+@
+\clearpage
 
 
 \end{document}
