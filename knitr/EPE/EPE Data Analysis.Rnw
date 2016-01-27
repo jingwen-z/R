@@ -808,7 +808,8 @@ propen.score<-length(Dso[Dso==1])/NO
 @
 \noindent{According to R, I get the propensity score is $\bm{\Sexpr{propen.score}}$.}
 
-\noindent{\textbf{common support and trimming}}
+\noindent{\textbf{common support and trimming}\\
+Common Support: Illustration}
 <<simul.com.supp,eval=TRUE,echo=FALSE,results='hide'>>=
 set.seed(2345)
 NO <-1500
@@ -849,7 +850,7 @@ par {graphics}:par can be used to set or query graphical parameters. Parameters 
 \emph{oma}-A vector of the form c(bottom, left, top, right) giving the size of the outer margins in lines of text.}
 \clearpage
 
-\noindent{\textbf{LLR matching on the trimmed sample}}
+\noindent{LLR Matching}
 <<LLR,eval=TRUE,echo=FALSE,results='hide',cache=TRUE>>=
 llr <- function(y,x,gridx,bw,kernel){
   if (kernel=='uniform'){
