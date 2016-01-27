@@ -918,5 +918,158 @@ legend(4,10.5,c('y0|D=0','y0|D=1',expression(hat(y0))),pch=c(1,1,1),col=c(col.ob
 @
 \clearpage
 
+<<plot.LLR.step.2,dependson='LLR',eval=TRUE,echo=FALSE,results='hide',fig.cap='Step 2',fig.align='center',out.width='.51\\textwidth',out.height='.5\\textwidth',fig.width=5.5,fig.height=5.7,fig.pos='htbp'>>=
+par(mar=c(4,3,2,3),oma=c(0.3,0,0.3,0))
+plot(yBo[Dso==0],y0o[Dso==0],pch=1,xlim=c(4,10.5),ylim=c(4,10.5),xlab="yB",ylab="Outcomes")
+points(yBo[Dso==1],y0o[Dso==1],pch=1,col=col.unobs)
+points(yBo[Dso==1],y0.llr,col='blue')
+points(yBo[Dso==1],yo[Dso==1],pch=3)
+legend(4,10.5,c('y0|D=0','y0|D=1',expression(hat(y0)),'y|D=1'),pch=c(1,1,1,3),col=c(col.obs,col.unobs,'blue',col.obs),ncol=2)
+@
+
+<<delta.y.tt.com.supp,eval=TRUE,echo=FALSE,results='hide'>>=
+delta.y.tt.com.supp <- function(param){
+  return(param["baralpha"]+param["theta"]*param["barmu"]-param["theta"]*((param["sigma2mu"]*dnorm((log(param["barY"])-param["barmu"])/(sqrt(2*(param["sigma2mu"]+param["sigma2U"])))))/(sqrt(2*(param["sigma2mu"]+param["sigma2U"]))*pnorm((log(param["barY"])-param["barmu"])/(sqrt(2*(param["sigma2mu"]+param["sigma2U"])))))))
+}
+@
+
+<<ww.llr,dependson='LLR',eval=TRUE,echo=FALSE,results='hide'>>=
+ww.llr <- mean(yo[Dso==1]-y0.llr)
+@
+
+<<plot.LLR.step.3,dependson='LLR',eval=FALSE,echo=FALSE,results='hide',fig.cap='Step 3',fig.align='center',out.width='.65\\textwidth',fig.pos='htbp'>>=
+plot(1, type="n", xlab="", ylab="", xlim=xlim.small, ylim=c(0, 10))
+abline(v=delta.y.tt.com.supp(param),col=col.unobs,lty=lty.unobs)
+abline(v=ww.llr,col=col.obs,lty=lty.obs)
+text(x=c(delta.y.tt.com.supp(param),ww.llr),y=c(adj),labels=c('TT',expression(hat('E'))),pos=c(2,4),col=c(col.unobs,col.obs),lty=c(lty.unobs,lty.obs))
+@
+
+% As what happened before, it exports different graph from what it actually did in R, I insert the right gragh.
+\begin{figure}[htb]
+\centering
+\includegraphics[height=8cm]{Step3}
+\caption{Step 3}
+\end{figure} 
+
+\noindent{with bandwidth=\Sexpr{bw} and a \Sexpr{kernel} kernel.}
+\clearpage
+
+\noindent{\emph{Trimming: Illustration}}
+<<trimming,eval=TRUE,echo=FALSE,results='hide'>>=
+# density function estimated at one point
+dens.fun.point <- function(n,x,gridx,bw,kernel){
+  return(density(x,n=1,from=gridx[n],to=gridx[n],bw=bw,kernel=kernel)[[2]])
+}
+
+dens.fun <- function(x,gridx,bw,kernel){
+  return(sapply(1:length(gridx), dens.fun.point, x=x, gridx=gridx, bw=bw, kernel=kernel))
+}
+dens.yB.D0 <- dens.fun(yBo[Dso==0],yBo[Dso==1],bw=bw.nrd(yBo[Dso==0]),kernel='b')
+dens.yB.D1 <- dens.fun(yBo[Dso==1],yBo[Dso==1],bw=bw.nrd(yBo[Dso==1]),kernel='b')
+
+com.supp <- function(x,gridx,t,bw,kernel){
+  dens.x <- dens.fun(x=x,gridx=gridx,bw=bw,kernel=kernel)
+  return(ifelse(dens.x<=quantile(dens.x,t),0,1))
+}
+
+t<- 0.05  # t is the trimming level (5% in general)
+com.supp.yB <- com.supp(yBo[Dso==0],yBo[Dso==1],t=t,bw=bw.nrd(yBo[Dso==0]),kernel='b')
+@
+
+<<plot.trimming,eval=TRUE,echo=FALSE,results='hide',fig.cap='Trimming and Common Support',fig.align='center',out.width='.5\\textwidth',out.height='.5\\textwidth',fig.width=7,fig.height=7,fig.pos='htbp'>>=
+par(mar=c(4,4,2,4),oma=c(0.3,0,0.3,0))
+plot(yBo[Dso==1],dens.yB.D0,pch=1,xlim=c(4,10),ylim=c(0,0.6),xlab="yB",ylab="density")
+points(yBo[Dso==1],dens.yB.D1,pch=3)
+legend(4,0.59,c('fyB|D=0','fyB|D=1','Common Support'),pch=c(1,3,2),col=c(col.obs,col.obs,col.unobs),ncol=1)
+par(new=TRUE)
+plot(yBo[Dso==1],com.supp.yB,pch=2,col=col.unobs,xlim=c(4,10),ylim=c(0,1),xaxt="n",yaxt="n",xlab="",ylab="")
+axis(4)
+mtext("Common Support",side=4,line=3)
+@
+
+\noindent{\textbf{LLR matching on the trimmed sample}}
+<<LLR.trim,eval=TRUE,echo=FALSE,results='hide',cache=TRUE>>=
+llr.match.trim <- function(y,D,x,t,bw,kernel){
+  com.supp.x <- com.supp(x[D==0],x[D==1],t=t,bw=bw.nrd(x[D==0]),kernel='b')
+  y0.llr <- llr(y[D==0],x[D==0],x[D==1][com.supp.x==1],bw=bw,kernel=kernel)
+  return(mean(y[D==1][com.supp.x==1]-y0.llr))
+}
+ww.llr.trim <- llr.match.trim(yo,Dso,yBo,t=t,bw=bw,kernel=kernel)
+@
+
+<<plot.LLR.trimming,dependson='LLR.trim',eval=FALSE,echo=FALSE,results='hide',fig.cap='LLR Matching with Trimming',fig.align='center',out.width='.65\\textwidth',fig.pos='htbp'>>=
+plot(1, type="n", xlab="", ylab="", xlim=xlim.small, ylim=c(0, 10))
+abline(v=delta.y.tt.com.supp(param),col=col.unobs,lty=lty.unobs)
+abline(v=ww.llr.trim,col=col.obs,lty=lty.obs)
+text(x=c(delta.y.tt.com.supp(param),ww.llr.trim),y=c(adj),labels=c('TT',expression(hat('E'))),pos=c(4,2),col=c(col.unobs,col.obs),lty=c(lty.unobs,lty.obs))
+@
+
+% As what happened before, it exports different graph from what it actually did in R, I insert the right gragh.
+\begin{figure}[htb]
+\centering
+\includegraphics[height=8.6cm]{LLRTrimming}
+\caption{LLR Matching with Trimming}
+\end{figure} 
+
+\noindent{with bandwidth$=$\Sexpr{bw}, \Sexpr{kernel} kernel and trimming level \Sexpr{t*100}\%.}
+\clearpage
+
+    \subsection{Compute the standard errors and sampling noise using the bootstrap.}
+<<monte.carlo.llr.trim,eval=TRUE,echo=FALSE,warning=FALSE,error=FALSE,message=FALSE,results='hide',cache=TRUE>>=
+monte.carlo.llr.trim <- function(s,N,param,t,bw,kernel){
+  set.seed(s)
+  mu <- rnorm(N,param["barmu"],sqrt(param["sigma2mu"]))
+  UB <- rnorm(N,0,sqrt(param["sigma2U"]))
+  yB <- mu + UB 
+  YB <- exp(yB)
+  Ds <- rep(0,N)
+  V <- rnorm(N,0,sqrt(param["sigma2mu"]+param["sigma2U"]))
+  Ds[yB+V<=log(param["barY"])] <- 1 
+  epsilon <- rnorm(N,0,sqrt(param["sigma2epsilon"]))
+  eta<- rnorm(N,0,sqrt(param["sigma2eta"]))
+  U0 <- param["rho"]*UB + epsilon
+  y0 <- mu +  U0 + param["delta"] 
+  alpha <- param["baralpha"]+  param["theta"]*mu + eta
+  y1 <- y0+alpha
+  Y0 <- exp(y0)
+  Y1 <- exp(y1)
+  y <- y1*Ds+y0*(1-Ds)
+  Y <- Y1*Ds+Y0*(1-Ds)
+  ww.llr <- llr.match.trim(y,Ds,yB,t=t,bw=bw,kernel=kernel)
+  return(ww.llr)
+}
+
+simuls.llr.trim.N <- function(N,Nsim,param,t,bw,kernel){
+  simuls.llr.trim <- matrix(unlist(lapply(1:Nsim,monte.carlo.llr.trim,N=N,param=param,t=t,bw=bw,kernel=kernel)),nrow=Nsim,ncol=1,byrow=TRUE)
+  colnames(simuls.llr.trim) <- c('LLR Trim')
+  return(simuls.llr.trim)
+}
+
+sf.simuls.llr.trim.N <- function(N,Nsim,param,t,bw,kernel){
+  sfInit(parallel=TRUE,cpus=8)
+  sfExport('llr.match.trim','llr','dens.fun.point','dens.fun','com.supp')
+  sim.llr.trim <- matrix(unlist(sfLapply(1:Nsim,monte.carlo.llr.trim,N=N,param=param,t=t,bw=bw,kernel=kernel)),nrow=Nsim,ncol=1,byrow=TRUE)
+  sfStop()
+  colnames(sim.llr.trim) <- c('LLR Trim')
+  return(sim.llr.trim)
+}
+
+Nsim <- 1000
+#Nsim <- 10
+#N.sample <- c(100,1000,10000,100000)
+#N.sample <- c(100,1000,10000)
+N.sample <- c(100)
+#simuls.llr.trim <- lapply(N.sample,simuls.llr.trim.N,Nsim=Nsim,param=param,t=t,bw=bw,kernel=kernel)
+simuls.llr.trim <- lapply(N.sample,sf.simuls.llr.trim.N,Nsim=Nsim,param=param,t=t,bw=bw,kernel=kernel)
+names(simuls.llr.trim) <- N.sample
+@
+
+<<monte.carlo.hist.llr.trim,dependson='monte.carlo.llr.trim',eval=TRUE,echo=FALSE,warning=FALSE,error=FALSE,message=FALSE,results='hide',fig.cap='Distribution of the trimmed $LLR$ estimator over replications of samples of different sizes',fig.align='center',out.width='.65\\textwidth',fig.pos='htbp'>>=
+for (i in 1:length(simuls.llr.trim)){
+  hist(simuls.llr.trim[[i]][,'LLR Trim'],main=paste('N=',as.character(N.sample[i])),xlab=expression(hat(Delta^yLLRTrim)),xlim=c(0.25,1.2))
+  abline(v=delta.y.tt.com.supp(param),col="red")
+}
+@
+
 
 \end{document}
