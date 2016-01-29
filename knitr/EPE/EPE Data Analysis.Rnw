@@ -28,6 +28,7 @@ library(AER)
 \usepackage{amsfonts}
 \newcommand{\uns}[1]{\mathds{1}[ #1 ]}
 \newcommand{\esp}[1]{\mathbb{E}[ #1 ]}
+\newcommand{\esph}[1]{\hat{\mathbb{E}}[ #1 ]}
 \newcommand{\var}[1]{\mathbb{V}[ #1 ]}
 \newcommand\Ind{\protect\mathpalette{\protect\independenT}{\perp}}
 
@@ -58,7 +59,7 @@ delta.y.tt <- function(param){
 @
 
 <<data.FPCI,eval=TRUE,echo=FALSE,results='hide'>>=
-set.seed(6789)
+set.seed(2345)
 NC <-2000
 mu <- rnorm(NC,param["barmu"],sqrt(param["sigma2mu"]))
 UB <- rnorm(NC,0,sqrt(param["sigma2U"]))
@@ -187,7 +188,7 @@ names(paramS) <- c("barmu","sigma2mu","sigma2U","barY","rho","theta","sigma2epsi
 @
 
 <<data.FPSI,eval=TRUE,echo=FALSE,results='hide'>>=
-data.FPSI<-set.seed(8778)
+set.seed(2345)
 NS <-1500
 mus <- rnorm(NS,paramS["barmu"],sqrt(paramS["sigma2mu"]))
 UBs <- rnorm(NS,0,sqrt(paramS["sigma2U"]))
@@ -1118,6 +1119,206 @@ text(x=c(log(param["barY"])),y=c(5),labels=c(expression(bar('y'))),pos=c(2),col=
 legend(4,10.5,c('y0|D=0','y1|D=1',expression(hat('y0')),expression(hat('y1'))),pch=c(1,3,1,3),col=c(col.obs,col.obs,'blue','blue'),ncol=2)
 @
 \clearpage
+
+\begin{itemize}
+  \item Build a plot showing the discontinuity in the linear sample using OLS
+\end{itemize}
+
+<<continuity.sharp.ols,eval=TRUE,echo=FALSE,results='hide'>>=
+reg.ols.00 <- lm(y0o[Dso==0]~yBo[Dso==0])
+reg.ols.01 <- lm(y0o[Dso==1]~yBo[Dso==1])
+reg.ols.10 <- lm(y1o[Dso==0]~yBo[Dso==0])
+reg.ols.11 <- lm(y1o[Dso==1]~yBo[Dso==1])
+@
+
+<<identification.sharp.ols.1,eval=FALSE,echo=FALSE,results='hide',fig.cap='the discontinuity in the linear sample using OLS',fig.align='center',out.width='.65\\textwidth',fig.pos='htbp'>>=
+plot(yBo[Dso==0],yo[Dso==0],pch=1,xlim=c(4,10.5),ylim=c(4,10.5),xlab="yB",ylab="Outcomes")
+points(yBo[Dso==1],yo[Dso==1],pch=3)
+abline(v=log(param["barY"]),col=col.unobs)
+text(x=c(log(param["barY"])),y=c(5),labels=c(expression(bar('y'))),pos=c(2),col=c(col.unobs),lty=c(lty.obs))
+legend(4,10.5,c('y0|D=0','y1|D=1'),pch=c(1,3),col=c(col.obs,col.obs),ncol=1)
+@
+
+<<identification.sharp.ols.2,eval=FALSE,echo=FALSE,results='hide',fig.cap='the discontinuity in the linear sample using OLS',fig.align='center',out.width='.65\\textwidth',fig.pos='htbp'>>=
+plot(yBo[Dso==0],yo[Dso==0],pch=1,xlim=c(4,10.5),ylim=c(4,10.5),xlab="yB",ylab="Outcomes")
+points(yBo[Dso==1],yo[Dso==1],pch=3)
+points(yBo[Dso==0],reg.ols.00$fitted.values,col='blue',pch=1)
+abline(v=log(param["barY"]),col=col.unobs)
+text(x=c(log(param["barY"])),y=c(4),labels=c(expression(bar('y'))),pos=c(2),col=c(col.unobs),lty=c(lty.obs))
+legend(4,10.5,c('y0|D=0','y1|D=1',expression(hat('y0'))),pch=c(1,3,1),col=c(col.obs,col.obs,'blue'),ncol=2)
+@
+
+<<identification.sharp.ols.3,eval=TRUE,echo=FALSE,results='hide',fig.cap='the discontinuity in the linear sample using OLS',fig.align='center',out.width='.65\\textwidth',fig.width=8,fig.height=8,fig.pos='htbp'>>=
+plot(yBo[Dso==0],yo[Dso==0],pch=1,xlim=c(4,10.5),ylim=c(4,10.5),xlab="yB",ylab="Outcomes")
+points(yBo[Dso==1],yo[Dso==1],pch=3)
+points(yBo[Dso==0],reg.ols.00$fitted.values,col='blue',pch=1)
+points(yBo[Dso==1],reg.ols.11$fitted.values,col='blue',pch=3)
+abline(v=log(param["barY"]),col=col.unobs)
+text(x=c(log(param["barY"])),y=c(4),labels=c(expression(bar('y'))),pos=c(2),col=c(col.unobs),lty=c(lty.obs))
+legend(4,10.5,c('y0|D=0','y1|D=1',expression(hat('y0')),expression(hat('y1'))),pch=c(1,3,1,3),col=c(col.obs,col.obs,'blue','blue'),ncol=2)
+@
+
+\begin{itemize}
+  \item Estimate TT(z) using OLS predicted at the discontinuity
+\end{itemize}
+
+<<ols.reg.pred,eval=TRUE,echo=FALSE,results='hide'>>=
+y0.bary.pred <- reg.ols.00$coef[[1]]+reg.ols.00$coef[[2]]*log(param['barY'])
+y1.bary.pred <- reg.ols.11$coef[[1]]+reg.ols.11$coef[[2]]*log(param['barY'])
+delta.y.rddols <- y1.bary.pred-y0.bary.pred
+@
+
+\noindent{According to R, I get $\esph{y^1_i|y^B_i=\bar{y}}=$\Sexpr{y1.bary.pred} and $\esph{y_i^0|y_i^B=\bar{y}}=$\Sexpr{y0.bary.pred}, so the estimated TT is $\hat{\Delta^{y}_{RDDOLS}}=$\Sexpr{delta.y.rddols}.\\
+Then I calculate $\bm{TT(z)}$ with the following formula:\\}
+
+\centerline{$\Delta^y_{TT}(\Large\bar{z}) = \bar{\alpha} + \theta\bar{\mu}+\theta\displaystyle\frac{\sigma^2_{\mu}}{\sigma^2_{\mu}+\sigma^2_{U}}(\bar{y}-\bar{\mu})$}
+
+<<delta.y.tt.z,eval=TRUE,echo=FALSE,results='hide'>>=
+delta.y.tt.z <- function(param){
+  return(param["baralpha"]+param["theta"]*param["barmu"]+param["theta"]*(log(param["barY"])-param["barmu"])*param["sigma2mu"]/(param["sigma2mu"]+param["sigma2U"]))
+}
+@
+
+\noindent{So $\bm{TT(z)=\Sexpr{delta.y.tt.z(param)}}$.\\
+Moreover, I show the graph of the results of RDD using OLS as following:}
+
+<<plot.RDD.sharp.ols,eval=FALSE,echo=FALSE,results='hide',fig.cap='Sharp RDD Using OLS',fig.align='center',out.width='.65\\textwidth',fig.pos='htbp'>>=
+plot(1, type="n", xlab="", ylab="", xlim=xlim.small, ylim=c(0, 10))
+abline(v=delta.y.tt.z(param),col=col.unobs,lty=lty.unobs)
+abline(v=delta.y.rddols,col=col.obs,lty=lty.obs)
+text(x=c(delta.y.tt.z(param),delta.y.rddols),y=c(adj),labels=c('TT(z)',expression(hat('E'))),pos=c(4,2),col=c(col.unobs,col.obs),lty=c(lty.unobs,lty.obs))
+@
+\clearpage
+
+% As what happened before, it exports different graph from what it actually did in R, I insert the right gragh.
+\begin{figure}[htb]
+\centering
+\includegraphics[height=8.6cm]{SRDDols}
+\caption{Sharp RDD Using OLS}
+\end{figure} 
+
+        \subsubsection{Nonlinear sample}
+% preparation of parameters and data
+<<param.nonlin,eval=TRUE,echo=FALSE,results='hide'>>=
+param <- c(param,0.1,7.98)
+names(param) <- c("barmu","sigma2mu","sigma2U","barY","rho","theta","sigma2epsilon","sigma2eta","delta","baralpha","gamma","baryB")
+@
+
+<<simul.nonlin,eval=TRUE,echo=FALSE,results='hide'>>=
+set.seed(2345)
+N <-1500
+mu <- rnorm(N,param["barmu"],sqrt(param["sigma2mu"]))
+UB <- rnorm(N,0,sqrt(param["sigma2U"]))
+yB <- mu + UB 
+YB <- exp(yB)
+Ds <- rep(0,N)
+Ds[YB<=param["barY"]] <- 1 
+epsilon <- rnorm(N,0,sqrt(param["sigma2epsilon"]))
+eta<- rnorm(N,0,sqrt(param["sigma2eta"]))
+U0 <- param["rho"]*UB + epsilon
+y0 <- mu +  U0 + param["delta"] + param["gamma"]*(yB-param["baryB"])^2
+alpha <- param["baralpha"]+  param["theta"]*mu + eta
+y1 <- y0+alpha
+Y0 <- exp(y0)
+Y1 <- exp(y1)
+y <- y1*Ds+y0*(1-Ds)
+Y <- Y1*Ds+Y0*(1-Ds)
+@
+
+\begin{itemize}
+  \item Compute the optimal bandwidth using CV
+\end{itemize}
+
+<<LLR.nonlin,eval=TRUE,echo=FALSE,results='hide',cache=TRUE>>=
+llr <- function(y,x,gridx,bw,kernel){
+  if (kernel=='uniform'){
+    K <- function(u){
+      K.u <- 0
+      if (abs(u)<=.5){K.u <- 1}
+      return(K.u)
+    }
+  }
+  if (kernel=='triangular'){
+    K <- function(u){
+      K.u <- 0
+      if (abs(u)<=.5){K.u <- 2*(1-2*abs(u))}
+      return(K.u)
+    }
+  }
+  if (kernel=='epanechnikov'){
+    K <- function(u){
+      K.u <- 0
+      if (abs(u)<=.5){K.u <- (3/2)*(1-4*u^2)}
+      return(K.u)
+    }
+  }
+  if (kernel=='quartic'){
+    K <- function(u){
+      K.u <- 0
+      if (abs(u)<=.5){K.u <- (15/8)*(1-4*u^2)^2}
+      return(K.u)
+    }
+  }
+  if (kernel=='gaussian'){
+    K <- function(u){
+      return(exp(-0.5*u^2)/(sqrt(2*pi)))
+    }
+  }
+  K.vec <- Vectorize(K)
+  y0.hat <- rep(0,length(gridx))  
+  for (i in (1:length(gridx))){
+    x.i <- gridx[i]-x
+    weights.i <- K.vec((x.i)/bw)
+    ols.i <- lm(y~x.i,weights=weights.i)
+    y0.hat[i] <- ols.i$coefficients[1]
+  }
+  return(y0.hat)
+}
+
+MSE.llr <- function(bw,y,D,x,kernel,d){
+  MSE <- 0
+  for (i in (1:length(y[D==d]))){
+    MSE <- MSE + (y[D==d][i]-llr(y[D==d][-i],x[D==d][-i],x[D==d][i],bw=bw,kernel=kernel))^2
+  }
+  return(MSE)
+}
+
+kernel <- 'gaussian'
+bw <- 0.5
+
+MSE.grid <- seq(0.1,1,by=.1)
+MSE.llr.0 <- sapply(MSE.grid,MSE.llr,y=y,D=Ds,x=yB,kernel=kernel,d=0)
+MSE.llr.1 <- sapply(MSE.grid,MSE.llr,y=y,D=Ds,x=yB,kernel=kernel,d=1)
+
+y0.llr <- llr(y[Ds==0],yB[Ds==0],yB[Ds==0],bw=MSE.grid[MSE.llr.0==min(MSE.llr.0)],kernel=kernel)    
+y1.llr <- llr(y[Ds==1],yB[Ds==1],yB[Ds==1],bw=MSE.grid[MSE.llr.1==min(MSE.llr.1)],kernel=kernel)    
+@
+
+<<plot.rdd.llr.cv,eval=TRUE,echo=FALSE,results='hide',fig.cap='Cross Validation Results',fig.align='center',out.width='.5\\textwidth',out.height='.5\\textwidth',fig.width=8,fig.height=8,fig.pos='htbp'>>=
+plot(MSE.grid,MSE.llr.0,xlab='Bandwidth',ylab='MSE (y|D=0)')
+legend(0.8,50,c('y|D=0','y|D=1'),pch=c(1,3),col=c(col.obs,col.obs),ncol=1)
+par(new=TRUE)
+plot(MSE.grid,MSE.llr.1,pch=3,xaxt="n",yaxt="n",xlab="",ylab="")
+axis(4)
+mtext("MSE (y|D=1)",side=4,line=3)
+@
+
+\noindent{According to the CV results, we get the optimal bandwidth is \bm{0.6}.}
+\clearpage
+
+\begin{itemize}
+  \item  Build a plot showing the discontinuity in the linear sample using LLR
+\end{itemize}
+
+<<plot.rdd.llr.nonlin.1,eval=TRUE,echo=FALSE,results='hide',fig.cap='RDD LLR',fig.align='center',out.width='.5\\textwidth',out.height='.5\\textwidth',fig.width=8,fig.height=8,fig.pos='htbp'>>=
+plot(yB[Ds==0],y[Ds==0],pch=1,xlim=c(4,11),ylim=c(4,11),xlab="yB",ylab="Outcomes")
+points(yB[Ds==1],y[Ds==1],pch=3)
+points(yB[Ds==0],y0.llr,col='blue',pch=1)
+points(yB[Ds==1],y1.llr,col='blue',pch=3)
+abline(v=log(param["barY"]),col=col.unobs)
+text(x=c(log(param["barY"])),y=c(4),labels=c(expression(bar('y'))),pos=c(2),col=c(col.unobs),lty=c(lty.obs))
+legend(4,11,c('y|D=0','y|D=1',expression(hat('y0')),expression(hat('y1'))),pch=c(1,3,1,3),col=c(col.obs,col.obs,'blue','blue'),ncol=2)
+@
 
 
 \end{document}
