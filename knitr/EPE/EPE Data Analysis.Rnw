@@ -818,9 +818,9 @@ muo <- rnorm(NO,param["barmu"],sqrt(param["sigma2mu"]))
 UBo <- rnorm(NO,0,sqrt(param["sigma2U"]))
 yBo <- muo + UBo 
 YBo <- exp(yBo)
-Dso <- rep(0,NO)
+Dsc <- rep(0,NO)
 Vo <- rnorm(NO,0,sqrt(param["sigma2mu"]+param["sigma2U"]))
-Dso[yBo+Vo<=log(param["barY"])] <- 1 
+Dsc[yBo+Vo<=log(param["barY"])] <- 1 
 epsilono <- rnorm(NO,0,sqrt(param["sigma2epsilon"]))
 etao<- rnorm(NO,0,sqrt(param["sigma2eta"]))
 U0o <- param["rho"]*UBo + epsilono
@@ -829,17 +829,17 @@ alphao <- param["baralpha"]+  param["theta"]*muo + etao
 y1o <- y0o+alphao
 Y0o <- exp(y0o)
 Y1o <- exp(y1o)
-yo <- y1o*Dso+y0o*(1-Dso)
-Yo <- Y1o*Dso+Y0o*(1-Dso)
+yc <- y1o*Dsc+y0o*(1-Dsc)
+Yc <- Y1o*Dsc+Y0o*(1-Dsc)
 @
 
 <<plot.com.supp,eval=TRUE,echo=FALSE,results='hide',fig.align='center',out.width='.65\\textwidth',fig.pos='htbp'>>=
 par(mar=c(4,3,2,3),oma=c(0.5,0,0.5,0))
-plot(yBo[Dso==0],y0o[Dso==0],pch=1,xlim=c(4,10.5),ylim=c(4,10.5),xlab="yB",ylab="Outcomes")
-points(yBo[Dso==1],yo[Dso==1],pch=3,col='blue')
+plot(yBo[Dsc==0],y0o[Dsc==0],pch=1,xlim=c(4,10.5),ylim=c(4,10.5),xlab="yB",ylab="Outcomes")
+points(yBo[Dsc==1],yc[Dsc==1],pch=3,col='blue')
 legend(4,10.3,c('y0|D=0','y1|D=1','D'),pch=c(1,3,2),col=c(col.obs,'blue',col.unobs),ncol=1)
 par(new=TRUE)
-plot(yBo,Dso,pch=2,col=col.unobs,xlim=c(4,10.5),xaxt="n",yaxt="n",xlab="",ylab="")
+plot(yBo,Dsc,pch=2,col=col.unobs,xlim=c(4,10.5),xaxt="n",yaxt="n",xlab="",ylab="")
 axis(4)
 mtext("D",side=4,line=3)
 @
@@ -900,31 +900,31 @@ llr <- function(y,x,gridx,bw,kernel){
 
 kernel <- 'gaussian'
 bw <- 1
-y0.llr <- llr(yo[Dso==0],yBo[Dso==0],yBo[Dso==1],bw=bw,kernel=kernel)    
+y0.llr <- llr(yc[Dsc==0],yBo[Dsc==0],yBo[Dsc==1],bw=bw,kernel=kernel)    
 @
 
 <<plot.LLR.step.0,dependson='LLR',eval=TRUE,echo=FALSE,results='hide',fig.cap='Step 0',fig.align='center',out.width='.51\\textwidth',out.height='.5\\textwidth',fig.width=5.5,fig.height=5.7,fig.pos='htp'>>=
 par(mar=c(4,3,2,3),oma=c(0.3,0,0.3,0))
-plot(yBo[Dso==0],y0o[Dso==0],pch=1,xlim=c(4,10.5),ylim=c(4,10.5),xlab="yB",ylab="Outcomes")
-points(yBo[Dso==1],y0o[Dso==1],pch=1,col=col.unobs)
+plot(yBo[Dsc==0],y0o[Dsc==0],pch=1,xlim=c(4,10.5),ylim=c(4,10.5),xlab="yB",ylab="Outcomes")
+points(yBo[Dsc==1],y0o[Dsc==1],pch=1,col=col.unobs)
 legend(4,10.5,c('y0|D=0','y0|D=1'),pch=c(1,1),col=c(col.obs,col.unobs),ncol=1)
 @
 
 <<plot.LLR.step.1,dependson='LLR',eval=TRUE,echo=FALSE,results='hide',fig.cap='Step 1',fig.align='center',out.width='.51\\textwidth',out.height='.5\\textwidth',fig.width=5.5,fig.height=5.7,fig.pos='hb'>>=
 par(mar=c(4,3,2,3),oma=c(0.3,0,0.3,0))
-plot(yBo[Dso==0],y0o[Dso==0],pch=1,xlim=c(4,10.5),ylim=c(4,10.5),xlab="yB",ylab="Outcomes")
-points(yBo[Dso==1],y0o[Dso==1],pch=1,col=col.unobs)
-points(yBo[Dso==1],y0.llr,col='blue')
+plot(yBo[Dsc==0],y0o[Dsc==0],pch=1,xlim=c(4,10.5),ylim=c(4,10.5),xlab="yB",ylab="Outcomes")
+points(yBo[Dsc==1],y0o[Dsc==1],pch=1,col=col.unobs)
+points(yBo[Dsc==1],y0.llr,col='blue')
 legend(4,10.5,c('y0|D=0','y0|D=1',expression(hat(y0))),pch=c(1,1,1),col=c(col.obs,col.unobs,'blue'),ncol=2)
 @
 \clearpage
 
 <<plot.LLR.step.2,dependson='LLR',eval=TRUE,echo=FALSE,results='hide',fig.cap='Step 2',fig.align='center',out.width='.51\\textwidth',out.height='.5\\textwidth',fig.width=5.5,fig.height=5.7,fig.pos='htbp'>>=
 par(mar=c(4,3,2,3),oma=c(0.3,0,0.3,0))
-plot(yBo[Dso==0],y0o[Dso==0],pch=1,xlim=c(4,10.5),ylim=c(4,10.5),xlab="yB",ylab="Outcomes")
-points(yBo[Dso==1],y0o[Dso==1],pch=1,col=col.unobs)
-points(yBo[Dso==1],y0.llr,col='blue')
-points(yBo[Dso==1],yo[Dso==1],pch=3)
+plot(yBo[Dsc==0],y0o[Dsc==0],pch=1,xlim=c(4,10.5),ylim=c(4,10.5),xlab="yB",ylab="Outcomes")
+points(yBo[Dsc==1],y0o[Dsc==1],pch=1,col=col.unobs)
+points(yBo[Dsc==1],y0.llr,col='blue')
+points(yBo[Dsc==1],yc[Dsc==1],pch=3)
 legend(4,10.5,c('y0|D=0','y0|D=1',expression(hat(y0)),'y|D=1'),pch=c(1,1,1,3),col=c(col.obs,col.unobs,'blue',col.obs),ncol=2)
 @
 
@@ -935,7 +935,7 @@ delta.y.tt.com.supp <- function(param){
 @
 
 <<ww.llr,dependson='LLR',eval=TRUE,echo=FALSE,results='hide'>>=
-ww.llr <- mean(yo[Dso==1]-y0.llr)
+ww.llr <- mean(yc[Dsc==1]-y0.llr)
 @
 
 <<plot.LLR.step.3,dependson='LLR',eval=FALSE,echo=FALSE,results='hide',fig.cap='Step 3',fig.align='center',out.width='.65\\textwidth',fig.pos='htbp'>>=
@@ -965,8 +965,8 @@ dens.fun.point <- function(n,x,gridx,bw,kernel){
 dens.fun <- function(x,gridx,bw,kernel){
   return(sapply(1:length(gridx), dens.fun.point, x=x, gridx=gridx, bw=bw, kernel=kernel))
 }
-dens.yB.D0 <- dens.fun(yBo[Dso==0],yBo[Dso==1],bw=bw.nrd(yBo[Dso==0]),kernel='b')
-dens.yB.D1 <- dens.fun(yBo[Dso==1],yBo[Dso==1],bw=bw.nrd(yBo[Dso==1]),kernel='b')
+dens.yB.D0 <- dens.fun(yBo[Dsc==0],yBo[Dsc==1],bw=bw.nrd(yBo[Dsc==0]),kernel='b')
+dens.yB.D1 <- dens.fun(yBo[Dsc==1],yBo[Dsc==1],bw=bw.nrd(yBo[Dsc==1]),kernel='b')
 
 com.supp <- function(x,gridx,t,bw,kernel){
   dens.x <- dens.fun(x=x,gridx=gridx,bw=bw,kernel=kernel)
@@ -974,16 +974,16 @@ com.supp <- function(x,gridx,t,bw,kernel){
 }
 
 t<- 0.05  # t is the trimming level (5% in general)
-com.supp.yB <- com.supp(yBo[Dso==0],yBo[Dso==1],t=t,bw=bw.nrd(yBo[Dso==0]),kernel='b')
+com.supp.yB <- com.supp(yBo[Dsc==0],yBo[Dsc==1],t=t,bw=bw.nrd(yBo[Dsc==0]),kernel='b')
 @
 
 <<plot.trimming,eval=TRUE,echo=FALSE,results='hide',fig.cap='Trimming and Common Support',fig.align='center',out.width='.5\\textwidth',out.height='.5\\textwidth',fig.width=7,fig.height=7,fig.pos='htbp'>>=
 par(mar=c(4,4,2,4),oma=c(0.3,0,0.3,0))
-plot(yBo[Dso==1],dens.yB.D0,pch=1,xlim=c(4,10),ylim=c(0,0.6),xlab="yB",ylab="density")
-points(yBo[Dso==1],dens.yB.D1,pch=3)
+plot(yBo[Dsc==1],dens.yB.D0,pch=1,xlim=c(4,10),ylim=c(0,0.6),xlab="yB",ylab="density")
+points(yBo[Dsc==1],dens.yB.D1,pch=3)
 legend(4,0.59,c('fyB|D=0','fyB|D=1','Common Support'),pch=c(1,3,2),col=c(col.obs,col.obs,col.unobs),ncol=1)
 par(new=TRUE)
-plot(yBo[Dso==1],com.supp.yB,pch=2,col=col.unobs,xlim=c(4,10),ylim=c(0,1),xaxt="n",yaxt="n",xlab="",ylab="")
+plot(yBo[Dsc==1],com.supp.yB,pch=2,col=col.unobs,xlim=c(4,10),ylim=c(0,1),xaxt="n",yaxt="n",xlab="",ylab="")
 axis(4)
 mtext("Common Support",side=4,line=3)
 @
@@ -995,7 +995,7 @@ llr.match.trim <- function(y,D,x,t,bw,kernel){
   y0.llr <- llr(y[D==0],x[D==0],x[D==1][com.supp.x==1],bw=bw,kernel=kernel)
   return(mean(y[D==1][com.supp.x==1]-y0.llr))
 }
-ww.llr.trim <- llr.match.trim(yo,Dso,yBo,t=t,bw=bw,kernel=kernel)
+ww.llr.trim <- llr.match.trim(yc,Dsc,yBo,t=t,bw=bw,kernel=kernel)
 @
 
 <<plot.LLR.trimming,dependson='LLR.trim',eval=FALSE,echo=FALSE,results='hide',fig.cap='LLR Matching with Trimming',fig.align='center',out.width='.65\\textwidth',fig.pos='htbp'>>=
