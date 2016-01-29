@@ -1091,15 +1091,15 @@ reg.ols.10 <- lm(y1o[Dso==0]~yBo[Dso==0])
 reg.ols.11 <- lm(y1o[Dso==1]~yBo[Dso==1])
 @
 
-<<identification.sharp.ols.1,eval=TRUE,echo=FALSE,results='hide',fig.cap='Identification in a sharp RDD design',fig.align='center',out.width='.65\\textwidth',fig.pos='htbp'>>=
+<<identification.sharp.ols.1,eval=FALSE,echo=FALSE,results='hide',fig.cap='Identification in a sharp RDD design',fig.align='center',out.width='.65\\textwidth',fig.pos='htbp'>>=
 plot(yBo[Dso==0],yo[Dso==0],pch=1,xlim=c(4,10.5),ylim=c(4,10.5),xlab="yB",ylab="Outcomes")
 points(yBo[Dso==1],yo[Dso==1],pch=3)
 abline(v=log(param["barY"]),col=col.unobs)
 text(x=c(log(param["barY"])),y=c(5),labels=c(expression(bar('y'))),pos=c(2),col=c(col.unobs),lty=c(lty.obs))
 legend(4,10.5,c('y0|D=0','y1|D=1'),pch=c(1,3),col=c(col.obs,col.obs),ncol=1)
 @
-% il faut changer...
-<<identification.sharp.ols.2,eval=TRUE,echo=FALSE,results='hide',fig.cap='Identification in a sharp RDD design',fig.align='center',out.width='.65\\textwidth',fig.pos='htbp'>>=
+
+<<identification.sharp.ols.2,eval=FALSE,echo=FALSE,results='hide',fig.cap='Identification in a sharp RDD design',fig.align='center',out.width='.65\\textwidth',fig.pos='htbp'>>=
 plot(yBo[Dso==0],yo[Dso==0],pch=1,xlim=c(4,10.5),ylim=c(4,10.5),xlab="yB",ylab="Outcomes")
 points(yBo[Dso==1],yo[Dso==1],pch=3)
 points(yBo[Dso==0],reg.ols.00$fitted.values,col='blue',pch=1)
@@ -1117,6 +1117,7 @@ abline(v=log(param["barY"]),col=col.unobs)
 text(x=c(log(param["barY"])),y=c(5),labels=c(expression(bar('y'))),pos=c(2),col=c(col.unobs),lty=c(lty.obs))
 legend(4,10.5,c('y0|D=0','y1|D=1',expression(hat('y0')),expression(hat('y1'))),pch=c(1,3,1,3),col=c(col.obs,col.obs,'blue','blue'),ncol=2)
 @
+\clearpage
 
 
 \end{document}
