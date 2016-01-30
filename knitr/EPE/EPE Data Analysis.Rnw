@@ -1296,14 +1296,14 @@ y1.llr <- llr(y[Ds==1],yB[Ds==1],yB[Ds==1],bw=MSE.grid[MSE.llr.1==min(MSE.llr.1)
 
 <<plot.rdd.llr.cv,eval=TRUE,echo=FALSE,results='hide',fig.cap='Cross Validation Results',fig.align='center',out.width='.5\\textwidth',out.height='.5\\textwidth',fig.width=8,fig.height=8,fig.pos='htbp'>>=
 plot(MSE.grid,MSE.llr.0,xlab='Bandwidth',ylab='MSE (y|D=0)')
-legend(0.8,50,c('y|D=0','y|D=1'),pch=c(1,3),col=c(col.obs,col.obs),ncol=1)
+legend(0.8,31.6,c('y|D=0','y|D=1'),pch=c(1,3),col=c(col.obs,col.obs),ncol=1)
 par(new=TRUE)
 plot(MSE.grid,MSE.llr.1,pch=3,xaxt="n",yaxt="n",xlab="",ylab="")
 axis(4)
 mtext("MSE (y|D=1)",side=4,line=3)
 @
 
-\noindent{According to the CV results, we get the optimal bandwidth is \bm{0.6}.}
+According to the CV results, we get the optimal bandwidth is \bm{0.6}.
 \clearpage
 
 \begin{itemize}
@@ -1319,6 +1319,132 @@ abline(v=log(param["barY"]),col=col.unobs)
 text(x=c(log(param["barY"])),y=c(4),labels=c(expression(bar('y'))),pos=c(2),col=c(col.unobs),lty=c(lty.obs))
 legend(4,11,c('y|D=0','y|D=1',expression(hat('y0')),expression(hat('y1'))),pch=c(1,3,1,3),col=c(col.obs,col.obs,'blue','blue'),ncol=2)
 @
+
+\begin{itemize}
+  \item  Estimate TT(z) using the simplified Local OLS estimator of Imbens and Lemieux
+\end{itemize}
+
+<<rdd.local.ols.precision,eval=TRUE,echo=FALSE,results='hide'>>=
+bw <- 0.6
+y.h <- y[log(param['barY'])-bw<yB & yB<log(param['barY'])+bw]
+Ds.h <- Ds[log(param['barY'])-bw<yB & yB<log(param['barY'])+bw]
+yB.l <- (yB[log(param['barY'])-bw<yB & yB<log(param['barY'])+bw]-log(param['barY']))*Ds[log(param['barY'])-bw<yB & yB<log(param['barY'])+bw]
+yB.r <- (yB[log(param['barY'])-bw<yB & yB<log(param['barY'])+bw]-log(param['barY']))*(1-Ds[log(param['barY'])-bw<yB & yB<log(param['barY'])+bw])
+
+reg.rdd.local.ols <- lm(y.h ~ Ds.h + yB.l + yB.r)
+reg.rdd.local.ols$coef[2]
+@
+
+The estimated value of TT(z) by simplified LLR is \bm{\Sexpr{reg.rdd.local.ols$coef[[2]]}}.
+
+\begin{itemize}
+  \item  Compute precision using the local OLS robust standard error
+\end{itemize}
+
+The estimated 99\% sampling noise is: \bm{\Sexpr{2*qnorm((.99+1)/2)*sqrt(vcov(reg.rdd.local.ols)[2,2])}}.
+
+      \subsection{Fuzzy RDD}
+
+<<simul.fuzzy.rdd,eval=TRUE,echo=FALSE,results='hide'>>=
+set.seed(2345)
+mu <- rnorm(N,param["barmu"],sqrt(param["sigma2mu"]))
+UB <- rnorm(N,0,sqrt(param["sigma2U"]))
+yB <- mu + UB 
+YB <- exp(yB)
+Ds <- rep(0,N)
+V <- rnorm(N,0,sqrt(param["sigma2mu"]+param["sigma2U"]))
+Ds[yB+V<=log(param["barY"])] <- 1 
+epsilon <- rnorm(N,0,sqrt(param["sigma2epsilon"]))
+eta<- rnorm(N,0,sqrt(param["sigma2eta"]))
+U0 <- param["rho"]*UB + epsilon
+y0 <- mu +  U0 + param["delta"] + param["gamma"]*(yB-param["baryB"])^2
+alpha <- param["baralpha"]+  param["theta"]*mu + eta
+y1 <- y0+alpha
+Y0 <- exp(y0)
+Y1 <- exp(y1)
+y <- y1*Ds+y0*(1-Ds)
+Y <- Y1*Ds+Y0*(1-Ds)
+@
+
+<<LLR.fuzzy.pscore,eval=TRUE,echo=FALSE,results='hide',cache=TRUE>>=
+kernel <- 'gaussian'
+MSE.grid <- seq(0.1,1,by=.1)
+Z <- ifelse(yB<=log(param['barY']),1,0)
+MSE.pr.llr.0 <- sapply(MSE.grid,MSE.llr,y=Ds,D=Z,x=yB,kernel=kernel,d=0)
+MSE.pr.llr.1 <- sapply(MSE.grid,MSE.llr,y=Ds,D=Z,x=yB,kernel=kernel,d=1)
+
+Pr.D0.llr <- llr(Ds[Z==0],yB[Z==0],yB[Z==0],bw=MSE.grid[MSE.pr.llr.0==min(MSE.pr.llr.0)],kernel=kernel)    
+Pr.D1.llr <- llr(Ds[Z==1],yB[Z==1],yB[Z==1],bw=MSE.grid[MSE.pr.llr.1==min(MSE.pr.llr.1)],kernel=kernel)    
+@
+
+<<LLR.fuzzy.y,eval=TRUE,echo=FALSE,results='hide',cache=TRUE>>=
+MSE.llr.0 <- sapply(MSE.grid,MSE.llr,y=y,D=Z,x=yB,kernel=kernel,d=0)
+MSE.llr.1 <- sapply(MSE.grid,MSE.llr,y=y,D=Z,x=yB,kernel=kernel,d=1)
+
+y.Z0.llr <- llr(y[Z==0],yB[Z==0],yB[Z==0],bw=MSE.grid[MSE.llr.0==min(MSE.llr.0)],kernel=kernel)    
+y.Z1.llr <- llr(y[Z==1],yB[Z==1],yB[Z==1],bw=MSE.grid[MSE.llr.1==min(MSE.llr.1)],kernel=kernel)    
+@
+
+\begin{itemize}
+  \item  Choose optimal bandwidth using CV for each of the 4 regression functions
+\end{itemize}
+
+<<rdd.fuzzy.local.iv,eval=TRUE,echo=FALSE,results='hide'>>=
+bw <- min(c(MSE.grid[MSE.pr.llr.0==min(MSE.pr.llr.0)],MSE.grid[MSE.pr.llr.1==min(MSE.pr.llr.1)],MSE.grid[MSE.llr.0==min(MSE.llr.0)],MSE.grid[MSE.llr.1==min(MSE.llr.1)]))
+
+y.h <- y[log(param['barY'])-bw<yB & yB<log(param['barY'])+bw]
+Ds.h <- Ds[log(param['barY'])-bw<yB & yB<log(param['barY'])+bw]
+yB.l <- (yB[log(param['barY'])-bw<yB & yB<log(param['barY'])+bw]-log(param['barY']))*Z[log(param['barY'])-bw<yB & yB<log(param['barY'])+bw]
+yB.r <- (yB[log(param['barY'])-bw<yB & yB<log(param['barY'])+bw]-log(param['barY']))*(1-Z[log(param['barY'])-bw<yB & yB<log(param['barY'])+bw])
+Z.h <- Z[log(param['barY'])-bw<yB & yB<log(param['barY'])+bw]
+
+reg.fuzzy.rdd.local.iv <- ivreg(y.h  ~ Ds.h + yB.l + yB.r | Z.h + yB.l + yB.r)
+delta.rdd.fuzzy.il <- reg.fuzzy.rdd.local.iv$coef[2]
+@
+The optimal bandwidth is \bm{\Sexpr{bw}}.
+
+%\begin{itemize}
+ % \item  Build a plot of $\Pr(D_i=1|y_i^B)$ using LLR on each side of the discontinuity
+%\end{itemize}
+\clearpage
+
+\begin{itemize}
+  \item  Build a plot of the expected outcomes on each side of the discontinuity using LLR
+\end{itemize}
+
+<<plot.fuzzy.rdd.3,dependson='LLR.fuzzy.pscore',eval=TRUE,echo=FALSE,results='hide',fig.cap='Fuzzy RDD',fig.align='center',out.width='.65\\textwidth',fig.pos='htbp'>>=
+plot(yB[Ds==0],y0[Ds==0],pch=1,xlim=c(4,10.5),ylim=c(4,10.5),xlab="yB",ylab="Outcomes")
+points(yB[Ds==1],y[Ds==1],pch=3,col=col.obs)
+points(yB[Z==0],y.Z0.llr,col='blue')
+points(yB[Z==1],y.Z1.llr,col='blue',pch=3)
+abline(v=log(param["barY"]),col=col.unobs)
+legend(4,10,c('y0|D=0','y1|D=1','D'),pch=c(1,3,2),col=c(col.obs,'blue',col.unobs),ncol=1)
+par(new=TRUE)
+plot(yB,Ds,pch=2,col=col.unobs,xlim=c(5,11),xaxt="n",yaxt="n",xlab="",ylab="")
+points(yB[Z==0],Pr.D0.llr,col='red')
+points(yB[Z==1],Pr.D1.llr,col='red',pch=3)
+axis(4)
+mtext("D",side=4,line=3)
+@
+
+%\begin{itemize}
+ % \item  Use LLR to build the Wald estimate of LATE(z)
+%\end{itemize}
+
+% not sure...
+<<plot.wald.rdd.llr.il,eval=FALSE,echo=FALSE,results='hide',fig.cap='Simplified Wald RDD LLR',fig.align='center',out.width='.65\\textwidth',fig.pos='htbp'>>=
+plot(1, type="n", xlab="", ylab="", xlim=xlim.big, ylim=c(0, 10))
+abline(v=delta.y.tt.z(param),col=col.unobs,lty=lty.unobs)
+abline(v=delta.rdd.fuzzy.il,col=col.obs,lty=lty.obs)
+text(x=c(delta.y.tt.z(param),delta.rdd.fuzzy.il),y=c(adj),labels=c('TT(z)',expression(hat('E'))),pos=c(2,4),col=c(col.unobs,col.obs),lty=c(lty.unobs,lty.obs))
+@
+
+\begin{itemize}
+  \item  Use the simplified Imbens and Lemieux 2SLS estimator to estimate LATE(z) and precision
+\end{itemize}
+
+% not sure...
+The estimated value of LATE(z) by simplified LLR IV is \Sexpr{delta.rdd.fuzzy.il}. The estimated 99\% sampling noise is: \Sexpr{2*qnorm((.99+1)/2)*sqrt(vcov(reg.fuzzy.rdd.local.iv)[2,2])}.
 
 
 \end{document}
