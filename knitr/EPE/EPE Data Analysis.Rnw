@@ -11,6 +11,10 @@ library(sandwich)
 library(AER)
 @
 
+\hfuzz=\maxdimen
+\tolerance=10000
+\hbadness=10000
+
 \usepackage{geometry}
 \geometry{left=2cm,right=2cm,top=2cm,bottom=2cm}
 \renewcommand{\baselinestretch}{1.25}
@@ -79,7 +83,7 @@ Y <- Y1*Ds+Y0*(1-Ds)
 @
 
       \subsection{plot potential outcomes and observed outcomes}
-<<Pot.obs.out.FPCI,eval=TRUE,fig.cap='Potential outcomes and observed outcomes',fig.subcap=c('Potential outcomes','Observed outcomes'),fig.align='center',out.width='.5\\textwidth',echo=FALSE,results='hide',fig.pos='htbp'>>=
+<<Pot.obs.out.FPCI,eval=TRUE,fig.cap='Potential outcomes and observed outcomes',fig.subcap=c('Potential outcomes','Observed outcomes'),fig.align='center',out.width='.45\\textwidth',echo=FALSE,results='hide',fig.pos='htbp'>>=
 col.obs <- 'black'
 col.unobs <- 'red'
 
@@ -95,6 +99,7 @@ points(yB[Ds==1],y1[Ds==1],pch=3)
 legend(4,11,c('y|D=0','y|D=1'),pch=c(1,3))
 abline(v=log(param["barY"]),col=col.unobs)
 @
+\clearpage
       
       \subsection{Compute individual level treatment effects in the sample}
       
@@ -116,7 +121,7 @@ By computing the average of the individual level treatment effects of the treate
 
       \subsection{Compare its value with the theoretical one in the population}
 According to the course, we learnt the theoretical average treatment effect with the following formula:\\
-\centerline{$\Large\Delta_{TT}^y =\bar{\alpha}+\theta\bar{\mu} -\theta\displaystyle\frac{\sigma^2_{\mu}}{\sqrt{\sigma^2_{\mu}+\sigma^2_{U}}}\frac{\displaystyle\phi\left(\frac{\bar{y}-\bar{\mu}}{\sqrt{\sigma^2_{\mu}+\sigma^2_{U}}}\right)}{\displaystyle\Phi\left(\frac{\bar{y}-\bar{\mu}}{\sqrt{\sigma^2_{\mu}+\sigma^2_{U}}}\right)}$}\\
+\centerline{$\Delta_{TT}^y =\bar{\alpha}+\theta\bar{\mu} -\theta\displaystyle\frac{\sigma^2_{\mu}}{\sqrt{\sigma^2_{\mu}+\sigma^2_{U}}}\frac{\displaystyle\phi\left(\frac{\bar{y}-\bar{\mu}}{\sqrt{\sigma^2_{\mu}+\sigma^2_{U}}}\right)}{\displaystyle\Phi\left(\frac{\bar{y}-\bar{\mu}}{\sqrt{\sigma^2_{\mu}+\sigma^2_{U}}}\right)}$}\\
 
 <<theo.avg.tt,eval=TRUE,echo=FALSE>>=
 theo.avg.tt<-delta.y.tt(param)
@@ -145,7 +150,7 @@ SB<-abs(WW.esti-avg.tt)
 
       \subsection{Compare its value to the theoretical one in the sample}
 According to the course, we learnt the theoretical selection bias with the following formula:\\ \\
-\centerline{$\Large\Delta_{SB}^y = -\displaystyle\frac{\sigma^2_{\mu}+\rho\sigma^2_{U}}{\sqrt{\sigma^2_{\mu}+\sigma^2_{U}}}\left(\frac{\displaystyle\phi\left(\frac{\bar{y}-\bar{\mu}}{\sqrt{\sigma^2_{\mu}+\sigma^2_{U}}}\right)}{\displaystyle\Phi\left(\frac{\bar{y}-\bar{\mu}}{\sqrt{\sigma^2_{\mu}+\sigma^2_{U}}}\right)}+\frac{\displaystyle\phi\left(\frac{\bar{y}-\bar{\mu}}{\sqrt{\sigma^2_{\mu}+\sigma^2_{U}}}\right)}{1-\displaystyle\Phi\left(\frac{\bar{y}-\bar{\mu}}{\sqrt{\sigma^2_{\mu}+\sigma^2_{U}}}\right)}\right)$} \\
+\centerline{$\Delta_{SB}^y = -\displaystyle\frac{\sigma^2_{\mu}+\rho\sigma^2_{U}}{\sqrt{\sigma^2_{\mu}+\sigma^2_{U}}}\left(\frac{\displaystyle\phi\left(\frac{\bar{y}-\bar{\mu}}{\sqrt{\sigma^2_{\mu}+\sigma^2_{U}}}\right)}{\displaystyle\Phi\left(\frac{\bar{y}-\bar{\mu}}{\sqrt{\sigma^2_{\mu}+\sigma^2_{U}}}\right)}+\frac{\displaystyle\phi\left(\frac{\bar{y}-\bar{\mu}}{\sqrt{\sigma^2_{\mu}+\sigma^2_{U}}}\right)}{1-\displaystyle\Phi\left(\frac{\bar{y}-\bar{\mu}}{\sqrt{\sigma^2_{\mu}+\sigma^2_{U}}}\right)}\right)$} \\
 
 <<WW.SB,eval=TRUE,echo=FALSE,results='hide'>>=
 delta.y.sb <- function(param){
@@ -206,9 +211,10 @@ Y1s <- exp(y1s)
 ys <- y1s*Dss+y0s*(1-Dss)
 Ys <- Y1s*Dss+Y0s*(1-Dss)
 @
+\clearpage
 
       \subsection{Plot potential outcomes and observed outcomes}
-<<Pot.obs.out.FPSI,eval=TRUE,fig.cap='Potential outcomes and observed outcomes',fig.subcap=c('Potential outcomes','Observed outcomes'),fig.align='center',out.width='.5\\textwidth',echo=FALSE,results='hide',fig.pos='htbp'>>=
+<<Pot.obs.out.FPSI,eval=TRUE,fig.cap='Potential outcomes and observed outcomes',fig.subcap=c('Potential outcomes','Observed outcomes'),fig.align='center',out.width='.45\\textwidth',echo=FALSE,results='hide',fig.pos='htbp'>>=
 col.obs <- 'black'
 col.unobs <- 'red'
 
@@ -243,7 +249,7 @@ By computing the average of the individual level treatment effects of the treate
 
       \subsection{Compare with the theoretical value in the population}
 According to the course, we learnt the theoretical average treatment effect with the following formula:\\
-\centerline{$\Large\Delta_{TT}^y =\bar{\alpha}+\theta\bar{\mu} -\theta\displaystyle\frac{\sigma^2_{\mu}}{\sqrt{\sigma^2_{\mu}+\sigma^2_{U}}}\frac{\displaystyle\phi\left(\frac{\bar{y}-\bar{\mu}}{\sqrt{\sigma^2_{\mu}+\sigma^2_{U}}}\right)}{\displaystyle\Phi\left(\frac{\bar{y}-\bar{\mu}}{\sqrt{\sigma^2_{\mu}+\sigma^2_{U}}}\right)}$}\\
+\centerline{$\Delta_{TT}^y =\bar{\alpha}+\theta\bar{\mu} -\theta\displaystyle\frac{\sigma^2_{\mu}}{\sqrt{\sigma^2_{\mu}+\sigma^2_{U}}}\frac{\displaystyle\phi\left(\frac{\bar{y}-\bar{\mu}}{\sqrt{\sigma^2_{\mu}+\sigma^2_{U}}}\right)}{\displaystyle\Phi\left(\frac{\bar{y}-\bar{\mu}}{\sqrt{\sigma^2_{\mu}+\sigma^2_{U}}}\right)}$}\\
 
 <<theo.avg.tts,eval=TRUE,echo=FALSE>>=
 theo.avg.tts<-delta.y.tt(paramS)
@@ -263,7 +269,7 @@ WW.estiS<-mean(ys[Dss==1])-mean(ys[Dss==0])
 
       \subsection{Compute the OLS of beta in $y_i = \alpha + \beta D_i + U_i$}
 According to the course, we learn the formula as following:\\ \\
-\centerline{$\Large\hat{\beta}_{OLS} = \displaystyle\frac{\frac{1}{N}\sum_{i=1}^N\left(Y_i-\frac{1}{N}\sum_{i=1}^NY_i\right)\left(D_i-\frac{1}{N}\sum_{i=1}^ND_i\right)}{\frac{1}{N}\sum_{i=1}^N\left(D_i-\frac{1}{N}\sum_{i=1}^ND_i\right)^2}$}
+\centerline{$\hat{\beta}_{OLS} = \displaystyle\frac{\frac{1}{N}\sum_{i=1}^N\left(Y_i-\frac{1}{N}\sum_{i=1}^NY_i\right)\left(D_i-\frac{1}{N}\sum_{i=1}^ND_i\right)}{\frac{1}{N}\sum_{i=1}^N\left(D_i-\frac{1}{N}\sum_{i=1}^ND_i\right)^2}$}
 
 <<btols,eval=TRUE,echo=FALSE>>=
 a<-ys-sum(ys)/NS
@@ -559,7 +565,7 @@ yo <- y1o*Dso+y0o*(1-Dso)
 Yo <- Y1o*Dso+Y0o*(1-Dso)
 @
 
-<<plot.ols.estim.step.0-1,eval=TRUE,fig.cap='compute the OLS estimator step by step',fig.subcap=c('Step 0','Step 1'),fig.align='center',out.width='.5\\textwidth',echo=FALSE,results='hide',fig.pos='htbp'>>=
+<<plot.ols.estim.step.0-1,eval=TRUE,fig.cap='compute the OLS estimator step by step',fig.subcap=c('Step 0','Step 1'),fig.align='center',out.width='.45\\textwidth',echo=FALSE,results='hide',fig.pos='htbp'>>=
 # Step 0
 col.obs <- 'black'
 col.unobs <- 'red'
@@ -586,7 +592,7 @@ legend(4,10,c('y0|D=0','y0|D=1',expression(hat('y0|D=0'))),pch=c(1,1,1),col=c(co
 @      
 \clearpage
 
-<<plot.ols.estim.step.2-3,eval=TRUE,fig.cap='compute the OLS estimator step by step',fig.subcap=c('Step 2','Step 3'),fig.align='center',out.width='.5\\textwidth',echo=FALSE,results='hide',fig.pos='htbp'>>=
+<<plot.ols.estim.step.2-3,eval=TRUE,fig.cap='compute the OLS estimator step by step',fig.subcap=c('Step 2','Step 3'),fig.align='center',out.width='.45\\textwidth',echo=FALSE,results='hide',fig.pos='htbp'>>=
 # Step 2
 y.pred <- ols.reg.0$coef[[1]]+ols.reg.0$coef[[2]]*yBo[Dso==1]
 
@@ -677,7 +683,7 @@ text(x=c(delta.y.tt(param),ww.ols.direct),y=c(adj),labels=c('TT',expression(hat(
 
 \noindent{Now I compare their values with the theoretical TT.\\
 According to the course, we learnt the theoretical TT with the following formula:\\
-\centerline{$\Large\Delta_{TT}^y =\bar{\alpha}+\theta\bar{\mu} -\theta\displaystyle\frac{\sigma^2_{\mu}}{\sqrt{\sigma^2_{\mu}+\sigma^2_{U}}}\frac{\displaystyle\phi\left(\frac{\bar{y}-\bar{\mu}}{\sqrt{\sigma^2_{\mu}+\sigma^2_{U}}}\right)}{\displaystyle\Phi\left(\frac{\bar{y}-\bar{\mu}}{\sqrt{\sigma^2_{\mu}+\sigma^2_{U}}}\right)}$}}
+\centerline{$\Delta_{TT}^y =\bar{\alpha}+\theta\bar{\mu} -\theta\displaystyle\frac{\sigma^2_{\mu}}{\sqrt{\sigma^2_{\mu}+\sigma^2_{U}}}\frac{\displaystyle\phi\left(\frac{\bar{y}-\bar{\mu}}{\sqrt{\sigma^2_{\mu}+\sigma^2_{U}}}\right)}{\displaystyle\Phi\left(\frac{\bar{y}-\bar{\mu}}{\sqrt{\sigma^2_{\mu}+\sigma^2_{U}}}\right)}$}}
 
 <<theo.tt,eval=TRUE,echo=FALSE>>=
 theo.tt<-delta.y.tt(param)
@@ -1171,7 +1177,7 @@ delta.y.rddols <- y1.bary.pred-y0.bary.pred
 \noindent{According to R, I get $\esph{y^1_i|y^B_i=\bar{y}}=$\Sexpr{y1.bary.pred} and $\esph{y_i^0|y_i^B=\bar{y}}=$\Sexpr{y0.bary.pred}, so the estimated TT is $\hat{\Delta^{y}_{RDDOLS}}=$\Sexpr{delta.y.rddols}.\\
 Then I calculate $\bm{TT(z)}$ with the following formula:\\}
 
-\centerline{$\Delta^y_{TT}(\Large\bar{z}) = \bar{\alpha} + \theta\bar{\mu}+\theta\displaystyle\frac{\sigma^2_{\mu}}{\sigma^2_{\mu}+\sigma^2_{U}}(\bar{y}-\bar{\mu})$}
+\centerline{$\Delta^y_{TT}(\bar{z}) = \bar{\alpha} + \theta\bar{\mu}+\theta\displaystyle\frac{\sigma^2_{\mu}}{\sigma^2_{\mu}+\sigma^2_{U}}(\bar{y}-\bar{\mu})$}
 
 <<delta.y.tt.z,eval=TRUE,echo=FALSE,results='hide'>>=
 delta.y.tt.z <- function(param){
