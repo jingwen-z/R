@@ -438,7 +438,7 @@ varyB0<-var(yB[Ds==0])
 tilde.N<-(1/(tilde.epsilon.WW^2))*(qnorm((0.99+1)/2))^2*((varyB1/proba1)+(varyB0/(1-proba1)))
 @
 
-\noindent{According to the formula above, I get $\bm{\tilde{N}=\Sexpr{tilde.N}}$, so the sample size should be $\bm{\Sexpr{tilde.N}}.}
+\noindent{According to the formula above, I get $\bm{\tilde{N}=\Sexpr{tilde.N}}$, so the sample size should be $\bm{\Sexpr{tilde.N}}$.}
 
 \noindent{Moreover, I would like to do the following graph like what you did in the course.}
 
