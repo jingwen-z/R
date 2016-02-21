@@ -464,7 +464,7 @@ precision$samp.CLT.1 <- sapply(as.numeric(names(simuls.ww)),CLT.samp.1,delta=del
 precision$samp.CLT.mean <- sapply(1:length(simuls.ww),CLT.samp.mean,delta=delta,simuls.ww=simuls.ww)
 @
 
-<<sample.CLT,dependson='monte.carlo',eval=TRUE,echo=FALSE,results='hide',echo=FALSE,warning=FALSE,error=FALSE,message=FALSE,fig.cap='Sample size using CLT',fig.align='center',out.width='.65\\textwidth',fig.pos='htbp'>>=
+<<sample.CLT,dependson='monte.carlo',eval=FALSE,echo=FALSE,results='hide',echo=FALSE,warning=FALSE,error=FALSE,message=FALSE,fig.cap='Sample size using CLT',fig.align='center',out.width='.65\\textwidth',fig.pos='htbp'>>=
 samp.t <- cbind(precision[,c('N','precision')],rep('Truth',length(precision$N)))
 colnames(samp.t) <- c('N','precision','Method')
 samp.1 <- cbind(precision[,c('samp.CLT.1','precision')],rep('CLT.1',length(precision$N)))
