@@ -24,3 +24,4 @@ summary(regions.pca,loadings=TRUE)
 # F2 = - 0.349*X1 + 0.496*X2 + 0.148*X3 + 0.72*X4 - 0.301*X5
 
 screeplot(regions.pca,type = "line")
+biplot(regions.pca,choices=1:2)
