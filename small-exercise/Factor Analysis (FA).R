@@ -40,5 +40,30 @@ head(regions)
 regions.bis <- regions[,-1]
 R <- cor(regions.bis)
 options(digits = 3)
-factor.analysis(R,5)
+factor.analysis(R,4)
+
+## according to factor.analysis(R,4)$loadings, we can get the following regressions of initial variable and 4 factors
+# X1 = 0.9578*F1 - 0.2555*F2 - 0.0444*F3 - 0.0888*F4
+# X2 = 0.7272*F1 + 0.5926*F2 + 0.1493*F3 + 0.3077*F4
+# X3 = -0.0155*F1 - 0.3319*F2 + 0.9420*F3 + 0.0320*F4
+# X4 = 0.9489*F1 - 0.2798*F2 + 0.0809*F3 - 0.0765*F4
+# X5 = 0.9735*F1 + 0.0224*F2 - 0.1575*F3 + 0.0620*F4
+# X6 = -0.2999*F1 - 0.8812*F2 - 0.2579*F3 + 0.2588*F4
+# X7 = 0.9722*F1 - 0.2180*F2 - 0.0536*F3 - 0.0497*F4
+
+## according to the real meaning of initial variables, we can summarize these 7 variables as 4 aspects
+# The loading coefficients between Factor 1 and X1(population), X4(number of firms of the region), 
+# X5(number of patents taken out during the year), X7(number of telephone lines in place in the region) are 
+# larger than 0.8, which indicates high positive correlation, thus Factor 1 refelcts the economic development of the regions.
+
+# The loading coefficient between Factor 2 and X6(unemployment rate) is higher, which indicates the chomage.
+
+# The loading coefficient between Factor 3 and X3(surface of the region) is higher, which reflects the surface of the region.
+
+# Factor 4 indicates people's general situation in the region.
+
+
+
+
+
 
