@@ -9,6 +9,8 @@ library(ggplot2)
 library(xtable)
 library(sandwich)
 library(AER)
+library(plm)
+library(tmvtnorm)
 @
 
 \hfuzz=\maxdimen
@@ -21,11 +23,14 @@ library(AER)
 
 \usepackage{graphicx}
 
-%The bm package defines a command \bm which makes its argument bold. The argument may be any maths object from a single symbol to an expression.
+% The bm package defines a command \bm which makes its argument bold. The argument may be any maths object from a single symbol to an expression.
 \usepackage{bm}
 
 % sous titres
 \usepackage{subfig}
+
+% indention
+\usepackage{indentfirst}
 
 % package to generate commands with double letters in maths
 \usepackage{dsfont}
@@ -40,11 +45,17 @@ library(AER)
 \begin{document}
 
 
-\title{EPE Data Analysis}
+\title{EPE Data Analysis Project}
 \author{\textbf{Jingwen ZHENG}\\ Toulouse School of Economics\\ M2 ERNA}
 \maketitle
 
 \tableofcontents
+
+\part{Introduction}
+
+
+
+\part{Data Analysis\\ in different methods}
 
   \chapter{The Two Fundamental Problems of Inference}
     \section{The Fundamental Problem of Causal Inference}  
@@ -83,7 +94,7 @@ Y <- Y1*Ds+Y0*(1-Ds)
 @
 
       \subsection{plot potential outcomes and observed outcomes}
-<<Pot.obs.out.FPCI,eval=TRUE,fig.cap='Potential outcomes and observed outcomes',fig.subcap=c('Potential outcomes','Observed outcomes'),fig.align='center',out.width='.45\\textwidth',echo=FALSE,results='hide',fig.pos='htbp'>>=
+<<Pot.obs.out.FPCI,eval=TRUE,fig.cap='Potential outcomes and observed outcomes',fig.subcap=c('Potential outcomes','Observed outcomes'),fig.align='center',out.width='.45\\linewidth',echo=FALSE,results='hide',fig.pos='htbp'>>=
 col.obs <- 'black'
 col.unobs <- 'red'
 
@@ -98,9 +109,9 @@ plot(yB[Ds==0],y0[Ds==0],pch=1,xlim=c(4,11),ylim=c(4,11),xlab="yB",ylab="Outcome
 points(yB[Ds==1],y1[Ds==1],pch=3)
 legend(4,11,c('y|D=0','y|D=1'),pch=c(1,3))
 abline(v=log(param["barY"]),col=col.unobs)
-@
+@      
 \clearpage
-      
+
       \subsection{Compute individual level treatment effects in the sample}
       
 In order to compute individual level treatment effects in the sample, I use the formula: \\ 
@@ -110,7 +121,7 @@ In order to compute individual level treatment effects in the sample, I use the 
 it<- y1-y0
 @
 
-\noindent{Here, I get the individual level treatment effects is \Sexpr{it[1:NC]}.}
+\noindent{Here, I get the individual level treatment effects are \\ \Sexpr{it[1:NC]}}
 
       \subsection{Compute the average treatment effect on the treated in the sample by taking the average of the individual level treatment effects of the treated}
   
@@ -239,7 +250,9 @@ In order to compute individual level treatment effects in the sample, I use the 
 its<- y1s-y0s
 @
 
-\noindent{Here, I get the individual level treatment effects are \\ \Sexpr{its[1:NS]}}
+\noindent{Here, I get the individual level treatment effects are \\
+\Sexpr{its[1:NS]}}
+
 
       \subsection{Compute TT in the sample}
 <<avg.tt.NS,eval=TRUE,echo=FALSE>>=
@@ -255,7 +268,7 @@ According to the course, we learnt the theoretical average treatment effect with
 theo.avg.tts<-delta.y.tt(paramS)
 @
 
-\noindent{Thus, I get the theoretical average treatment effect is \textbf{\Sexpr{theo.avg.tts}}, which is smaller than the value of last question.}
+\noindent{Thus, I get the theoretical average treatment effect is \textbf{\Sexpr{theo.avg.tts}}, which is bigger than the value of last question.}
 
       \subsection{Compute the WW estimator}
 In order to compute the WW estimator in the sample, I use the formula:\\
@@ -267,9 +280,9 @@ WW.estiS<-mean(ys[Dss==1])-mean(ys[Dss==0])
 
 \noindent{Here, I get the WW estimator in the sample is $\bm{\Sexpr{WW.estiS}}$.}
 
-      \subsection{Compute the OLS of beta in $y_i = \alpha + \beta D_i + U_i$}
+      \subsection{Compute the OLS of beta in $\bm{y_i = \alpha + \beta D_i + U_i}$}
 According to the course, we learn the formula as following:\\ \\
-\centerline{$\hat{\beta}_{OLS} = \displaystyle\frac{\frac{1}{N}\sum_{i=1}^N\left(Y_i-\frac{1}{N}\sum_{i=1}^NY_i\right)\left(D_i-\frac{1}{N}\sum_{i=1}^ND_i\right)}{\frac{1}{N}\sum_{i=1}^N\left(D_i-\frac{1}{N}\sum_{i=1}^ND_i\right)^2}$}
+\centerline{$\hat{\beta}_{OLS} = \displaystyle\frac{\frac{1}{N}\sum_{i=1}^N\left(Y_i-\frac{1}{N}\sum_{i=1}^NY_i\right)\left(D_i-\frac{1}{N}\sum_{i=1}^ND_i\right)}{\frac{1}{N}\sum_{i=1}^N\left(D_i-\frac{1}{N}\sum_{i=1}^ND_i\right)^2}$} \\
 
 <<btols,eval=TRUE,echo=FALSE>>=
 a<-ys-sum(ys)/NS
@@ -291,13 +304,13 @@ var1<-var(ys[Dss==1])
 var0<-var(ys[Dss==0])
 @
 
-\noindent{According to R, I get $\var{Y_i^1|D_i=1}=\Sexpr{var1}$ and $\var{Y_i^0|D_i=0}=\Sexpr{var0}$.}
+\noindent{According to R, I get $\bm{\var{Y_i^1|D_i=1}=\Sexpr{var1}}$ and $\bm{\var{Y_i^0|D_i=0}=\Sexpr{var0}}$.}
 
 <<probas,eval=TRUE,echo=FALSE>>=
 proba1<-length(Dss[Dss==1])/NS
 @
 
-\noindent{Moreover, I get $\Pr(D_i=1)=\Sexpr{proba1}$.}
+\noindent{Moreover, I get $\bm{\Pr(D_i=1)=\Sexpr{proba1}}$.}
 
 <<tilde.epsilon.WW,eval=TRUE,echo=FALSE>>=
 tilde.epsilon.WW<-qnorm((0.99+1)/2)*(1/NS)*sqrt((var1/proba1)+(var0/(1-proba1)))
@@ -349,12 +362,12 @@ sf.simuls.ww.N <- function(N,Nsim,param){
 Nsim <- 1000
 N.sample <- c(100,1000,10000,100000)
 
-simuls.ww <- lapply(N.sample,sf.simuls.ww.N,Nsim=Nsim,param=param)
+simuls.ww <- lapply(N.sample,sf.simuls.ww.N,Nsim=Nsim,param=paramS)
 names(simuls.ww) <- N.sample
 @
 
 <<delta.y.ate,eval=TRUE,echo=FALSE,results='hide'>>=
-delta.y.ate <- function(paramS){
+delta.y.ate <- function(param){
   return(paramS["baralpha"]+paramS["theta"]*paramS["barmu"])
 }
 @
@@ -362,7 +375,7 @@ delta.y.ate <- function(paramS){
 <<precision,dependson='monte.carlo',eval=TRUE,echo=FALSE,results='hide',echo=FALSE,warning=FALSE,error=FALSE,message=FALSE,fig.cap='Effect of sampling noise on the precision of the WW estimator (99\\% confidence)',fig.align='center',out.width='.65\\textwidth',fig.pos='htbp'>>=
 delta <- 0.99
 precision.ww <- function(k){
-  return(2*quantile(abs(simuls.ww[[k]][,'WW']-delta.y.ate(paramS)),probs=c(delta)))
+  return(2*quantile(abs(simuls.ww[[k]][,'WW']-delta.y.ate(paramS)),probs=c(delta),na.rm=TRUE))
 }
 precision.ww.N <- sapply(1:length(simuls.ww),precision.ww)
 precision <- as.data.frame(cbind(N.sample,precision.ww.N,rep(delta.y.ate(paramS),length(simuls.ww))))
@@ -391,7 +404,7 @@ precision$precision.CLT.1 <- sapply(1:length(simuls.ww),CLT.prec.1,delta=delta,s
 precision$precision.CLT.mean <- sapply(1:length(simuls.ww),CLT.prec.mean,delta=delta,simuls.ww=simuls.ww)
 @
 
-<<precision.CLT,dependson='monte.carlo',eval=TRUE,echo=FALSE,results='hide',echo=FALSE,warning=FALSE,error=FALSE,message=FALSE,fig.cap='sampling noise of the WW estimator with 99\\% confidence',fig.align='center',out.width='.65\\textwidth',fig.pos='htbp'>>=
+<<precision.CLT,dependson='monte.carlo',eval=TRUE,echo=FALSE,results='hide',echo=FALSE,warning=FALSE,error=FALSE,message=FALSE,fig.cap='sampling noise of the WW estimator with 99\\% confidence',fig.align='center',fig.width="6",out.width='.65\\textwidth',fig.pos='htbp'>>=
 
 ggplot(precision, aes(x=as.factor(N), y=TT)) +
   geom_bar(position=position_dodge(), stat="identity", colour='black') +
@@ -401,16 +414,8 @@ ggplot(precision, aes(x=as.factor(N), y=TT)) +
   xlab("Sample Size") 
 @
 
-\noindent{Hmmm, this graph doesn't look that nice, but in fact the graph below is what I really get in R, I don't understand why it's not the same as what it's shown in R.}
-\clearpage
-
-\begin{figure}
-\centering
-\includegraphics[scale=0.45]{Rplot}
-\caption{sampling noise of the WW estimator with 99\% confidence}
-\end{figure}
-
-\noindent{Well, this time the result is similar to yours.}
+\noindent{According to this graph, we observe that the result is similar to yours.\\
+\textbf{It indicates that ...}}
 
       \subsection{Estimate sampling noise using the same formula but for a confidence of 95\%. Has sampling noise increased or decreased?}
       
@@ -422,7 +427,7 @@ tilde.epsilon.WW.95<-qnorm((0.95+1)/2)*(1/NS)*sqrt((var1/proba1)+(var0/(1-proba1
       \subsection{Use the CLT formula to compute the sample size required to reach the amount of sampling noise that you have derived in question 9 with 99\% confidence. For this, use the variance of $\text{y^B}$ for the treated and untreated as an estimate of the two variances. Do you find a results similar to mine?}
 
 According to the course, we learnt the CLT formula to compute the sample size required to reach the amount of sampling noise: \\
-\centerline{$\displaystyle\tilde{N} & = \displaystyle\frac{1}{\epsilon^2}\left(\Phi^{-1}\left(\displaystyle\frac{\delta+1}{2}\right)\right)^2\left(\displaystyle\frac{\var{Y_i^1|D_i=1}}{\Pr(D_i=1)}+\displaystyle\frac{\var{Y_i^0|D_i=0}}{1-\Pr(D_i=1)}\right)$} \\
+\centerline{$\displaystyle\tilde{N} = \displaystyle\frac{1}{\epsilon^2}\left(\Phi^{-1}\left(\displaystyle\frac{\delta+1}{2}\right)\right)^2\left(\displaystyle\frac{\var{Y_i^1|D_i=1}}{\Pr(D_i=1)}+\displaystyle\frac{\var{Y_i^0|D_i=0}}{1-\Pr(D_i=1)}\right)$} \\
 
 \noindent{In \textbf{1.2.8}, I have already gotten $\Pr(D_i=1)=\Sexpr{proba1}$ and $\tilde{\epsilon}=\Sexpr{tilde.epsilon.WW}$.}
 \noindent{Since the question ask us to use the variance of $\text{y^B}$ for the treated and untreated as an estimate of the two variances, then I will firstly compute the variance of $\text{y^B}$ for the treated and untreated.}
@@ -464,7 +469,7 @@ precision$samp.CLT.1 <- sapply(as.numeric(names(simuls.ww)),CLT.samp.1,delta=del
 precision$samp.CLT.mean <- sapply(1:length(simuls.ww),CLT.samp.mean,delta=delta,simuls.ww=simuls.ww)
 @
 
-<<sample.CLT,dependson='monte.carlo',eval=FALSE,echo=FALSE,results='hide',echo=FALSE,warning=FALSE,error=FALSE,message=FALSE,fig.cap='Sample size using CLT',fig.align='center',out.width='.65\\textwidth',fig.pos='htbp'>>=
+<<sample.CLT,dependson='monte.carlo',eval=TRUE,echo=FALSE,results='hide',echo=FALSE,warning=FALSE,error=FALSE,message=FALSE,fig.cap='Sample size using CLT',fig.align='center',out.width='.65\\textwidth',fig.pos='htbp'>>=
 samp.t <- cbind(precision[,c('N','precision')],rep('Truth',length(precision$N)))
 colnames(samp.t) <- c('N','precision','Method')
 samp.1 <- cbind(precision[,c('samp.CLT.1','precision')],rep('CLT.1',length(precision$N)))
@@ -480,16 +485,9 @@ ggplot(sample.size.CLT, aes(x=precision, y=N,fill=Method)) +
 #  scale_y_continuous(trans='log10')
 @
 
-\noindent{Ops... the same problem as 1.2.8... In fact the graph that generated by R is as following:}
+\noindent{According to this graph, we can get that the result is similar to yours.\\
+\textbf{It indicates that ...}}
 \clearpage
-
-\begin{figure}
-\centering
-\includegraphics[scale=0.5]{CLT}
-\caption{Sample size using CLT}
-\end{figure}
-
-\noindent{Well, this time the result is similar to yours.}
 
       \subsection{What happens to sample size if you use the same variance (that of $\text{y^B}$ overall)?}
 
@@ -497,7 +495,7 @@ ggplot(sample.size.CLT, aes(x=precision, y=N,fill=Method)) +
 N.bis<-(1/(tilde.epsilon.WW^2))*(qnorm((0.99+1)/2))^2*((var(yB)/proba1)+(var(yB)/(1-proba1)))
 @
 
-\noindent{If I use the same variance $\var{y^B}$, then the sample size is $\bm{\Sexpr{N.bis}}$, which means the sample size decreases.}
+\noindent{If I use the same variance $\var{y^B}$, then the sample size is $\bm{\Sexpr{N.bis}}$, which means the sample size increases.}
 
       \subsection{Estimate sample size with a smaller sampling noise but the same level of confidence. Does sample size increase or decrease?}
 
@@ -618,19 +616,12 @@ legend(4,10,c('y0|D=0','y0|D=1','y1|D=1',expression(hat('y0|D=0')),expression(ha
 ww.ols <- mean(yo[Dso==1]-y.pred)
 @
 
-<<plot.ols.estim.step.4,eval=FALSE,echo=FALSE,results='hide',fig.cap='Step 4',fig.align='center',out.width='.65\\textwidth',fig.pos='htbp'>>=
-plot(1, type="n", xlab="", ylab="", xlim=xlim.small, ylim=c(0, 10))
+<<plot.ols.estim.step.4,eval=TRUE,echo=FALSE,results='hide',fig.cap='Step 4',fig.align='center',out.width='.49\\textwidth',out.height='.49\\textwidth',fig.width=5.5,fig.height=5.5,fig.pos='htbp'>>=
+plot(1, type="n", xlab="", ylab="", xlim=c(0.3,0.9), ylim=c(0, 10))
 abline(v=delta.y.tt(param),col=col.unobs,lty=lty.unobs)
 abline(v=ww.ols,col=col.obs,lty=lty.obs)
 text(x=c(delta.y.tt(param),ww.ols),y=c(adj),labels=c('TT',expression(hat('E'))),pos=c(4,2),col=c(col.unobs,col.obs),lty=c(lty.unobs,lty.obs))
 @
-
-% since it cannot export the same graph of step 4 as it did in R, I insert the gragh.
-\\begin{figure}[htb]
-\centering
-\includegraphics[height=7.5cm]{olsestim}
-\caption{Step 4}
-\end{figure}
 
 \clearpage
 
@@ -665,19 +656,12 @@ ols.direct <- lm(yo~yBo+Dso+yB.Ds)
 ww.ols.direct <- ols.direct$coef[[3]]
 @
 
-<<plot.ols.estim.direct,eval=FALSE,echo=FALSE,results='hide',fig.cap='Direct OLS Estimation',fig.align='center',out.width='.65\\textwidth',fig.pos='htbp'>>=
-plot(1, type="n", xlab="", ylab="", xlim=xlim.small, ylim=c(0, 10))
+<<plot.ols.estim.direct,eval=TRUE,echo=FALSE,results='hide',fig.cap='Direct OLS Estimation',fig.align='center',out.width='.65\\textwidth',fig.pos='htbp'>>=
+plot(1, type="n", xlab="", ylab="", xlim=c(0.3,0.9), ylim=c(0, 10))
 abline(v=delta.y.tt(param),col=col.unobs,lty=lty.unobs)
 abline(v=ww.ols.direct,col=col.obs,lty=lty.obs)
 text(x=c(delta.y.tt(param),ww.ols.direct),y=c(adj),labels=c('TT',expression(hat('E'))),pos=c(4,2),col=c(col.unobs,col.obs),lty=c(lty.unobs,lty.obs))
 @
-
-% since it cannot export the same graph as it did in R, I insert the gragh.
-\begin{figure}[htb]
-\centering
-\includegraphics[height=10cm]{DirectOLS}
-\caption{Direct OLS Estimation}
-\end{figure}
 
 \clearpage
 
@@ -761,7 +745,7 @@ for (i in 1:length(simuls.ols)){
 \noindent{When sample size is 100, the sampling noise is big. With the increasing of sample size, the sampling noise becomes much smaller.}
 \clearpage
 
-<<precision.ols,dependson='monte.carlo.ols',eval=FALSE,echo=FALSE,results='hide',echo=FALSE,warning=FALSE,error=FALSE,message=FALSE,fig.cap='precision of the OLS estimator with 99\\% confidence',fig.align='center',out.width='.65\\textwidth',fig.pos='htbp'>>=
+<<precision.ols,dependson='monte.carlo.ols',eval=TRUE,echo=FALSE,results='hide',echo=FALSE,warning=FALSE,error=FALSE,message=FALSE,fig.cap='precision of the OLS estimator with 99\\% confidence',fig.align='center',out.width='.65\\textwidth',fig.pos='htbp'>>=
 delta <- 0.99
 precision.ols <- function(k){
   return(2*quantile(abs(simuls.ols[[k]][,'OLS.direct']-delta.y.tt(param)),probs=c(delta)))
@@ -790,13 +774,7 @@ ggplot(precision.ols, aes(x=as.factor(N), y=TT)) +
   xlab("Sample Size") 
 @
 
-\noindent{As what happened before, it exports different graph from what it actually did in R, I insert the
-right gragh.}
-\begin{figure}[htb]
-\centering
-\includegraphics[height=10cm]{precols}
-\caption{precision of the OLS estimator with 99\% confidence}
-\end{figure}
+\noindent{\textbf{It indicates that ...}}
 
   \section{Nonparametric Observational Methods: Matching}
     \subsection{Compute the LLR estimator on the sample with common support.}
@@ -817,7 +795,7 @@ propen.score<-length(Dso[Dso==1])/NO
 \noindent{According to R, I get the propensity score is $\bm{\Sexpr{propen.score}}$.}
 
 \noindent{\textbf{common support and trimming}\\
-Common Support: Illustration}
+\emph{Common Support: Illustration}}
 <<simul.com.supp,eval=TRUE,echo=FALSE,results='hide'>>=
 set.seed(2345)
 NO <-1500
@@ -858,7 +836,7 @@ par {graphics}:par can be used to set or query graphical parameters. Parameters 
 \emph{oma}-A vector of the form c(bottom, left, top, right) giving the size of the outer margins in lines of text.}
 \clearpage
 
-\noindent{LLR Matching}
+\noindent{\emph{LLR Matching}}
 <<LLR,eval=TRUE,echo=FALSE,results='hide',cache=TRUE>>=
 llr <- function(y,x,gridx,bw,kernel){
   if (kernel=='uniform'){
@@ -946,18 +924,11 @@ ww.llr <- mean(yc[Dsc==1]-y0.llr)
 @
 
 <<plot.LLR.step.3,dependson='LLR',eval=FALSE,echo=FALSE,results='hide',fig.cap='Step 3',fig.align='center',out.width='.65\\textwidth',fig.pos='htbp'>>=
-plot(1, type="n", xlab="", ylab="", xlim=xlim.small, ylim=c(0, 10))
+plot(1, type="n", xlab="", ylab="", xlim=c(0.3,0.9), ylim=c(0, 10))
 abline(v=delta.y.tt.com.supp(param),col=col.unobs,lty=lty.unobs)
 abline(v=ww.llr,col=col.obs,lty=lty.obs)
 text(x=c(delta.y.tt.com.supp(param),ww.llr),y=c(adj),labels=c('TT',expression(hat('E'))),pos=c(2,4),col=c(col.unobs,col.obs),lty=c(lty.unobs,lty.obs))
 @
-
-% As what happened before, it exports different graph from what it actually did in R, I insert the right gragh.
-\begin{figure}[htb]
-\centering
-\includegraphics[height=8cm]{Step3}
-\caption{Step 3}
-\end{figure} 
 
 \noindent{with bandwidth=\Sexpr{bw} and a \Sexpr{kernel} kernel.}
 \clearpage
@@ -1006,18 +977,11 @@ ww.llr.trim <- llr.match.trim(yc,Dsc,yBo,t=t,bw=bw,kernel=kernel)
 @
 
 <<plot.LLR.trimming,dependson='LLR.trim',eval=FALSE,echo=FALSE,results='hide',fig.cap='LLR Matching with Trimming',fig.align='center',out.width='.65\\textwidth',fig.pos='htbp'>>=
-plot(1, type="n", xlab="", ylab="", xlim=xlim.small, ylim=c(0, 10))
+plot(1, type="n", xlab="", ylab="", xlim=c(0.3,0.9), ylim=c(0, 10))
 abline(v=delta.y.tt.com.supp(param),col=col.unobs,lty=lty.unobs)
 abline(v=ww.llr.trim,col=col.obs,lty=lty.obs)
 text(x=c(delta.y.tt.com.supp(param),ww.llr.trim),y=c(adj),labels=c('TT',expression(hat('E'))),pos=c(4,2),col=c(col.unobs,col.obs),lty=c(lty.unobs,lty.obs))
 @
-
-% As what happened before, it exports different graph from what it actually did in R, I insert the right gragh.
-\begin{figure}[htb]
-\centering
-\includegraphics[height=8.6cm]{LLRTrimming}
-\caption{LLR Matching with Trimming}
-\end{figure} 
 
 \noindent{with bandwidth$=$\Sexpr{bw}, \Sexpr{kernel} kernel and trimming level \Sexpr{t*100}\%.}
 \clearpage
@@ -1091,35 +1055,35 @@ for (i in 1:length(simuls.llr.trim)){
   \item Build a plot of Ds as a function of yB showing the discontinuity
 \end{itemize}
 
-<<continuity.sharp,eval=TRUE,echo=FALSE,results='hide'>>=
-reg.ols.00 <- lm(y0o[Dso==0]~yBo[Dso==0])
-reg.ols.01 <- lm(y0o[Dso==1]~yBo[Dso==1])
-reg.ols.10 <- lm(y1o[Dso==0]~yBo[Dso==0])
-reg.ols.11 <- lm(y1o[Dso==1]~yBo[Dso==1])
+<<continuity.sharp.yB,eval=TRUE,echo=FALSE,results='hide'>>=
+reg.yB.00 <- lm(y0[Ds==0]~yB[Ds==0])
+reg.yB.01 <- lm(y0[Ds==1]~yB[Ds==1])
+reg.yB.10 <- lm(y1[Ds==0]~yB[Ds==0])
+reg.yB.11 <- lm(y1[Ds==1]~yB[Ds==1])
 @
 
-<<identification.sharp.ols.1,eval=FALSE,echo=FALSE,results='hide',fig.cap='Identification in a sharp RDD design',fig.align='center',out.width='.65\\textwidth',fig.pos='htbp'>>=
-plot(yBo[Dso==0],yo[Dso==0],pch=1,xlim=c(4,10.5),ylim=c(4,10.5),xlab="yB",ylab="Outcomes")
-points(yBo[Dso==1],yo[Dso==1],pch=3)
+<<identification.sharp.yB.1,eval=FALSE,echo=FALSE,results='hide',fig.align='center',out.width='.65\\textwidth',fig.pos='htbp'>>=
+plot(yB[Ds==0],y[Ds==0],pch=1,xlim=c(4,10.5),ylim=c(4,10.5),xlab="yB",ylab="Outcomes")
+points(yB[Ds==1],y[Ds==1],pch=3)
 abline(v=log(param["barY"]),col=col.unobs)
 text(x=c(log(param["barY"])),y=c(5),labels=c(expression(bar('y'))),pos=c(2),col=c(col.unobs),lty=c(lty.obs))
 legend(4,10.5,c('y0|D=0','y1|D=1'),pch=c(1,3),col=c(col.obs,col.obs),ncol=1)
 @
 
-<<identification.sharp.ols.2,eval=FALSE,echo=FALSE,results='hide',fig.cap='Identification in a sharp RDD design',fig.align='center',out.width='.65\\textwidth',fig.pos='htbp'>>=
-plot(yBo[Dso==0],yo[Dso==0],pch=1,xlim=c(4,10.5),ylim=c(4,10.5),xlab="yB",ylab="Outcomes")
-points(yBo[Dso==1],yo[Dso==1],pch=3)
-points(yBo[Dso==0],reg.ols.00$fitted.values,col='blue',pch=1)
+<<identification.sharp.yB.2,eval=FALSE,echo=FALSE,results='hide',fig.align='center',out.width='.65\\textwidth',fig.pos='htbp'>>=
+plot(yB[Ds==0],y[Ds==0],pch=1,xlim=c(4,10.5),ylim=c(4,10.5),xlab="yB",ylab="Outcomes")
+points(yB[Ds==1],y[Ds==1],pch=3)
+points(yB[Ds==0],reg.yB.00$fitted.values,col='blue',pch=1)
 abline(v=log(param["barY"]),col=col.unobs)
 text(x=c(log(param["barY"])),y=c(5),labels=c(expression(bar('y'))),pos=c(2),col=c(col.unobs),lty=c(lty.obs))
 legend(4,10.5,c('y0|D=0','y1|D=1',expression(hat('y0'))),pch=c(1,3,1),col=c(col.obs,col.obs,'blue'),ncol=2)
 @
 
-<<identification.sharp.ols.3,eval=TRUE,echo=FALSE,results='hide',fig.cap='Identification in a sharp RDD design',fig.align='center',out.width='.65\\textwidth',fig.pos='htbp'>>=
-plot(yBo[Dso==0],yo[Dso==0],pch=1,xlim=c(4,10.5),ylim=c(4,10.5),xlab="yB",ylab="Outcomes")
-points(yBo[Dso==1],yo[Dso==1],pch=3)
-points(yBo[Dso==0],reg.ols.00$fitted.values,col='blue',pch=1)
-points(yBo[Dso==1],reg.ols.11$fitted.values,col='blue',pch=3)
+<<identification.sharp.yB.3,eval=TRUE,echo=FALSE,results='hide',fig.align='center',out.width='.65\\textwidth',fig.pos='htbp'>>=
+plot(yB[Ds==0],y[Ds==0],pch=1,xlim=c(4,10.5),ylim=c(4,10.5),xlab="yB",ylab="Outcomes")
+points(yB[Ds==1],y[Ds==1],pch=3)
+points(yB[Ds==0],reg.yB.00$fitted.values,col='blue',pch=1)
+points(yB[Ds==1],reg.yB.11$fitted.values,col='blue',pch=3)
 abline(v=log(param["barY"]),col=col.unobs)
 text(x=c(log(param["barY"])),y=c(5),labels=c(expression(bar('y'))),pos=c(2),col=c(col.unobs),lty=c(lty.obs))
 legend(4,10.5,c('y0|D=0','y1|D=1',expression(hat('y0')),expression(hat('y1'))),pch=c(1,3,1,3),col=c(col.obs,col.obs,'blue','blue'),ncol=2)
@@ -1189,19 +1153,12 @@ delta.y.tt.z <- function(param){
 Moreover, I show the graph of the results of RDD using OLS as following:}
 
 <<plot.RDD.sharp.ols,eval=FALSE,echo=FALSE,results='hide',fig.cap='Sharp RDD Using OLS',fig.align='center',out.width='.65\\textwidth',fig.pos='htbp'>>=
-plot(1, type="n", xlab="", ylab="", xlim=xlim.small, ylim=c(0, 10))
+plot(1, type="n", xlab="", ylab="", xlim=c(0.4,1), ylim=c(0, 10))
 abline(v=delta.y.tt.z(param),col=col.unobs,lty=lty.unobs)
 abline(v=delta.y.rddols,col=col.obs,lty=lty.obs)
 text(x=c(delta.y.tt.z(param),delta.y.rddols),y=c(adj),labels=c('TT(z)',expression(hat('E'))),pos=c(4,2),col=c(col.unobs,col.obs),lty=c(lty.unobs,lty.obs))
 @
 \clearpage
-
-% As what happened before, it exports different graph from what it actually did in R, I insert the right gragh.
-\begin{figure}[htb]
-\centering
-\includegraphics[height=8.6cm]{SRDDols}
-\caption{Sharp RDD Using OLS}
-\end{figure} 
 
         \subsubsection{Nonlinear sample}
 % preparation of parameters and data
@@ -1376,6 +1333,16 @@ Yc <- Y1o*Dsc+Y0o*(1-Dsc)
 \begin{itemize}
   \item  Choose optimal bandwidth using CV for each of the 4 regression functions
 \end{itemize}
+<<LLR.fuzzy.pscore,eval=TRUE,echo=FALSE,results='hide',cache=TRUE>>=
+kernel <- 'gaussian'
+MSE.grid <- seq(0.1,1,by=.1)
+Z <- ifelse(yBo<=log(param['barY']),1,0)
+MSE.pr.llr.0 <- sapply(MSE.grid,MSE.llr,y=Dsc,D=Z,x=yBo,kernel=kernel,d=0)
+MSE.pr.llr.1 <- sapply(MSE.grid,MSE.llr,y=Dsc,D=Z,x=yBo,kernel=kernel,d=1)
+
+Pr.D0.llr <- llr(Dsc[Z==0],yBo[Z==0],yBo[Z==0],bw=MSE.grid[MSE.pr.llr.0==min(MSE.pr.llr.0)],kernel=kernel)    
+Pr.D1.llr <- llr(Dsc[Z==1],yBo[Z==1],yBo[Z==1],bw=MSE.grid[MSE.pr.llr.1==min(MSE.pr.llr.1)],kernel=kernel)    
+@
 
 <<rdd.fuzzy.local.iv,eval=FALSE,echo=FALSE,results='hide'>>=
 bw.f <- min(c(MSE.grid[MSE.pr.llr.0==min(MSE.pr.llr.0)],MSE.grid[MSE.pr.llr.1==min(MSE.pr.llr.1)],MSE.grid[MSE.llr.0==min(MSE.llr.0)],MSE.grid[MSE.llr.1==min(MSE.llr.1)]))
@@ -1414,17 +1381,6 @@ axis(4)
 mtext("D",side=4,line=3)
 @
 
-<<LLR.fuzzy.pscore,eval=TRUE,echo=FALSE,results='hide',cache=TRUE>>=
-kernel <- 'gaussian'
-MSE.grid <- seq(0.1,1,by=.1)
-Z <- ifelse(yBo<=log(param['barY']),1,0)
-MSE.pr.llr.0 <- sapply(MSE.grid,MSE.llr,y=Dsc,D=Z,x=yBo,kernel=kernel,d=0)
-MSE.pr.llr.1 <- sapply(MSE.grid,MSE.llr,y=Dsc,D=Z,x=yBo,kernel=kernel,d=1)
-
-Pr.D0.llr <- llr(Dsc[Z==0],yBo[Z==0],yBo[Z==0],bw=MSE.grid[MSE.pr.llr.0==min(MSE.pr.llr.0)],kernel=kernel)    
-Pr.D1.llr <- llr(Dsc[Z==1],yBo[Z==1],yBo[Z==1],bw=MSE.grid[MSE.pr.llr.1==min(MSE.pr.llr.1)],kernel=kernel)    
-@
-
 <<plot.fuzzy.rdd.2,dependson='LLR.fuzzy.pscore',eval=FALSE,echo=FALSE,results='hide',fig.cap='Fuzzy RDD',fig.align='center',out.width='.65\\textwidth',fig.pos='htbp'>>=
 plot(yBo[Dsc==0],y0o[Dsc==0],pch=1,xlim=c(5,11),ylim=c(5,11),xlab="yB",ylab="Outcomes")
 points(yBo[Dsc==1],yc[Dsc==1],pch=3,col=col.obs)
@@ -1439,11 +1395,11 @@ mtext("D",side=4,line=3)
 @
 
 <<LLR.fuzzy.y,eval=TRUE,echo=FALSE,results='hide',cache=TRUE>>=
-MSE.llr.0 <- sapply(MSE.grid,MSE.llr,y=yc,D=Z,x=yBo,kernel=kernel,d=0)
-xMSE.llr.1 <- sapply(MSE.grid,MSE.llr,y=yc,D=Z,x=yBo,kernel=kernel,d=1)
+MSE.llr.0.f <- sapply(MSE.grid,MSE.llr,y=yc,D=Z,x=yBo,kernel=kernel,d=0)
+MSE.llr.1.f <- sapply(MSE.grid,MSE.llr,y=yc,D=Z,x=yBo,kernel=kernel,d=1)
 
-y.Z0.llr <- llr(yc[Z==0],yBo[Z==0],yBo[Z==0],bw=MSE.grid[MSE.llr.0==min(MSE.llr.0)],kernel=kernel)    
-y.Z1.llr <- llr(yc[Z==1],yBo[Z==1],yBo[Z==1],bw=MSE.grid[MSE.llr.1==min(MSE.llr.1)],kernel=kernel)    
+y.Z0.llr <- llr(yc[Z==0],yBo[Z==0],yBo[Z==0],bw=MSE.grid[MSE.llr.0==min(MSE.llr.0.f)],kernel=kernel)    
+y.Z1.llr <- llr(yc[Z==1],yBo[Z==1],yBo[Z==1],bw=MSE.grid[MSE.llr.1==min(MSE.llr.1.f)],kernel=kernel)    
 @
 
 <<plot.fuzzy.rdd.3,dependson='LLR.fuzzy.pscore',eval=TRUE,echo=FALSE,results='hide',fig.cap='Fuzzy RDD',fig.align='center',out.width='.5\\textwidth',out.height='.5\\textwidth',fig.width=8,fig.height=8,fig.pos='htbp'>>=
@@ -1461,33 +1417,38 @@ axis(4)
 mtext("D",side=4,line=3)
 @
 
-\begin{itemize}
-  \item  Use LLR to build the Wald estimate of LATE(z)
-\end{itemize}
+% \begin{itemize}
+  % \item  Use LLR to build the Wald estimate of LATE(z)
+% \end{itemize}
 
 % not sure...
 <<plot.wald.rdd.llr.il,eval=FALSE,echo=FALSE,results='hide',fig.cap='Simplified Wald RDD LLR',fig.align='center',out.width='.65\\textwidth',fig.pos='htbp'>>=
-plot(1, type="n", xlab="", ylab="", xlim=xlim.big, ylim=c(0, 10))
+plot(1, type="n", xlab="", ylab="", xlim=c(0.4,1), ylim=c(0, 10))
 abline(v=delta.y.tt.z(param),col=col.unobs,lty=lty.unobs)
 abline(v=delta.rdd.fuzzy.il,col=col.obs,lty=lty.obs)
 text(x=c(delta.y.tt.z(param),delta.rdd.fuzzy.il),y=c(adj),labels=c('TT(z)',expression(hat('E'))),pos=c(2,4),col=c(col.unobs,col.obs),lty=c(lty.unobs,lty.obs))
 @
 
 % As what happened before, it exports different graph from what it actually did in R, I insert the right gragh.
-\begin{figure}[htb]
-\centering
-\includegraphics[height=8.6cm]{WaldRDDLLR}
-\caption{Simplified Wald RDD LLR}
-\end{figure}
-\clearpage
+% \begin{figure}[htb]
+% \centering
+% \includegraphics[height=8.6cm]{WaldRDDLLR}
+% \caption{Simplified Wald RDD LLR}
+% \end{figure}
+% \clearpage
 
-\begin{itemize}
-  \item  Use the simplified Imbens and Lemieux 2SLS estimator to estimate LATE(z) and precision
-\end{itemize}
+% \begin{itemize}
+  % \item  Use the simplified Imbens and Lemieux 2SLS estimator to estimate LATE(z) and precision
+% \end{itemize}
 
 % not sure...
 % we have gotten delta.rdd.fuzzy.il<-0.005781747 and 2*qnorm((.99+1)/2)*sqrt(vcov(reg.fuzzy.rdd.local.iv)[2,2])<-3.360884
-The estimated value of LATE(z) by simplified LLR IV is $\bm{0.005781747}$. The estimated 99\% sampling noise is $\bm{3.360884}$.
+% The estimated value of LATE(z) by simplified LLR IV is $\bm{0.005781747}$. The estimated 99\% sampling noise is $\bm{3.360884}$.
+
+
+\part{Conclusion}
+
+
 
 
 \end{document}
