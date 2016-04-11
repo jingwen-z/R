@@ -55,7 +55,7 @@ library(tmvtnorm)
 
 
 
-\part{Data Analysis\\ in different methods}
+\part{Data Analysis in different methods}
 
   \chapter{The Two Fundamental Problems of Inference}
     \section{The Fundamental Problem of Causal Inference}  
