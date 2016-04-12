@@ -1,0 +1,1530 @@
+\documentclass[12pt,a4paper]{book}
+
+<<libraries,eval=TRUE,include=FALSE>>=
+library(MASS)
+library(RColorBrewer)
+library(gplots)
+library(snowfall)
+library(ggplot2)
+library(xtable)
+library(sandwich)
+library(AER)
+library(plm)
+library(tmvtnorm)
+@
+
+\hfuzz=\maxdimen
+\tolerance=10000
+\hbadness=10000
+
+\usepackage{geometry}
+\geometry{left=2cm,right=2cm,top=2cm,bottom=2cm}
+\renewcommand{\baselinestretch}{1.25}
+
+\usepackage{graphicx}
+
+% The bm package defines a command \bm which makes its argument bold. The argument may be any maths object from a single symbol to an expression.
+\usepackage{bm}
+
+% sous titres
+\usepackage{subfig}
+
+% indention
+\usepackage{indentfirst}
+
+% package to generate commands with double letters in maths
+\usepackage{dsfont}
+\usepackage{amsfonts}
+\newcommand{\uns}[1]{\mathds{1}[ #1 ]}
+\newcommand{\esp}[1]{\mathbb{E}[ #1 ]}
+\newcommand{\esph}[1]{\hat{\mathbb{E}}[ #1 ]}
+\newcommand{\var}[1]{\mathbb{V}[ #1 ]}
+\newcommand\Ind{\protect\mathpalette{\protect\independenT}{\perp}}
+
+
+\begin{document}
+
+
+\title{EPE Data Analysis Project}
+\author{\textbf{Jingwen ZHENG}\\ Toulouse School of Economics\\ M2 ERNA}
+\maketitle
+
+\tableofcontents
+
+
+\part{Introduction}
+
+  As a student in M2 ERNA of Toulouse School of Economics, during the last half year of study, I'm really honoured to participate the course "Econometrics of Program Evaluation". In this course, I learnt some methods to estimate the effect of an interention on an outcome as the following outline.
+  
+  \begin{itemize}
+    \item The Two Fundamental Problems of Inference
+    \item Observational Methods of Causal Inference
+    \item Natural Experiments
+    \item Randomized Controlled Trials
+    \item Power Analysis: Choosing Sample Size and Gauging Sampling Noise Ex Ante
+    \item Placebo Tests and Power Analysis for Natural Experiments and Observational Studies
+    \item Estimating Precision In Group Designs With Autocorrelated Errors
+  \end{itemize}\\
+  
+\noindent{\textit{\textbf{Methods}}}
+
+\vspace{.5em}  
+  \underline{The Two Fundamental Problems of Inference} indicate the Fundamental Problem of Causal Inference(FPCI) and the Fundamental Problem of Statistical Inference(FPSI). In the lecture \underline{Observational Methods of Causal Inference}, we learnt how to estimate the effect of an intervention on an outcome using observational methods, this method tries to correct for selection bias by accounting for as many observed confounders as possible. There are several ways to leverage on Selection on Observables to build estimators for TT; "Parametric Observational Method: OLS", "Nonparametric Observational Method: Matching" and "Semiparametric Observational Method: Synthetic Control (SCM)".
+
+\vspace{.5em}  
+  A \underline{natural experiment} is an empirical study in which individuals (or clusters of individuals) exposed to the experimental and control conditions are determined by nature or by other factors outside the control of the investigators, yet the process governing the exposures arguably resembles random assignment. Thus, natural experiments are observational studies and are not controlled in the traditional sense of a randomized experiment. In the lecture "Natural Experiments", we learnt how to estimate the effect of an intervention on an outcome using natural experiments, this methods tries to correct for selection bias by finding situations analog to randomized experiments but due to the natural course of events. It covers three ways: Regression Discontinuity Designs (RDD), Difference in Differences (DID) and Instrumental Variables (IV). Natural experiments are most useful when there has been a clearly defined exposure involving a well defined subpopulation (and the absence of exposure in a similar subpopulation) such that changes in outcomes may be plausibly attributed to the exposure.
+
+\vspace{.5em}  
+  Besides, a \underline{Randomized Controlled Trial} is a type of scientific (often medical) experiment, where the people being studied are randomly allocated one or other of the different treatments under study. In the lecture "Randomized Controlled Trials", we learnt how to estimate the effect of an intervention on an outcome using randomized experiments. We especially learnt the various types of designs and what can be recovered from them using which technique. RCTs are often used to test the efficacy or effectiveness of various types of medical intervention and may provide information about adverse effects, such as drug reactions. 
+
+\vspace{.5em}  
+  Moreover, we learnt how to choose the size of our sample (mainly in a RCT) and how to gauge the size of sampling noise before conducting a study in the lecture \underline{Power Analysis: Choosing Sample Size and Gauging Sampling Noise Ex Ante}. There are two ways; one is using test statistics, the other is gauging sampling noise or choosing sample size to reach a given sampling noise. 
+
+\vspace{.5em}  
+  By \underline{Placebo Tests and Power Analysis for Natural Experiments and Observational Studies}, we know how to test for the validity and estimate the power of observational studies and natural experiments. 
+
+\vspace{.5em}  
+  Finally, we get how to estimate the precision of an estimator by studying lecture \underline{Estimating Precision In Group Designs With Autocorrelated Errors}, when the treatment has been allocated to groups of observations whose outcomes are correlated.\\
+
+\noindent{\textit{\textbf{Software}}}
+
+\vspace{.5em}
+  When writing a paper, slides or a report, we generally have a separate file for our statistical code and for our text (paper or slides). In general, the statistical files are in .R and the text in .tex. It's not convenient to use and is a waste of time.
+
+\vspace{.5em}
+  Thanks to this course, I master how to use \textbf{Knitr} package in RStudio in order to completely sidestep this problem by intertwining the .R code with .tex code within an .Rnw file.\\
+
+\noindent{\textit{\textbf{For this project}}}
+
+\vspace{.5em}
+  Since I didn't choose Paul and Cesar's class, I didn't do the report for that course. In this report, I generate data as Mr. Chabé-Ferret did. I did analysis with "The Two Fundamental Problems of Inference", the method "Observational Methods of Causal Inference" and the method "Regression Discontinuity Designs(RDD)" of "Natural Experiments".
+
+\vspace{.5em}  
+  In this project, I firstly generated data, then I used different methods to analyse and estimate the effect of an interention on an outcome. I will explaine the result with graphs and text in the following part.
+
+
+\part{Data Analysis in different methods}
+
+  \chapter{The Two Fundamental Problems of Inference}
+    \section{The Fundamental Problem of Causal Inference}  
+
+      \subsection{generate data with selection rule $D_i = \uns{y_i^B\leq\bar{y}}$}
+
+<<param,eval=TRUE,echo=FALSE,results='hide'>>=
+param <- c(7,.77,.1,1700,0.5,0.1,0.05,0.07,0.05,0.01)
+names(param) <- c("barmu","sigma2mu","sigma2U","barY","rho","theta","sigma2epsilon","sigma2eta","delta","baralpha")
+@
+
+<<delta.y.tt,eval=TRUE,echo=FALSE,results='hide'>>=
+delta.y.tt <- function(param){
+  return(param["baralpha"]+param["theta"]*param["barmu"]-param["theta"]*((param["sigma2mu"]*dnorm((log(param["barY"])-param["barmu"])/(sqrt(param["sigma2mu"]+param["sigma2U"]))))/(sqrt(param["sigma2mu"]+param["sigma2U"])*pnorm((log(param["barY"])-param["barmu"])/(sqrt(param["sigma2mu"]+param["sigma2U"]))))))
+}
+@
+
+<<data.FPCI,eval=TRUE,echo=FALSE,results='hide'>>=
+set.seed(2345)
+NC <-2000
+mu <- rnorm(NC,param["barmu"],sqrt(param["sigma2mu"]))
+UB <- rnorm(NC,0,sqrt(param["sigma2U"]))
+yB <- mu + UB 
+Ds <- rep(0,NC)
+Ds[yB<=log(param["barY"])] <- 1 
+epsilon <- rnorm(NC,0,sqrt(param["sigma2epsilon"]))
+eta<- rnorm(NC,0,sqrt(param["sigma2eta"]))
+U0 <- param["rho"]*UB + epsilon
+y0 <- mu +  U0 + param["delta"]
+alpha <- param["baralpha"]+  param["theta"]*mu + eta
+y1 <- y0+alpha
+Y0 <- exp(y0)
+Y1 <- exp(y1)
+y <- y1*Ds+y0*(1-Ds)
+Y <- Y1*Ds+Y0*(1-Ds)
+@
+
+      \subsection{plot potential outcomes and observed outcomes}
+<<Pot.obs.out.FPCI,eval=TRUE,fig.cap='Potential outcomes and observed outcomes',fig.subcap=c('Potential outcomes','Observed outcomes'),fig.align='center',out.width='.45\\linewidth',echo=FALSE,results='hide',fig.pos='htbp'>>=
+col.obs <- 'black'
+col.unobs <- 'red'
+
+plot(yB[Ds==0],y0[Ds==0],pch=1,xlim=c(4,11),ylim=c(4,11),xlab="yB",ylab="Outcomes")
+points(yB[Ds==1],y1[Ds==1],pch=3)
+points(yB[Ds==0],y1[Ds==0],pch=3,col=col.unobs)
+points(yB[Ds==1],y0[Ds==1],pch=1,col=col.unobs)
+abline(v=log(param["barY"]),col=col.unobs)
+legend(4,11,c('y0|D=0','y1|D=1','y0|D=1','y1|D=0'),pch=c(1,3,1,3),col=c(col.obs,col.obs,col.unobs,col.unobs),ncol=2)
+
+plot(yB[Ds==0],y0[Ds==0],pch=1,xlim=c(4,11),ylim=c(4,11),xlab="yB",ylab="Outcomes")
+points(yB[Ds==1],y1[Ds==1],pch=3)
+legend(4,11,c('y|D=0','y|D=1'),pch=c(1,3))
+abline(v=log(param["barY"]),col=col.unobs)
+@      
+\clearpage
+
+      \subsection{Compute individual level treatment effects in the sample}
+      
+In order to compute individual level treatment effects in the sample, I use the formula: \\ 
+\centerline{$\Delta_i^Y =Y_i^1 -Y^0_i$} 
+
+<<ind.tt.NC,eval=TRUE,echo=FALSE>>=
+it<- y1-y0
+@
+
+Because of the large amount of data, here I just show the first 20 and last 20 individual level treatment effects as following, the completed individual level treatment effects are in "Annex". \\ 
+
+\noindent{\Sexpr{it[1:20]} \\ ... \\ \Sexpr{it[1980:NC]}}
+
+      \subsection{Compute the average treatment effect on the treated in the sample by taking the average of the individual level treatment effects of the treated}
+  
+<<avg.tt,eval=TRUE,echo=FALSE>>=
+avg.tt<-mean(it)
+@
+By computing the average of the individual level treatment effects of the treated, I get the average treatment effect on the treated in the sample is \textbf{\Sexpr{avg.tt}}.
+
+      \subsection{Compare its value with the theoretical one in the population}
+According to the course, we learnt the theoretical average treatment effect with the following formula:\\
+\centerline{$\Delta_{TT}^y =\bar{\alpha}+\theta\bar{\mu} -\theta\displaystyle\frac{\sigma^2_{\mu}}{\sqrt{\sigma^2_{\mu}+\sigma^2_{U}}}\frac{\displaystyle\phi\left(\frac{\bar{y}-\bar{\mu}}{\sqrt{\sigma^2_{\mu}+\sigma^2_{U}}}\right)}{\displaystyle\Phi\left(\frac{\bar{y}-\bar{\mu}}{\sqrt{\sigma^2_{\mu}+\sigma^2_{U}}}\right)}$}\\
+
+<<theo.avg.tt,eval=TRUE,echo=FALSE>>=
+theo.avg.tt<-delta.y.tt(param)
+@
+
+Thus, I get the theoretical average treatment effect is \textbf{\Sexpr{theo.avg.tt}}, which is smaller than the value of last question.
+
+      \subsection{Compute the WW estimator in the sample}
+In order to compute the WW estimator in the sample, I use the formula:\\
+\centerline{$\Delta^Y_{WW} = \esp{Y_i|D_i=1} - \esp{Y_i|D_i=0}$}
+
+<<WW.esti,eval=TRUE,echo=FALSE>>=
+WW.esti<-mean(y[Ds==1])-mean(y[Ds==0])
+@
+
+Here, I get the WW estimator in the sample is $\bm{\Sexpr{WW.esti}}$.
+
+      \subsection{Compute Selection Bias}
+According to the course, we get that $\Delta^Y_{WW} = \Delta^Y_{TT} + \Delta^Y_{SB}$, so $\Delta^Y_{SB} = \Delta^Y_{WW} - \Delta^Y_{TT}$ . 
+
+<<SB,eval=TRUE,echo=FALSE>>=
+SB<-abs(WW.esti-avg.tt)
+@
+
+With the $\Delta^Y_{TT}$ and $\Delta^Y_{WW}$ that I got before, I can get the Selecton Bias is $\bm{\Sexpr{SB}}$.
+
+      \subsection{Compare its value to the theoretical one in the sample}
+According to the course, we learnt the theoretical selection bias with the following formula:\\ \\
+\centerline{$\Delta_{SB}^y = -\displaystyle\frac{\sigma^2_{\mu}+\rho\sigma^2_{U}}{\sqrt{\sigma^2_{\mu}+\sigma^2_{U}}}\left(\frac{\displaystyle\phi\left(\frac{\bar{y}-\bar{\mu}}{\sqrt{\sigma^2_{\mu}+\sigma^2_{U}}}\right)}{\displaystyle\Phi\left(\frac{\bar{y}-\bar{\mu}}{\sqrt{\sigma^2_{\mu}+\sigma^2_{U}}}\right)}+\frac{\displaystyle\phi\left(\frac{\bar{y}-\bar{\mu}}{\sqrt{\sigma^2_{\mu}+\sigma^2_{U}}}\right)}{1-\displaystyle\Phi\left(\frac{\bar{y}-\bar{\mu}}{\sqrt{\sigma^2_{\mu}+\sigma^2_{U}}}\right)}\right)$} \\
+
+<<WW.SB,eval=TRUE,echo=FALSE,results='hide'>>=
+delta.y.sb <- function(param){
+  return(-(param["sigma2mu"]+param["rho"]*param["sigma2U"])/sqrt(param["sigma2mu"]+param["sigma2U"])*dnorm((log(param["barY"])-param["barmu"])/(sqrt(param["sigma2mu"]+param["sigma2U"])))*(1/pnorm((log(param["barY"])-param["barmu"])/(sqrt(param["sigma2mu"]+param["sigma2U"])))+1/(1-pnorm((log(param["barY"])-param["barmu"])/(sqrt(param["sigma2mu"]+param["sigma2U"]))))))
+}
+@
+
+<<theo.SB,eval=TRUE,echo=FALSE>>=
+theo.SB<-abs(delta.y.sb(param))
+@
+
+Thus, I get the theoretical average treatment effect is $\bm{\Sexpr{theo.SB}}$, which is smaller than the value of last question.
+
+      \subsection{Compute the BA estimator in the sample}
+In order to compute the BA estimator in the sample, I use the formula:\\
+\centerline{$\Delta^Y_{BA} = \esp{Y_i|D_i=1} - \esp{Y_i^B|D_i=1}$}
+
+<<BA.esti,eval=TRUE,echo=FALSE>>=
+BA.esti<-mean(y[Ds==1])-mean(yB[Ds==1])
+@
+
+Here, I get the BA estimator in the sample is $\bm{\Sexpr{BA.esti}}$.
+
+      \subsection{Compute its bias}
+According to the course, we get that $\Delta^Y_{BA} = \Delta^Y_{TT} + \Delta^Y_{TB}$, so $\Delta^Y_{TB} = \Delta^Y_{BA} - \Delta^Y_{TT}$ . 
+
+<<TB,eval=TRUE,echo=FALSE>>=
+TB<-BA.esti-avg.tt
+@
+
+With the $\Delta^Y_{TT}$ and $\Delta^Y_{BA}$ that I got before, I can get the Time Trend Bias is $\bm{\Sexpr{TB}}$.
+
+
+  \section{The Fundamental Problem of Statistical Inference}
+    
+    \subsection{Generate data with selection rule $D_i = \uns{V_i\leq\bar{y}}$}
+<<param.FPSI,eval=TRUE,echo=FALSE,results='hide'>>=
+paramS <- c(5,.45,.3,600,0.8,0.06,0.05,0.2,0.05,0.1)
+names(paramS) <- c("barmu","sigma2mu","sigma2U","barY","rho","theta","sigma2epsilon","sigma2eta","delta","baralpha")
+@
+
+<<data.FPSI,eval=TRUE,echo=FALSE,results='hide'>>=
+set.seed(2345)
+NS <-1500
+mus <- rnorm(NS,paramS["barmu"],sqrt(paramS["sigma2mu"]))
+UBs <- rnorm(NS,0,sqrt(paramS["sigma2U"]))
+V <- mus + UBs 
+Dss <- rep(0,NS)
+Dss[V<=log(paramS["barY"])] <- 1 
+epsilons <- rnorm(NS,0,sqrt(paramS["sigma2epsilon"]))
+etas<- rnorm(NS,0,sqrt(paramS["sigma2eta"]))
+U0s <- paramS["rho"]*UBs + epsilons
+y0s <- mus +  U0s + paramS["delta"]
+alphas <- paramS["baralpha"]+  paramS["theta"]*mus + etas
+y1s <- y0s+alphas
+Y0s <- exp(y0s)
+Y1s <- exp(y1s)
+ys <- y1s*Dss+y0s*(1-Dss)
+Ys <- Y1s*Dss+Y0s*(1-Dss)
+@
+\clearpage
+
+      \subsection{Plot potential outcomes and observed outcomes}
+<<Pot.obs.out.FPSI,eval=TRUE,fig.cap='Potential outcomes and observed outcomes',fig.subcap=c('Potential outcomes','Observed outcomes'),fig.align='center',out.width='.45\\textwidth',echo=FALSE,results='hide',fig.pos='htbp'>>=
+col.obs <- 'black'
+col.unobs <- 'red'
+
+plot(V[Dss==0],y0s[Dss==0],pch=1,xlim=c(2,10),ylim=c(2,10),xlab="V",ylab="Outcomes")
+points(V[Dss==1],y1s[Dss==1],pch=3)
+points(V[Dss==0],y1s[Dss==0],pch=3,col=col.unobs)
+points(V[Dss==1],y0s[Dss==1],pch=1,col=col.unobs)
+abline(v=log(paramS["barY"]),col=col.unobs)
+legend(2,10,c('y0|D=0','y1|D=1','y0|D=1','y1|D=0'),pch=c(1,3,1,3),col=c(col.obs,col.obs,col.unobs,col.unobs),ncol=2)
+
+plot(V[Dss==0],y0s[Dss==0],pch=1,xlim=c(2,10),ylim=c(2,10),xlab="V",ylab="Outcomes")
+points(V[Dss==1],y1s[Dss==1],pch=3)
+legend(2,10,c('y|D=0','y|D=1'),pch=c(1,3))
+abline(v=log(paramS["barY"]),col=col.unobs)
+@
+
+      \subsection{Compute Individual level treatment effects in the sample}
+In order to compute individual level treatment effects in the sample, I use the formula: \\ 
+\centerline{$\Delta_i^Y =Y_i^1 -Y^0_i$} 
+
+<<ind.tt.NS,eval=TRUE,echo=FALSE>>=
+its<- y1s-y0s
+@
+
+Because of the large amount of data, here I just show the first 20 and last 20 individual level treatment effects as following, the completed individual level treatment effects are in "Annex". \\ 
+
+\noindent{\Sexpr{its[1:20]} \\ ... \\ \Sexpr{its[1480:NS]}}
+
+
+      \subsection{Compute TT in the sample}
+<<avg.tt.NS,eval=TRUE,echo=FALSE>>=
+avg.tts<-mean(its)
+@
+By computing the average of the individual level treatment effects of the treated, I get the value of TT is \textbf{\Sexpr{avg.tts}}.
+
+      \subsection{Compare with the theoretical value in the population}
+According to the course, we learnt the theoretical average treatment effect with the following formula:\\
+\centerline{$\Delta_{TT}^y =\bar{\alpha}+\theta\bar{\mu} -\theta\displaystyle\frac{\sigma^2_{\mu}}{\sqrt{\sigma^2_{\mu}+\sigma^2_{U}}}\frac{\displaystyle\phi\left(\frac{\bar{y}-\bar{\mu}}{\sqrt{\sigma^2_{\mu}+\sigma^2_{U}}}\right)}{\displaystyle\Phi\left(\frac{\bar{y}-\bar{\mu}}{\sqrt{\sigma^2_{\mu}+\sigma^2_{U}}}\right)}$}\\
+
+<<theo.avg.tts,eval=TRUE,echo=FALSE>>=
+theo.avg.tts<-delta.y.tt(paramS)
+@
+
+Thus, I get the theoretical average treatment effect is \textbf{\Sexpr{theo.avg.tts}}, which is bigger than the value of last question.
+
+      \subsection{Compute the WW estimator}
+In order to compute the WW estimator in the sample, I use the formula:\\
+\centerline{$\Delta^Y_{WW} = \esp{Y_i|D_i=1} - \esp{Y_i|D_i=0}$}
+
+<<WW.estiS,eval=TRUE,echo=FALSE>>=
+WW.estiS<-mean(ys[Dss==1])-mean(ys[Dss==0])
+@
+
+Here, I get the WW estimator in the sample is $\bm{\Sexpr{WW.estiS}}$.
+
+      \subsection{Compute the OLS of beta in $\bm{y_i = \alpha + \beta D_i + U_i}$}
+According to the course, we learn the formula as following:\\ \\
+\centerline{$\hat{\beta}_{OLS} = \displaystyle\frac{\frac{1}{N}\sum_{i=1}^N\left(Y_i-\frac{1}{N}\sum_{i=1}^NY_i\right)\left(D_i-\frac{1}{N}\sum_{i=1}^ND_i\right)}{\frac{1}{N}\sum_{i=1}^N\left(D_i-\frac{1}{N}\sum_{i=1}^ND_i\right)^2}$} \\
+
+<<btols,eval=TRUE,echo=FALSE>>=
+a<-ys-sum(ys)/NS
+b<-Dss-sum(Dss)/NS
+betaOLS<-(sum(a*b)/NS)/(sum(b^2)/NS)
+@
+
+Thus, I get the value of $\hat{\beta}_{OLS}$ is $\bm{\Sexpr{betaOLS}}$, which is the same as WW.}
+
+      \subsection{Use the CLT formula to estimate the effect of sampling noise on WW with 99\% confidence. For this, estimate the variances of the outcomes of the treated and of the untreated in the sample. Do you find a result similar to mine?}
+
+According to the course, we learnt the CLT formula to estimate the effect of sampling noise on WW: \\
+\centerline{$\displaystyle\tilde{\epsilon} = \Phi^{-1}\left(\displaystyle\frac{\delta+1}{2}\right)\displaystyle\frac{1}{\sqrt{N}}\sqrt{\displaystyle\frac{\var{Y_i^1|D_i=1}}{\Pr(D_i=1)}+\displaystyle\frac{\var{Y_i^0|D_i=0}}{1-\Pr(D_i=1)}}$} \\
+
+In order to compute the value of $\tilde{\epsilon}$, I firstly compute $\var{Y_i^1|D_i=1}$ and $\var{Y_i^0|D_i=0}$.}
+
+<<vars,eval=TRUE,echo=FALSE>>=
+var1<-var(ys[Dss==1])
+var0<-var(ys[Dss==0])
+@
+
+According to R, I get $\bm{\var{Y_i^1|D_i=1}=\Sexpr{var1}}$ and $\bm{\var{Y_i^0|D_i=0}=\Sexpr{var0}}$.
+
+<<probas,eval=TRUE,echo=FALSE>>=
+proba1<-length(Dss[Dss==1])/NS
+@
+
+Moreover, I get $\bm{\Pr(D_i=1)=\Sexpr{proba1}}$.
+
+<<tilde.epsilon.WW,eval=TRUE,echo=FALSE>>=
+tilde.epsilon.WW<-qnorm((0.99+1)/2)*(1/NS)*sqrt((var1/proba1)+(var0/(1-proba1)))
+@
+Finally, I estimate the effect of sampling noise on WW with 99\% confidence is $\bm{\Sexpr{tilde.epsilon.WW}}$.
+
+In order to show the effect of sampling noise better, I do the graph as following:
+
+<<monte.carlo,eval=TRUE,echo=FALSE,warning=FALSE,error=FALSE,message=FALSE,results='hide',cache=TRUE>>=
+monte.carlo.ww <- function(s,N,param){
+  set.seed(s)
+  mu <- rnorm(N,param["barmu"],sqrt(param["sigma2mu"]))
+  UB <- rnorm(N,0,sqrt(param["sigma2U"]))
+  yB <- mu + UB 
+  YB <- exp(yB)
+  Ds <- rep(0,N)
+  V <- rnorm(N,param["barmu"],sqrt(param["sigma2mu"]+param["sigma2U"]))
+  Ds[V<=log(param["barY"])] <- 1 
+  epsilon <- rnorm(N,0,sqrt(param["sigma2epsilon"]))
+  eta<- rnorm(N,0,sqrt(param["sigma2eta"]))
+  U0 <- param["rho"]*UB + epsilon
+  y0 <- mu +  U0 + param["delta"]
+  alpha <- param["baralpha"]+  param["theta"]*mu + eta
+  y1 <- y0+alpha
+  Y0 <- exp(y0)
+  Y1 <- exp(y1)
+  y <- y1*Ds+y0*(1-Ds)
+  Y <- Y1*Ds+Y0*(1-Ds)
+  return(c((1/sum(Ds))*sum(y*Ds)-(1/sum(1-Ds))*sum(y*(1-Ds)),var(y1[Ds==1]),var(y0[Ds==0]),mean(Ds)))
+}
+
+
+simuls.ww.N <- function(N,Nsim,param){
+  simuls.ww <- matrix(unlist(lapply(1:Nsim,monte.carlo.ww,N=N,param=param)),
+                      nrow=Nsim,ncol=4,byrow=TRUE)
+  colnames(simuls.ww) <- c('WW','V1','V0','p')
+  return(simuls.ww)
+}
+
+
+sf.simuls.ww.N <- function(N,Nsim,param){
+  sfInit(parallel=TRUE,cpus=8)
+  sim <- matrix(unlist(sfLapply(1:Nsim,monte.carlo.ww,N=N,param=param)),nrow=Nsim,ncol=4,byrow=TRUE)
+  sfStop()
+  colnames(sim) <- c('WW','V1','V0','p')
+  return(sim)
+}
+
+Nsim <- 1000
+N.sample <- c(100,1000,10000,100000)
+
+simuls.ww <- lapply(N.sample,sf.simuls.ww.N,Nsim=Nsim,param=paramS)
+names(simuls.ww) <- N.sample
+@
+
+<<delta.y.ate,eval=TRUE,echo=FALSE,results='hide'>>=
+delta.y.ate <- function(param){
+  return(paramS["baralpha"]+paramS["theta"]*paramS["barmu"])
+}
+@
+
+<<precision,dependson='monte.carlo',eval=TRUE,echo=FALSE,results='hide',echo=FALSE,warning=FALSE,error=FALSE,message=FALSE,fig.cap='Effect of sampling noise on the precision of the WW estimator (99\\% confidence)',fig.align='center',out.width='.65\\textwidth',fig.pos='htbp'>>=
+delta <- 0.99
+precision.ww <- function(k){
+  return(2*quantile(abs(simuls.ww[[k]][,'WW']-delta.y.ate(paramS)),probs=c(delta),na.rm=TRUE))
+}
+precision.ww.N <- sapply(1:length(simuls.ww),precision.ww)
+precision <- as.data.frame(cbind(N.sample,precision.ww.N,rep(delta.y.ate(paramS),length(simuls.ww))))
+colnames(precision) <- c('N','precision','TT')
+@
+
+<<CLTprec,eval=TRUE,echo=FALSE,results='hide'>>=
+CLT.prec <- function(N,delta,v1,v0,p){
+  return(2*qnorm((delta+1)/2)*sqrt((v1/p+v0/(1-p))/N))
+}
+
+CLT.prec.1 <- function(k,delta,simuls.ww){
+  return(CLT.prec(as.numeric(names(simuls.ww)[[k]]),delta,simuls.ww[[k]][1,'V1'],simuls.ww[[k]][1,'V0'],simuls.ww[[k]][1,'p']))
+}
+
+CLT.prec.line <- function(k,delta,simuls.ww,N){
+  return(CLT.prec(as.numeric(N),delta,simuls.ww[[as.character(N)]][k,'V1'],simuls.ww[[as.character(N)]][k,'V0'],simuls.ww[[as.character(N)]][k,'p']))
+}
+
+CLT.prec.mean <- function(k,delta,simuls.ww){
+  return(mean(sapply(1:nrow(simuls.ww[[k]]),CLT.prec.line,delta=delta,simuls.ww=simuls.ww,N=as.numeric(names(simuls.ww)[[k]]))))
+}
+
+# I compute the precision for the first sample of each draw and the average sample size over draws
+precision$precision.CLT.1 <- sapply(1:length(simuls.ww),CLT.prec.1,delta=delta,simuls.ww=simuls.ww)
+precision$precision.CLT.mean <- sapply(1:length(simuls.ww),CLT.prec.mean,delta=delta,simuls.ww=simuls.ww)
+@
+
+<<precision.CLT,dependson='monte.carlo',eval=TRUE,echo=FALSE,results='hide',echo=FALSE,warning=FALSE,error=FALSE,message=FALSE,fig.cap='sampling noise of the WW estimator with 99\\% confidence',fig.align='center',fig.width="6",out.width='.65\\textwidth',fig.pos='htbp'>>=
+
+ggplot(precision, aes(x=as.factor(N), y=TT)) +
+  geom_bar(position=position_dodge(), stat="identity", colour='black') +
+  geom_errorbar(aes(ymin=TT-precision/2, ymax=TT+precision/2), width=.2,position=position_dodge(.9),color='red') +
+  geom_errorbar(aes(ymin=TT-precision.CLT.1/2, ymax=TT+precision.CLT.1/2), width=.2,position=position_dodge(.9),color='blue') +
+  geom_errorbar(aes(ymin=TT-precision.CLT.mean/2, ymax=TT+precision.CLT.mean/2), width=.2,position=position_dodge(.9),color='green') +
+  xlab("Sample Size") 
+@
+
+According to this graph, we observe that the result is similar to the one of prof.\\
+It indicates that the sampling noise of the WW estimator decreases with increasing of sample size.
+
+      \subsection{Estimate sampling noise using the same formula but for a confidence of 95\%. Has sampling noise increased or decreased?}
+      
+<<tilde.epsilon.WW.95,eval=TRUE,echo=FALSE>>=
+tilde.epsilon.WW.95<-qnorm((0.95+1)/2)*(1/NS)*sqrt((var1/proba1)+(var0/(1-proba1)))
+@
+With the formula that I showed in the last question, I estimate the effect of sampling noise on WW with 95\% confidence is $\bm{\Sexpr{tilde.epsilon.WW.95}}$, which means the sampling noise has decreased.
+
+      \subsection{Use the CLT formula to compute the sample size required to reach the amount of sampling noise that you have derived in question 9 with 99\% confidence. For this, use the variance of $\text{y^B}$ for the treated and untreated as an estimate of the two variances. Do you find a results similar to mine?}
+
+According to the course, we learnt the CLT formula to compute the sample size required to reach the amount of sampling noise: \\
+\centerline{$\displaystyle\tilde{N} = \displaystyle\frac{1}{\epsilon^2}\left(\Phi^{-1}\left(\displaystyle\frac{\delta+1}{2}\right)\right)^2\left(\displaystyle\frac{\var{Y_i^1|D_i=1}}{\Pr(D_i=1)}+\displaystyle\frac{\var{Y_i^0|D_i=0}}{1-\Pr(D_i=1)}\right)$} \\
+
+In \textbf{1.2.8}, I have already gotten $\Pr(D_i=1)=\Sexpr{proba1}$ and $\tilde{\epsilon}=\Sexpr{tilde.epsilon.WW}$.
+Since the question ask us to use the variance of $\text{y^B}$ for the treated and untreated as an estimate of the two variances, then I will firstly compute the variance of $\text{y^B}$ for the treated and untreated.
+
+<<varyB,eval=TRUE,echo=FALSE>>=
+varyB1<-var(yB[Ds==1])
+varyB0<-var(yB[Ds==0])
+@
+
+According to the calculating in R, I get $\bm{\var{yB|D_i=1}=\Sexpr{varyB1}}$ and $\bm{\var{yB|D_i=0}=\Sexpr{varyB0}}$.
+
+<<tilde.N,eval=TRUE,echo=FALSE>>=
+tilde.N<-(1/(tilde.epsilon.WW^2))*(qnorm((0.99+1)/2))^2*((varyB1/proba1)+(varyB0/(1-proba1)))
+@
+
+According to the formula above, I get $\bm{\tilde{N}=\Sexpr{tilde.N}}$, so the sample size should be $\bm{\Sexpr{tilde.N}}$.
+
+Moreover, I would like to do the following graph like what prof did in the course.
+
+<<CLTsamp,eval=TRUE,echo=FALSE,results='hide'>>=
+CLT.samp <- function(epsilon,delta,v1,v0,p){
+  return((1/(epsilon^2))*(qnorm((delta+1)/2))^2*(v1/p+v0/(1-p)))
+}
+
+CLT.samp.1 <- function(N,delta,simuls.ww){
+  return(CLT.samp(precision$precision[which(precision$N==N)]/2,delta,simuls.ww[[as.character(N)]][1,'V1'],simuls.ww[[as.character(N)]][1,'V0'],simuls.ww[[as.character(N)]][1,'p']))
+}
+
+CLT.samp.line <- function(k,delta,simuls.ww,N){
+  return(CLT.samp(precision$precision[which(precision$N==N)]/2,delta,simuls.ww[[as.character(N)]][k,'V1'],simuls.ww[[as.character(N)]][k,'V0'],simuls.ww[[as.character(N)]][k,'p']))
+}
+
+CLT.samp.mean <- function(k,delta,simuls.ww){
+  return(mean(sapply(1:nrow(simuls.ww[[k]]),CLT.samp.line,delta=delta,simuls.ww=simuls.ww,N=as.numeric(names(simuls.ww)[[k]]))))
+}
+
+# I compute the precision for the first sample of each draw and the average precision over draws
+precision$samp.CLT.1 <- sapply(as.numeric(names(simuls.ww)),CLT.samp.1,delta=delta,simuls.ww=simuls.ww)
+precision$samp.CLT.mean <- sapply(1:length(simuls.ww),CLT.samp.mean,delta=delta,simuls.ww=simuls.ww)
+@
+
+<<sample.CLT,dependson='monte.carlo',eval=TRUE,echo=FALSE,results='hide',echo=FALSE,warning=FALSE,error=FALSE,message=FALSE,fig.cap='Sample size using CLT',fig.align='center',out.width='.65\\textwidth',fig.pos='htbp'>>=
+samp.t <- cbind(precision[,c('N','precision')],rep('Truth',length(precision$N)))
+colnames(samp.t) <- c('N','precision','Method')
+samp.1 <- cbind(precision[,c('samp.CLT.1','precision')],rep('CLT.1',length(precision$N)))
+colnames(samp.1) <- c('N','precision','Method')
+samp.mean <- cbind(precision[,c('samp.CLT.mean','precision')],rep('CLT.mean',length(precision$N)))
+colnames(samp.mean) <- c('N','precision','Method')
+sample.size.CLT <- as.data.frame(rbind(samp.t,samp.1,samp.mean))
+sample.size.CLT$precision <- as.character(round(sample.size.CLT$precision,digits=2))
+sample.size.CLT$precision <- factor(sample.size.CLT$precision,levels=sort(levels(as.factor(sample.size.CLT$precision)),decreasing=T))
+
+ggplot(sample.size.CLT, aes(x=precision, y=N,fill=Method)) +
+  geom_bar(position=position_dodge(), stat="identity", colour='black') #+
+#  scale_y_continuous(trans='log10')
+@
+
+According to this graph, we can get that the result is similar to the one of prof.\\
+It indicates that with Central Limit Theorem (CLT), the precision increases with sample size, which is near to the precision of truth.
+\clearpage
+
+      \subsection{What happens to sample size if you use the same variance (that of $\text{y^B}$ overall)?}
+
+<<tilde.N.bis,eval=TRUE,echo=FALSE>>=
+N.bis<-(1/(tilde.epsilon.WW^2))*(qnorm((0.99+1)/2))^2*((var(yB)/proba1)+(var(yB)/(1-proba1)))
+@
+
+If I use the same variance $\var{y^B}$, then the sample size is $\bm{\Sexpr{N.bis}}$, which means the sample size increases.
+
+      \subsection{Estimate sample size with a smaller sampling noise but the same level of confidence. Does sample size increase or decrease?}
+
+The sampling noise in 1.2.10 is $\Sexpr{tilde.epsilon.WW}$, now I suppose a smaller sampling noise $\bm{0.002087}$. Then I will estimate sample size with this new smaller sampling noise and the same level of confidence 99\%.}
+
+<<tilde.N.new,eval=TRUE,echo=FALSE>>=
+N.new<-(1/(0.002087^2))*(qnorm((0.99+1)/2))^2*((varyB1/proba1)+(varyB0/(1-proba1)))
+@
+
+The new sample size is $\bm{\Sexpr{N.new}}$, which is bigger than the sample size in 1.2.10, so the sample size increases.
+
+      \subsection{Estimate sample size with 95\% confidence for the same values of sampling noise as in questions 10 and 12. Does sample size increase or decrease?}
+The sampling noise in question 10 is $\Sexpr{tilde.epsilon.WW}$, the one in question 12 is 0.002087.
+
+<<N.10,eval=TRUE,echo=FALSE>>=
+N.10<-(1/(tilde.epsilon.WW^2))*(qnorm((0.95+1)/2))^2*((varyB1/proba1)+(varyB0/(1-proba1)))
+@
+
+<<N.12,eval=TRUE,echo=FALSE>>=
+N.12<-(1/(0.002087^2))*(qnorm((0.95+1)/2))^2*((varyB1/proba1)+(varyB0/(1-proba1)))
+@
+
+\vspace{.5em}
+Using R, I estimate the sample size with the sampling noise in question 10 is $\bm{\Sexpr{N.10}}$, the one with the sampling noise in question 12 is $\bm{\Sexpr{N.12}}$.
+
+\vspace{.5em}
+Now, I will compare the sample size in different situation.
+
+\vspace{.5em}
+With 99\% confidence, when the sampling noise is $\Sexpr{tilde.epsilon.WW}$, the sample size is $\Sexpr{tilde.N}$; when the sampling noise is 0.002087, the sample size is $\Sexpr{N.new}$.
+
+\vspace{.5em}
+With 95\% confidence, when the sampling noise is $\Sexpr{tilde.epsilon.WW}$, the sample size is $\Sexpr{N.10}$; when the sampling noise is 0.002087, the sample size is $\Sexpr{N.12}$.
+
+\vspace{.5em}
+Comparing the results above, we can easily observe that for the same confidence level, sample size decreases with sampling noise; for the same sampling noise, sample size increases  with confidence level.
+
+
+  \chapter{Observational Methods of Causal Inference}
+    \section{Parametric Observational Methods: OLS}
+    
+      \subsection{Compute the OLS estimators (step by step and direct) and compare their values with the theoretical TT.}
+
+I firstly compute the OLS estimator step by step (by graphs)
+
+% preparing data
+<<simul.ols.estim,eval=TRUE,echo=FALSE,results='hide'>>=
+set.seed(2345)
+NO <-1500
+muo <- rnorm(NO,param["barmu"],sqrt(param["sigma2mu"]))
+UBo <- rnorm(NO,0,sqrt(param["sigma2U"]))
+yBo <- muo + UBo 
+YBo <- exp(yBo)
+Dso <- rep(0,NO)
+Dso[YBo<=param["barY"]] <- 1 
+epsilono <- rnorm(NO,0,sqrt(param["sigma2epsilon"]))
+etao<- rnorm(NO,0,sqrt(param["sigma2eta"]))
+U0o <- param["rho"]*UBo + epsilono
+y0o <- muo +  U0o + param["delta"]
+alphao <- param["baralpha"]+  param["theta"]*muo + etao
+y1o <- y0o+alphao
+Y0o <- exp(y0o)
+Y1o <- exp(y1o)
+yo <- y1o*Dso+y0o*(1-Dso)
+Yo <- Y1o*Dso+Y0o*(1-Dso)
+@
+
+<<plot.ols.estim.step.0-1,eval=TRUE,fig.cap='compute the OLS estimator step by step',fig.subcap=c('Step 0','Step 1'),fig.align='center',out.width='.45\\textwidth',echo=FALSE,results='hide',fig.pos='htbp'>>=
+# Step 0
+col.obs <- 'black'
+col.unobs <- 'red'
+lty.obs <- 1
+lty.unobs <- 2
+xlim.big <- c(-1.5,0.5)
+xlim.small <- c(-0.15,0.55)
+adj <- 0
+
+plot(yBo[Dso==0],y0o[Dso==0],pch=1,xlim=c(4,10),ylim=c(4,10),xlab="yB",ylab="Outcomes")
+points(yBo[Dso==1],y0o[Dso==1],pch=1,col=col.unobs)
+abline(v=log(param["barY"]),col=col.unobs)
+legend(4,10,c('y0|D=0','y0|D=1'),pch=c(1,1),col=c(col.obs,col.unobs),ncol=1)
+
+# Step 1
+ols.reg.0 <- lm(yo[Dso==0]~yBo[Dso==0])
+summary(ols.reg.0)
+
+plot(yBo[Dso==0],y0o[Dso==0],pch=1,xlim=c(4,10),ylim=c(4,10),xlab="yB",ylab="Outcomes")
+points(yBo[Dso==1],y0o[Dso==1],pch=1,col=col.unobs)
+points(yBo[Dso==0],ols.reg.0$fitted.values,col='blue')
+abline(v=log(param["barY"]),col=col.unobs)
+legend(4,10,c('y0|D=0','y0|D=1',expression(hat('y0|D=0'))),pch=c(1,1,1),col=c(col.obs,col.unobs,'blue'),ncol=2)
+@      
+\clearpage
+
+<<plot.ols.estim.step.2-3,eval=TRUE,fig.cap='compute the OLS estimator step by step',fig.subcap=c('Step 2','Step 3'),fig.align='center',out.width='.45\\textwidth',echo=FALSE,results='hide',fig.pos='htbp'>>=
+# Step 2
+y.pred <- ols.reg.0$coef[[1]]+ols.reg.0$coef[[2]]*yBo[Dso==1]
+
+plot(yBo[Dso==0],y0o[Dso==0],pch=1,xlim=c(4,10),ylim=c(4,10),xlab="yB",ylab="Outcomes")
+points(yBo[Dso==1],y0o[Dso==1],pch=1,col=col.unobs)
+points(yBo[Dso==0],ols.reg.0$fitted.values,col='blue')
+points(yBo[Dso==1],y.pred,pch=3,col='blue')
+abline(v=log(param["barY"]),col=col.unobs)
+legend(4,10,c('y0|D=0','y0|D=1',expression(hat('y0|D=0')),expression(hat('y0|D=1'))),pch=c(1,1,1,3),col=c(col.obs,col.unobs,'blue','blue'),ncol=2)
+
+# Step 3
+plot(yBo[Dso==0],y0o[Dso==0],pch=1,xlim=c(4,10),ylim=c(4,10),xlab="yB",ylab="Outcomes")
+points(yBo[Dso==1],y0o[Dso==1],pch=1,col=col.unobs)
+points(yBo[Dso==0],ols.reg.0$fitted.values,col='blue')
+points(yBo[Dso==1],y.pred,col='blue')
+points(yBo[Dso==1],yo[Dso==1],pch=3,col='black')
+abline(v=log(param["barY"]),col=col.unobs)
+legend(4,10,c('y0|D=0','y0|D=1','y1|D=1',expression(hat('y0|D=0')),expression(hat('y0|D=1'))),pch=c(1,1,3,1,3),col=c(col.obs,col.unobs,col.obs,'blue','blue'),ncol=2)
+@
+
+% Step 4
+<<ww.ols,eval=TRUE,echo=FALSE,results='hide'>>=
+ww.ols <- mean(yo[Dso==1]-y.pred)
+@
+
+<<plot.ols.estim.step.4,eval=TRUE,echo=FALSE,results='hide',fig.cap='Step 4',fig.align='center',out.width='.49\\textwidth',out.height='.49\\textwidth',fig.width=5.5,fig.height=5.5,fig.pos='htbp'>>=
+plot(1, type="n", xlab="", ylab="", xlim=c(0.3,0.9), ylim=c(0, 10))
+abline(v=delta.y.tt(param),col=col.unobs,lty=lty.unobs)
+abline(v=ww.ols,col=col.obs,lty=lty.obs)
+text(x=c(delta.y.tt(param),ww.ols),y=c(adj),labels=c('TT',expression(hat('E'))),pos=c(4,2),col=c(col.unobs,col.obs),lty=c(lty.unobs,lty.obs))
+@
+
+\clearpage
+
+Then, I'll compute the OLS estimator directly.According to the course, I get the following assumptions:\\
+\textbf{Selection on Observables}
+
+We assume that there exists a known set of observable covariates $X_i$ such that:\\
+\centerline{$\esp{Y_i^0|X_i,D_i=1} = \esp{Y_i^0|X_i,D_i=0}$}\\
+And \textbf{Parametric Functional Form}
+
+We assume that there exists a known set of observable covariates $X_i$ such that:\\
+\centerline{$\esp{Y_i^0|X_i} = \alpha_0+\beta_0'X_i$}
+
+According to these two assumptions, we get the following theorem:\\
+\textbf{Identification of TT using OLS}
+
+Under Selection on Observables and Parametric Functional Form, TT is identified using the WW comparison adjusted by the OLS projection.\\
+\centerline{$\Delta^Y_{WWOLS(X)} = \Delta^Y_{TT}$}\\
+
+<<tt,eval=TRUE,echo=FALSE>>=
+tt<-mean(y1o-y0o)
+@
+According to R, I get $\bm{\Delta^Y_{TT}=\Sexpr{tt}}$, which means $\bm{\Delta^Y_{WWOLS(X)}=\Sexpr{tt}}$.
+
+Moreover, thanks to another assumption \textbf{Parametric functional form for the Treated} and theorem \textbf{WWOLS is OLS}, I get\\
+\centerline{$\hat{\delta}_{OLS} = \hat{\Delta^Y_{WWOLS(X)}}$}
+
+So I get the OLS estimator $\bm{\hat{\delta}_{OLS} = \hat{\Delta^Y_{WWOLS(X)}}=\Sexpr{tt}$.
+
+Furthermore, I get the following graph:
+
+<<ww.ols.direct,eval=TRUE,echo=FALSE,results='hide'>>=
+yB.Ds <-(yBo-mean(yBo[Dso==1]))*Dso
+ols.direct <- lm(yo~yBo+Dso+yB.Ds)
+ww.ols.direct <- ols.direct$coef[[3]]
+@
+
+<<plot.ols.estim.direct,eval=TRUE,echo=FALSE,results='hide',fig.cap='Direct OLS Estimation',fig.align='center',out.width='.65\\textwidth',fig.pos='htbp'>>=
+plot(1, type="n", xlab="", ylab="", xlim=c(0.3,0.9), ylim=c(0, 10))
+abline(v=delta.y.tt(param),col=col.unobs,lty=lty.unobs)
+abline(v=ww.ols.direct,col=col.obs,lty=lty.obs)
+text(x=c(delta.y.tt(param),ww.ols.direct),y=c(adj),labels=c('TT',expression(hat('E'))),pos=c(4,2),col=c(col.unobs,col.obs),lty=c(lty.unobs,lty.obs))
+@
+
+\clearpage
+
+Now I compare their values with the theoretical TT. According to the course, we learnt the theoretical TT with the following formula:\\
+\centerline{$\Delta_{TT}^y =\bar{\alpha}+\theta\bar{\mu} -\theta\displaystyle\frac{\sigma^2_{\mu}}{\sqrt{\sigma^2_{\mu}+\sigma^2_{U}}}\frac{\displaystyle\phi\left(\frac{\bar{y}-\bar{\mu}}{\sqrt{\sigma^2_{\mu}+\sigma^2_{U}}}\right)}{\displaystyle\Phi\left(\frac{\bar{y}-\bar{\mu}}{\sqrt{\sigma^2_{\mu}+\sigma^2_{U}}}\right)}$}
+
+<<theo.tt,eval=TRUE,echo=FALSE>>=
+theo.tt<-delta.y.tt(param)
+@
+
+Thus, I get the theoretical TT is \textbf{\Sexpr{theo.tt}}, which is smaller than the value that I calculated just now.
+
+      \subsection{Compute the robust standard errors and sampling noise}
+
+I first compute the robust standard errors with sandwich package in R.
+
+<<ww.ols.direct.HC1,eval=TRUE,echo=FALSE>>=
+ols.direct.HC1 <- vcovHC(ols.direct,type='HC1')
+@
+
+The robust standard error using HC1 is thus $\bm{\Sexpr{sqrt(ols.direct.HC1[3,3])}}$. Then, I'll compute the sampling noise and show it in the following graph.
+
+<<monte.carlo.ols,eval=TRUE,echo=FALSE,warning=FALSE,error=FALSE,message=FALSE,results='hide',cache=TRUE>>=
+monte.carlo.ols <- function(s,N,param){
+  set.seed(s)
+  mu <- rnorm(N,param["barmu"],sqrt(param["sigma2mu"]))
+  UB <- rnorm(N,0,sqrt(param["sigma2U"]))
+  yB <- mu + UB 
+  YB <- exp(yB)
+  Ds <- rep(0,N)
+  Ds[YB<=param["barY"]] <- 1 
+  epsilon <- rnorm(N,0,sqrt(param["sigma2epsilon"]))
+  eta<- rnorm(N,0,sqrt(param["sigma2eta"]))
+  U0 <- param["rho"]*UB + epsilon
+  y0 <- mu +  U0 + param["delta"]
+  alpha <- param["baralpha"]+  param["theta"]*mu + eta
+  y1 <- y0+alpha
+  Y0 <- exp(y0)
+  Y1 <- exp(y1)
+  y <- y1*Ds+y0*(1-Ds)
+  Y <- Y1*Ds+Y0*(1-Ds)
+  yB.Ds <-(yB-mean(yB[Ds==1]))*Ds
+  ols.direct <- lm(y~yB+Ds+yB.Ds)
+  ols.simple <- lm(y~yB+Ds)
+  return(c(ols.simple$coef[3],ols.direct$coef[3],sqrt(vcov(ols.direct)[3,3]),sqrt(vcovHC(ols.direct,type='HC0')[3,3]),sqrt(vcovHC(ols.direct,type='HC1')[3,3]),sqrt(vcovHC(ols.direct,type='HC2')[3,3]),sqrt(vcovHC(ols.direct,type='HC3')[3,3])))
+}
+
+simuls.ols.N <- function(N,Nsim,param){
+  simuls.ols <- matrix(unlist(lapply(1:Nsim,monte.carlo.ols,N=N,param=param)),nrow=Nsim,ncol=7,byrow=TRUE)
+  colnames(simuls.ols) <- c('OLS.simple','OLS.direct','Homo','HC0','HC1','HC2','HC3')
+  return(simuls.ols)
+}
+
+sf.simuls.ols.N <- function(N,Nsim,param){
+  sfInit(parallel=TRUE,cpus=8)
+  sfLibrary(sandwich)
+  sim <- matrix(unlist(sfLapply(1:Nsim,monte.carlo.ols,N=N,param=param)),nrow=Nsim,ncol=7,byrow=TRUE)
+  sfStop()
+  colnames(sim) <- c('OLS.simple','OLS.direct','Homo','HC0','HC1','HC2','HC3')
+  return(sim)
+}
+
+Nsim <- 1000
+#Nsim <- 10
+N.sample <- c(100,1000,10000,100000)
+#N.sample <- c(100,1000,10000)
+
+simuls.ols <- lapply(N.sample,sf.simuls.ols.N,Nsim=Nsim,param=param)
+names(simuls.ols) <- N.sample
+@
+
+<<monte.carlo.hist.ols,dependson='monte.carlo.ols',eval=TRUE,echo=FALSE,warning=FALSE,error=FALSE,message=FALSE,results='hide',fig.cap='Distribution of the $OLS$ estimator over replications of samples of different sizes',fig.align='center',out.width='.65\\textwidth',fig.pos='htbp'>>=
+par(mfrow=c(2,2))
+for (i in 1:length(simuls.ols)){
+  hist(simuls.ols[[i]][,'OLS.direct'],main=paste('N=',as.character(N.sample[i])),xlab=expression(hat(Delta^yOLS)),xlim=c(0.1,1.25))
+  abline(v=delta.y.tt(param),col="red")
+}
+@
+When sample size is 100, the sampling noise is big. With the increasing of sample size, the sampling noise becomes much smaller.
+\clearpage
+
+<<precision.ols,dependson='monte.carlo.ols',eval=TRUE,echo=FALSE,results='hide',echo=FALSE,warning=FALSE,error=FALSE,message=FALSE,fig.cap='precision of the OLS estimator with 99\\% confidence',fig.align='center',out.width='.65\\textwidth',fig.pos='htbp'>>=
+delta <- 0.99
+precision.ols <- function(k){
+  return(2*quantile(abs(simuls.ols[[k]][,'OLS.direct']-delta.y.tt(param)),probs=c(delta)))
+}
+precision.ols.N <- sapply(1:length(simuls.ols),precision.ols)
+
+mean.ols.prec <- function(k,HC,delta=delta){
+  return(2*(qnorm((delta+1)/2))*mean(simuls.ols[[k]][,HC]))
+}
+mean.ols.prec.homo <- sapply(1:length(simuls.ols),mean.ols.prec,HC='Homo',delta=delta)
+mean.ols.prec.HC0 <- sapply(1:length(simuls.ols),mean.ols.prec,HC='HC0',delta=delta)
+mean.ols.prec.HC1 <- sapply(1:length(simuls.ols),mean.ols.prec,HC='HC1',delta=delta)
+mean.ols.prec.HC2 <- sapply(1:length(simuls.ols),mean.ols.prec,HC='HC2',delta=delta)
+mean.ols.prec.HC3 <- sapply(1:length(simuls.ols),mean.ols.prec,HC='HC3',delta=delta)
+
+precision.ols <- as.data.frame(cbind(N.sample,precision.ols.N,mean.ols.prec.homo,mean.ols.prec.HC0,mean.ols.prec.HC1,mean.ols.prec.HC2,mean.ols.prec.HC3,rep(delta.y.tt(param),length(simuls.ols))))
+colnames(precision.ols) <- c('N','precision','Homo','HC0','HC1','HC2','HC3','TT')
+ggplot(precision.ols, aes(x=as.factor(N), y=TT)) +
+  geom_bar(position=position_dodge(), stat="identity", colour='black') +
+  geom_errorbar(aes(ymin=TT-precision/2, ymax=TT+precision/2), width=.2,position=position_dodge(.9),color='red') +
+  geom_errorbar(aes(ymin=TT-Homo/2, ymax=TT+Homo/2), width=.2,position=position_dodge(.9),color='blue') +
+  geom_errorbar(aes(ymin=TT-HC0/2, ymax=TT+HC0/2), width=.2,position=position_dodge(.9),color='green') +
+  geom_errorbar(aes(ymin=TT-HC1/2, ymax=TT+HC1/2), width=.2,position=position_dodge(.9),color='yellow') +
+  geom_errorbar(aes(ymin=TT-HC2/2, ymax=TT+HC2/2), width=.2,position=position_dodge(.9),color='orange') +
+  geom_errorbar(aes(ymin=TT-HC3/2, ymax=TT+HC3/2), width=.2,position=position_dodge(.9),color='purple') +
+  xlab("Sample Size") 
+@
+
+It indicates that the precision of the OLS estimator with 99\% confidence increases with sample size.
+
+  \section{Nonparametric Observational Methods: Matching}
+  For this approach, in order to avoid specification bias, we only rely on local comparisons, that is on the parts of the sample where treated and untreated observations overlap.
+
+    \subsection{Compute the LLR estimator on the sample with common support.}
+
+For that, I will do the following step by step:
+\begin{enumerate}
+  \item estimate the propensity score
+  \item common support and trimming
+  \item LLR matching on the trimmed sample
+\end{enumerate}
+\clearpage
+
+\noindent{\textbf{Estimate the propensity score}}
+
+<<propen.score,eval=TRUE,echo=FALSE>>=
+propen.score<-length(Dso[Dso==1])/NO
+@
+According to R, I get the propensity score is $\bm{\Sexpr{propen.score}}$.
+
+\noindent{\textbf{common support and trimming}\\
+\emph{Common Support: Illustration}}
+<<simul.com.supp,eval=TRUE,echo=FALSE,results='hide'>>=
+set.seed(2345)
+NO <-1500
+muo <- rnorm(NO,param["barmu"],sqrt(param["sigma2mu"]))
+UBo <- rnorm(NO,0,sqrt(param["sigma2U"]))
+yBo <- muo + UBo 
+YBo <- exp(yBo)
+Dsc <- rep(0,NO)
+Vo <- rnorm(NO,0,sqrt(param["sigma2mu"]+param["sigma2U"]))
+Dsc[yBo+Vo<=log(param["barY"])] <- 1 
+epsilono <- rnorm(NO,0,sqrt(param["sigma2epsilon"]))
+etao<- rnorm(NO,0,sqrt(param["sigma2eta"]))
+U0o <- param["rho"]*UBo + epsilono
+y0o <- muo +  U0o + param["delta"]
+alphao <- param["baralpha"]+  param["theta"]*muo + etao
+y1o <- y0o+alphao
+Y0o <- exp(y0o)
+Y1o <- exp(y1o)
+yc <- y1o*Dsc+y0o*(1-Dsc)
+Yc <- Y1o*Dsc+Y0o*(1-Dsc)
+@
+
+<<plot.com.supp,eval=TRUE,echo=FALSE,results='hide',fig.align='center',out.width='.65\\textwidth',fig.pos='htbp'>>=
+par(mar=c(4,3,2,3),oma=c(0.5,0,0.5,0))
+plot(yBo[Dsc==0],y0o[Dsc==0],pch=1,xlim=c(4,10.5),ylim=c(4,10.5),xlab="yB",ylab="Outcomes")
+points(yBo[Dsc==1],yc[Dsc==1],pch=3,col='blue')
+legend(4,10.3,c('y0|D=0','y1|D=1','D'),pch=c(1,3,2),col=c(col.obs,'blue',col.unobs),ncol=1)
+par(new=TRUE)
+plot(yBo,Dsc,pch=2,col=col.unobs,xlim=c(4,10.5),xaxt="n",yaxt="n",xlab="",ylab="")
+axis(4)
+mtext("D",side=4,line=3)
+@
+
+According to this graph, we can observe that there is an overlapped part, which indicates common support holds.\\
+
+\noindent{\textbf{Remark:}\ Set or Query Graphical Parameters\\
+par {graphics}:par can be used to set or query graphical parameters. Parameters can be set by specifying them as arguments to par in tag = value form, or by passing them as a list of tagged values.\\
+\textbf{par(..., no.readonly = FALSE)}\\
+\emph{mar}-A numerical vector of the form c(bottom, left, top, right) which gives the number of lines of margin to be specified on the four sides of the plot. The default is c(5, 4, 4, 2) + 0.1.\\
+\emph{oma}-A vector of the form c(bottom, left, top, right) giving the size of the outer margins in lines of text.}
+\clearpage
+
+\noindent{\emph{LLR Matching}}
+<<LLR,eval=TRUE,echo=FALSE,results='hide',cache=TRUE>>=
+llr <- function(y,x,gridx,bw,kernel){
+  if (kernel=='uniform'){
+    K <- function(u){
+      K.u <- 0
+      if (abs(u)<=.5){K.u <- 1}
+      return(K.u)
+    }
+  }
+  if (kernel=='triangular'){
+    K <- function(u){
+      K.u <- 0
+      if (abs(u)<=.5){K.u <- 2*(1-2*abs(u))}
+      return(K.u)
+    }
+  }
+  if (kernel=='epanechnikov'){
+    K <- function(u){
+      K.u <- 0
+      if (abs(u)<=.5){K.u <- (3/2)*(1-4*u^2)}
+      return(K.u)
+    }
+  }
+  if (kernel=='quartic'){
+    K <- function(u){
+      K.u <- 0
+      if (abs(u)<=.5){K.u <- (15/8)*(1-4*u^2)^2}
+      return(K.u)
+    }
+  }
+  if (kernel=='gaussian'){
+    K <- function(u){
+      return(exp(-0.5*u^2)/(sqrt(2*pi)))
+    }
+  }
+  K.vec <- Vectorize(K)
+  y0.hat <- rep(0,length(gridx))  
+  for (i in (1:length(gridx))){
+    x.i <- gridx[i]-x
+    weights.i <- K.vec((x.i)/bw)
+    ols.i <- lm(y~x.i,weights=weights.i)
+    y0.hat[i] <- ols.i$coefficients[1]
+  }
+  return(y0.hat)
+}
+
+kernel <- 'gaussian'
+bw <- 1
+y0.llr <- llr(yc[Dsc==0],yBo[Dsc==0],yBo[Dsc==1],bw=bw,kernel=kernel)    
+@
+
+<<plot.LLR.step.0-1,dependson='LLR',eval=TRUE,echo=FALSE,results='hide',fig.cap='LLR Matching step by step',fig.subcap=c('Step 0','Step 1'),fig.align='center',out.width='.43\\textwidth',echo=FALSE,results='hide',fig.pos='htbp'>>=
+# Step 0
+par(mar=c(4,3,2,3),oma=c(0.3,0,0.3,0))
+plot(yBo[Dsc==0],y0o[Dsc==0],pch=1,xlim=c(4,10.5),ylim=c(4,10.5),xlab="yB",ylab="Outcomes")
+points(yBo[Dsc==1],y0o[Dsc==1],pch=1,col=col.unobs)
+legend(4,10.5,c('y0|D=0','y0|D=1'),pch=c(1,1),col=c(col.obs,col.unobs),ncol=1)
+
+# Step 1
+par(mar=c(4,3,2,3),oma=c(0.3,0,0.3,0))
+plot(yBo[Dsc==0],y0o[Dsc==0],pch=1,xlim=c(4,10.5),ylim=c(4,10.5),xlab="yB",ylab="Outcomes")
+points(yBo[Dsc==1],y0o[Dsc==1],pch=1,col=col.unobs)
+points(yBo[Dsc==1],y0.llr,col='blue')
+legend(4,10.5,c('y0|D=0','y0|D=1',expression(hat(y0))),pch=c(1,1,1),col=c(col.obs,col.unobs,'blue'),ncol=2)
+@
+
+<<delta.y.tt.com.supp,eval=TRUE,echo=FALSE,results='hide'>>=
+delta.y.tt.com.supp <- function(param){
+  return(param["baralpha"]+param["theta"]*param["barmu"]-param["theta"]*((param["sigma2mu"]*dnorm((log(param["barY"])-param["barmu"])/(sqrt(2*(param["sigma2mu"]+param["sigma2U"])))))/(sqrt(2*(param["sigma2mu"]+param["sigma2U"]))*pnorm((log(param["barY"])-param["barmu"])/(sqrt(2*(param["sigma2mu"]+param["sigma2U"])))))))
+}
+@
+
+<<ww.llr,dependson='LLR',eval=TRUE,echo=FALSE,results='hide'>>=
+ww.llr <- mean(yc[Dsc==1]-y0.llr)
+@
+
+<<plot.LLR.step.2-3,dependson='LLR',eval=TRUE,echo=FALSE,results='hide',fig.cap='LLR Matching step by step',fig.subcap=c('Step 2','Step 3'),fig.align='center',out.width='.43\\textwidth',echo=FALSE,results='hide',fig.pos='htbp'>>=
+# Step 2
+par(mar=c(4,3,2,3),oma=c(0.3,0,0.3,0))
+plot(yBo[Dsc==0],y0o[Dsc==0],pch=1,xlim=c(4,10.5),ylim=c(4,10.5),xlab="yB",ylab="Outcomes")
+points(yBo[Dsc==1],y0o[Dsc==1],pch=1,col=col.unobs)
+points(yBo[Dsc==1],y0.llr,col='blue')
+points(yBo[Dsc==1],yc[Dsc==1],pch=3)
+legend(4,10.5,c('y0|D=0','y0|D=1',expression(hat(y0)),'y|D=1'),pch=c(1,1,1,3),col=c(col.obs,col.unobs,'blue',col.obs),ncol=2)
+
+# Step 3
+plot(1, type="n", xlab="", ylab="", xlim=c(0.3,0.9), ylim=c(0, 10))
+abline(v=delta.y.tt.com.supp(param),col=col.unobs,lty=lty.unobs)
+abline(v=ww.llr,col=col.obs,lty=lty.obs)
+text(x=c(delta.y.tt.com.supp(param),ww.llr),y=c(adj),labels=c('TT',expression(hat('E'))),pos=c(2,4),col=c(col.unobs,col.obs),lty=c(lty.unobs,lty.obs))
+@
+
+\noindent{with bandwidth=\Sexpr{bw} and a \Sexpr{kernel} kernel.}
+\clearpage
+
+\noindent{\emph{Trimming: Illustration}}
+<<trimming,eval=TRUE,echo=FALSE,results='hide'>>=
+# density function estimated at one point
+dens.fun.point <- function(n,x,gridx,bw,kernel){
+  return(density(x,n=1,from=gridx[n],to=gridx[n],bw=bw,kernel=kernel)[[2]])
+}
+
+dens.fun <- function(x,gridx,bw,kernel){
+  return(sapply(1:length(gridx), dens.fun.point, x=x, gridx=gridx, bw=bw, kernel=kernel))
+}
+dens.yB.D0 <- dens.fun(yBo[Dsc==0],yBo[Dsc==1],bw=bw.nrd(yBo[Dsc==0]),kernel='b')
+dens.yB.D1 <- dens.fun(yBo[Dsc==1],yBo[Dsc==1],bw=bw.nrd(yBo[Dsc==1]),kernel='b')
+
+com.supp <- function(x,gridx,t,bw,kernel){
+  dens.x <- dens.fun(x=x,gridx=gridx,bw=bw,kernel=kernel)
+  return(ifelse(dens.x<=quantile(dens.x,t),0,1))
+}
+
+t<- 0.05  # t is the trimming level (5% in general)
+com.supp.yB <- com.supp(yBo[Dsc==0],yBo[Dsc==1],t=t,bw=bw.nrd(yBo[Dsc==0]),kernel='b')
+@
+
+<<plot.trimming,eval=TRUE,echo=FALSE,results='hide',fig.cap='Trimming and Common Support',fig.align='center',out.width='.5\\textwidth',out.height='.5\\textwidth',fig.width=7,fig.height=7,fig.pos='htbp'>>=
+par(mar=c(4,4,2,4),oma=c(0.3,0,0.3,0))
+plot(yBo[Dsc==1],dens.yB.D0,pch=1,xlim=c(4,10),ylim=c(0,0.6),xlab="yB",ylab="density")
+points(yBo[Dsc==1],dens.yB.D1,pch=3)
+legend(4,0.59,c('fyB|D=0','fyB|D=1','Common Support'),pch=c(1,3,2),col=c(col.obs,col.obs,col.unobs),ncol=1)
+par(new=TRUE)
+plot(yBo[Dsc==1],com.supp.yB,pch=2,col=col.unobs,xlim=c(4,10),ylim=c(0,1),xaxt="n",yaxt="n",xlab="",ylab="")
+axis(4)
+mtext("Common Support",side=4,line=3)
+@
+
+\noindent{\textbf{LLR matching on the trimmed sample}}
+<<LLR.trim,eval=TRUE,echo=FALSE,results='hide',cache=TRUE>>=
+llr.match.trim <- function(y,D,x,t,bw,kernel){
+  com.supp.x <- com.supp(x[D==0],x[D==1],t=t,bw=bw.nrd(x[D==0]),kernel='b')
+  y0.llr <- llr(y[D==0],x[D==0],x[D==1][com.supp.x==1],bw=bw,kernel=kernel)
+  return(mean(y[D==1][com.supp.x==1]-y0.llr))
+}
+ww.llr.trim <- llr.match.trim(yc,Dsc,yBo,t=t,bw=bw,kernel=kernel)
+@
+
+<<plot.LLR.trimming,dependson='LLR.trim',eval=TRUE,echo=FALSE,results='hide',fig.cap='LLR Matching with Trimming',fig.align='center',out.width='.5\\textwidth',out.height='.5\\textwidth',fig.width=7,fig.height=7,fig.pos='htbp'>>=
+plot(1, type="n", xlab="", ylab="", xlim=c(0.3,0.9), ylim=c(0, 10))
+abline(v=delta.y.tt.com.supp(param),col=col.unobs,lty=lty.unobs)
+abline(v=ww.llr.trim,col=col.obs,lty=lty.obs)
+text(x=c(delta.y.tt.com.supp(param),ww.llr.trim),y=c(adj),labels=c('TT',expression(hat('E'))),pos=c(4,2),col=c(col.unobs,col.obs),lty=c(lty.unobs,lty.obs))
+@
+
+\noindent{with bandwidth$=$\Sexpr{bw}, \Sexpr{kernel} kernel and trimming level \Sexpr{t*100}\%.}
+\clearpage
+
+    \subsection{Compute the standard errors and sampling noise using the bootstrap.}
+<<monte.carlo.llr.trim,eval=TRUE,echo=FALSE,warning=FALSE,error=FALSE,message=FALSE,results='hide',cache=TRUE>>=
+monte.carlo.llr.trim <- function(s,N,param,t,bw,kernel){
+  set.seed(s)
+  mu <- rnorm(N,param["barmu"],sqrt(param["sigma2mu"]))
+  UB <- rnorm(N,0,sqrt(param["sigma2U"]))
+  yB <- mu + UB 
+  YB <- exp(yB)
+  Ds <- rep(0,N)
+  V <- rnorm(N,0,sqrt(param["sigma2mu"]+param["sigma2U"]))
+  Ds[yB+V<=log(param["barY"])] <- 1 
+  epsilon <- rnorm(N,0,sqrt(param["sigma2epsilon"]))
+  eta<- rnorm(N,0,sqrt(param["sigma2eta"]))
+  U0 <- param["rho"]*UB + epsilon
+  y0 <- mu +  U0 + param["delta"] 
+  alpha <- param["baralpha"]+  param["theta"]*mu + eta
+  y1 <- y0+alpha
+  Y0 <- exp(y0)
+  Y1 <- exp(y1)
+  y <- y1*Ds+y0*(1-Ds)
+  Y <- Y1*Ds+Y0*(1-Ds)
+  ww.llr <- llr.match.trim(y,Ds,yB,t=t,bw=bw,kernel=kernel)
+  return(ww.llr)
+}
+
+simuls.llr.trim.N <- function(N,Nsim,param,t,bw,kernel){
+  simuls.llr.trim <- matrix(unlist(lapply(1:Nsim,monte.carlo.llr.trim,N=N,param=param,t=t,bw=bw,kernel=kernel)),nrow=Nsim,ncol=1,byrow=TRUE)
+  colnames(simuls.llr.trim) <- c('LLR Trim')
+  return(simuls.llr.trim)
+}
+
+sf.simuls.llr.trim.N <- function(N,Nsim,param,t,bw,kernel){
+  sfInit(parallel=TRUE,cpus=8)
+  sfExport('llr.match.trim','llr','dens.fun.point','dens.fun','com.supp')
+  sim.llr.trim <- matrix(unlist(sfLapply(1:Nsim,monte.carlo.llr.trim,N=N,param=param,t=t,bw=bw,kernel=kernel)),nrow=Nsim,ncol=1,byrow=TRUE)
+  sfStop()
+  colnames(sim.llr.trim) <- c('LLR Trim')
+  return(sim.llr.trim)
+}
+
+Nsim <- 1000
+#Nsim <- 10
+#N.sample <- c(100,1000,10000,100000)
+#N.sample <- c(100,1000,10000)
+N.sample <- c(100)
+#simuls.llr.trim <- lapply(N.sample,simuls.llr.trim.N,Nsim=Nsim,param=param,t=t,bw=bw,kernel=kernel)
+simuls.llr.trim <- lapply(N.sample,sf.simuls.llr.trim.N,Nsim=Nsim,param=param,t=t,bw=bw,kernel=kernel)
+names(simuls.llr.trim) <- N.sample
+@
+
+<<monte.carlo.hist.llr.trim,dependson='monte.carlo.llr.trim',eval=TRUE,echo=FALSE,warning=FALSE,error=FALSE,message=FALSE,results='hide',fig.cap='Distribution of the trimmed $LLR$ estimator over replications of samples of different sizes',fig.align='center',out.width='.65\\textwidth',fig.pos='htbp'>>=
+for (i in 1:length(simuls.llr.trim)){
+  hist(simuls.llr.trim[[i]][,'LLR Trim'],main=paste('N=',as.character(N.sample[i])),xlab=expression(hat(Delta^yLLRTrim)),xlim=c(0.25,1.2))
+  abline(v=delta.y.tt.com.supp(param),col="red")
+}
+@
+
+
+  \chapter{Natural Experiments}
+    \section{Regression Discontinuity Designs(RDD)}
+      
+      \subsection{Sharp RDD}
+        
+        \subsubsection{Linear sample}
+
+\begin{itemize}
+  \item Build a plot of Ds as a function of yB showing the discontinuity
+\end{itemize}
+
+<<continuity.sharp.yB,eval=TRUE,echo=FALSE,results='hide'>>=
+reg.yB.00 <- lm(y0[Ds==0]~yB[Ds==0])
+reg.yB.01 <- lm(y0[Ds==1]~yB[Ds==1])
+reg.yB.10 <- lm(y1[Ds==0]~yB[Ds==0])
+reg.yB.11 <- lm(y1[Ds==1]~yB[Ds==1])
+@
+
+<<identification.sharp.yB.1,eval=FALSE,echo=FALSE,results='hide',fig.align='center',out.width='.65\\textwidth',fig.pos='htbp'>>=
+plot(yB[Ds==0],y[Ds==0],pch=1,xlim=c(4,10.5),ylim=c(4,10.5),xlab="yB",ylab="Outcomes")
+points(yB[Ds==1],y[Ds==1],pch=3)
+abline(v=log(param["barY"]),col=col.unobs)
+text(x=c(log(param["barY"])),y=c(5),labels=c(expression(bar('y'))),pos=c(2),col=c(col.unobs),lty=c(lty.obs))
+legend(4,10.5,c('y0|D=0','y1|D=1'),pch=c(1,3),col=c(col.obs,col.obs),ncol=1)
+@
+
+<<identification.sharp.yB.2,eval=FALSE,echo=FALSE,results='hide',fig.align='center',out.width='.65\\textwidth',fig.pos='htbp'>>=
+plot(yB[Ds==0],y[Ds==0],pch=1,xlim=c(4,10.5),ylim=c(4,10.5),xlab="yB",ylab="Outcomes")
+points(yB[Ds==1],y[Ds==1],pch=3)
+points(yB[Ds==0],reg.yB.00$fitted.values,col='blue',pch=1)
+abline(v=log(param["barY"]),col=col.unobs)
+text(x=c(log(param["barY"])),y=c(5),labels=c(expression(bar('y'))),pos=c(2),col=c(col.unobs),lty=c(lty.obs))
+legend(4,10.5,c('y0|D=0','y1|D=1',expression(hat('y0'))),pch=c(1,3,1),col=c(col.obs,col.obs,'blue'),ncol=2)
+@
+
+<<identification.sharp.yB.3,eval=TRUE,echo=FALSE,results='hide',fig.align='center',out.width='.65\\textwidth',fig.pos='htbp'>>=
+plot(yB[Ds==0],y[Ds==0],pch=1,xlim=c(4,10.5),ylim=c(4,10.5),xlab="yB",ylab="Outcomes")
+points(yB[Ds==1],y[Ds==1],pch=3)
+points(yB[Ds==0],reg.yB.00$fitted.values,col='blue',pch=1)
+points(yB[Ds==1],reg.yB.11$fitted.values,col='blue',pch=3)
+abline(v=log(param["barY"]),col=col.unobs)
+text(x=c(log(param["barY"])),y=c(5),labels=c(expression(bar('y'))),pos=c(2),col=c(col.unobs),lty=c(lty.obs))
+legend(4,10.5,c('y0|D=0','y1|D=1',expression(hat('y0')),expression(hat('y1'))),pch=c(1,3,1,3),col=c(col.obs,col.obs,'blue','blue'),ncol=2)
+@
+\clearpage
+
+\begin{itemize}
+  \item Build a plot showing the discontinuity in the linear sample using OLS
+\end{itemize}
+
+<<continuity.sharp.ols,eval=TRUE,echo=FALSE,results='hide'>>=
+reg.ols.00 <- lm(y0o[Dso==0]~yBo[Dso==0])
+reg.ols.01 <- lm(y0o[Dso==1]~yBo[Dso==1])
+reg.ols.10 <- lm(y1o[Dso==0]~yBo[Dso==0])
+reg.ols.11 <- lm(y1o[Dso==1]~yBo[Dso==1])
+@
+
+<<identification.sharp.ols.1,eval=FALSE,echo=FALSE,results='hide',fig.cap='the discontinuity in the linear sample using OLS',fig.align='center',out.width='.65\\textwidth',fig.pos='htbp'>>=
+plot(yBo[Dso==0],yo[Dso==0],pch=1,xlim=c(4,10.5),ylim=c(4,10.5),xlab="yB",ylab="Outcomes")
+points(yBo[Dso==1],yo[Dso==1],pch=3)
+abline(v=log(param["barY"]),col=col.unobs)
+text(x=c(log(param["barY"])),y=c(5),labels=c(expression(bar('y'))),pos=c(2),col=c(col.unobs),lty=c(lty.obs))
+legend(4,10.5,c('y0|D=0','y1|D=1'),pch=c(1,3),col=c(col.obs,col.obs),ncol=1)
+@
+
+<<identification.sharp.ols.2,eval=FALSE,echo=FALSE,results='hide',fig.cap='the discontinuity in the linear sample using OLS',fig.align='center',out.width='.65\\textwidth',fig.pos='htbp'>>=
+plot(yBo[Dso==0],yo[Dso==0],pch=1,xlim=c(4,10.5),ylim=c(4,10.5),xlab="yB",ylab="Outcomes")
+points(yBo[Dso==1],yo[Dso==1],pch=3)
+points(yBo[Dso==0],reg.ols.00$fitted.values,col='blue',pch=1)
+abline(v=log(param["barY"]),col=col.unobs)
+text(x=c(log(param["barY"])),y=c(4),labels=c(expression(bar('y'))),pos=c(2),col=c(col.unobs),lty=c(lty.obs))
+legend(4,10.5,c('y0|D=0','y1|D=1',expression(hat('y0'))),pch=c(1,3,1),col=c(col.obs,col.obs,'blue'),ncol=2)
+@
+
+<<identification.sharp.ols.3,eval=TRUE,echo=FALSE,results='hide',fig.cap='the discontinuity in the linear sample using OLS',fig.align='center',out.width='.65\\textwidth',fig.width=8,fig.height=8,fig.pos='htbp'>>=
+plot(yBo[Dso==0],yo[Dso==0],pch=1,xlim=c(4,10.5),ylim=c(4,10.5),xlab="yB",ylab="Outcomes")
+points(yBo[Dso==1],yo[Dso==1],pch=3)
+points(yBo[Dso==0],reg.ols.00$fitted.values,col='blue',pch=1)
+points(yBo[Dso==1],reg.ols.11$fitted.values,col='blue',pch=3)
+abline(v=log(param["barY"]),col=col.unobs)
+text(x=c(log(param["barY"])),y=c(4),labels=c(expression(bar('y'))),pos=c(2),col=c(col.unobs),lty=c(lty.obs))
+legend(4,10.5,c('y0|D=0','y1|D=1',expression(hat('y0')),expression(hat('y1'))),pch=c(1,3,1,3),col=c(col.obs,col.obs,'blue','blue'),ncol=2)
+@
+
+\begin{itemize}
+  \item Estimate TT(z) using OLS predicted at the discontinuity
+\end{itemize}
+
+<<ols.reg.pred,eval=TRUE,echo=FALSE,results='hide'>>=
+y0.bary.pred <- reg.ols.00$coef[[1]]+reg.ols.00$coef[[2]]*log(param['barY'])
+y1.bary.pred <- reg.ols.11$coef[[1]]+reg.ols.11$coef[[2]]*log(param['barY'])
+delta.y.rddols <- y1.bary.pred-y0.bary.pred
+@
+
+\noindent{According to R, I get $\esph{y^1_i|y^B_i=\bar{y}}=$\Sexpr{y1.bary.pred} and $\esph{y_i^0|y_i^B=\bar{y}}=$\Sexpr{y0.bary.pred}, so the estimated TT is $\hat{\Delta^{y}_{RDDOLS}}=$\Sexpr{delta.y.rddols}.\\
+Then I calculate $\bm{TT(z)}$ with the following formula:\\}
+
+\centerline{$\Delta^y_{TT}(\bar{z}) = \bar{\alpha} + \theta\bar{\mu}+\theta\displaystyle\frac{\sigma^2_{\mu}}{\sigma^2_{\mu}+\sigma^2_{U}}(\bar{y}-\bar{\mu})$}
+
+<<delta.y.tt.z,eval=TRUE,echo=FALSE,results='hide'>>=
+delta.y.tt.z <- function(param){
+  return(param["baralpha"]+param["theta"]*param["barmu"]+param["theta"]*(log(param["barY"])-param["barmu"])*param["sigma2mu"]/(param["sigma2mu"]+param["sigma2U"]))
+}
+@
+
+\noindent{So $\bm{TT(z)=\Sexpr{delta.y.tt.z(param)}}$.\\
+Moreover, I show the graph of the results of RDD using OLS as following:}
+
+<<plot.RDD.sharp.ols,eval=FALSE,echo=FALSE,results='hide',fig.cap='Sharp RDD Using OLS',fig.align='center',out.width='.65\\textwidth',fig.pos='htbp'>>=
+plot(1, type="n", xlab="", ylab="", xlim=c(0.4,1), ylim=c(0, 10))
+abline(v=delta.y.tt.z(param),col=col.unobs,lty=lty.unobs)
+abline(v=delta.y.rddols,col=col.obs,lty=lty.obs)
+text(x=c(delta.y.tt.z(param),delta.y.rddols),y=c(adj),labels=c('TT(z)',expression(hat('E'))),pos=c(4,2),col=c(col.unobs,col.obs),lty=c(lty.unobs,lty.obs))
+@
+\clearpage
+
+        \subsubsection{Nonlinear sample}
+% preparation of parameters and data
+<<param.nonlin,eval=TRUE,echo=FALSE,results='hide'>>=
+param <- c(param,0.1,7.98)
+names(param) <- c("barmu","sigma2mu","sigma2U","barY","rho","theta","sigma2epsilon","sigma2eta","delta","baralpha","gamma","baryB")
+@
+
+<<simul.nonlin,eval=TRUE,echo=FALSE,results='hide'>>=
+set.seed(2345)
+N <-1500
+mu <- rnorm(N,param["barmu"],sqrt(param["sigma2mu"]))
+UB <- rnorm(N,0,sqrt(param["sigma2U"]))
+yB <- mu + UB 
+YB <- exp(yB)
+Ds <- rep(0,N)
+Ds[YB<=param["barY"]] <- 1 
+epsilon <- rnorm(N,0,sqrt(param["sigma2epsilon"]))
+eta<- rnorm(N,0,sqrt(param["sigma2eta"]))
+U0 <- param["rho"]*UB + epsilon
+y0 <- mu +  U0 + param["delta"] + param["gamma"]*(yB-param["baryB"])^2
+alpha <- param["baralpha"]+  param["theta"]*mu + eta
+y1 <- y0+alpha
+Y0 <- exp(y0)
+Y1 <- exp(y1)
+y <- y1*Ds+y0*(1-Ds)
+Y <- Y1*Ds+Y0*(1-Ds)
+@
+
+\begin{itemize}
+  \item Compute the optimal bandwidth using CV
+\end{itemize}
+
+<<LLR.nonlin,eval=TRUE,echo=FALSE,results='hide',cache=TRUE>>=
+llr <- function(y,x,gridx,bw,kernel){
+  if (kernel=='uniform'){
+    K <- function(u){
+      K.u <- 0
+      if (abs(u)<=.5){K.u <- 1}
+      return(K.u)
+    }
+  }
+  if (kernel=='triangular'){
+    K <- function(u){
+      K.u <- 0
+      if (abs(u)<=.5){K.u <- 2*(1-2*abs(u))}
+      return(K.u)
+    }
+  }
+  if (kernel=='epanechnikov'){
+    K <- function(u){
+      K.u <- 0
+      if (abs(u)<=.5){K.u <- (3/2)*(1-4*u^2)}
+      return(K.u)
+    }
+  }
+  if (kernel=='quartic'){
+    K <- function(u){
+      K.u <- 0
+      if (abs(u)<=.5){K.u <- (15/8)*(1-4*u^2)^2}
+      return(K.u)
+    }
+  }
+  if (kernel=='gaussian'){
+    K <- function(u){
+      return(exp(-0.5*u^2)/(sqrt(2*pi)))
+    }
+  }
+  K.vec <- Vectorize(K)
+  y0.hat <- rep(0,length(gridx))  
+  for (i in (1:length(gridx))){
+    x.i <- gridx[i]-x
+    weights.i <- K.vec((x.i)/bw)
+    ols.i <- lm(y~x.i,weights=weights.i)
+    y0.hat[i] <- ols.i$coefficients[1]
+  }
+  return(y0.hat)
+}
+
+MSE.llr <- function(bw,y,D,x,kernel,d){
+  MSE <- 0
+  for (i in (1:length(y[D==d]))){
+    MSE <- MSE + (y[D==d][i]-llr(y[D==d][-i],x[D==d][-i],x[D==d][i],bw=bw,kernel=kernel))^2
+  }
+  return(MSE)
+}
+
+kernel <- 'gaussian'
+bw <- 0.5
+
+MSE.grid <- seq(0.1,1,by=.1)
+MSE.llr.0 <- sapply(MSE.grid,MSE.llr,y=y,D=Ds,x=yB,kernel=kernel,d=0)
+MSE.llr.1 <- sapply(MSE.grid,MSE.llr,y=y,D=Ds,x=yB,kernel=kernel,d=1)
+
+y0.llr <- llr(y[Ds==0],yB[Ds==0],yB[Ds==0],bw=MSE.grid[MSE.llr.0==min(MSE.llr.0)],kernel=kernel)    
+y1.llr <- llr(y[Ds==1],yB[Ds==1],yB[Ds==1],bw=MSE.grid[MSE.llr.1==min(MSE.llr.1)],kernel=kernel)    
+@
+
+<<plot.rdd.llr.cv,eval=TRUE,echo=FALSE,results='hide',fig.cap='Cross Validation Results',fig.align='center',out.width='.5\\textwidth',out.height='.5\\textwidth',fig.width=8,fig.height=8,fig.pos='htbp'>>=
+plot(MSE.grid,MSE.llr.0,xlab='Bandwidth',ylab='MSE (y|D=0)')
+legend(0.8,31.6,c('y|D=0','y|D=1'),pch=c(1,3),col=c(col.obs,col.obs),ncol=1)
+par(new=TRUE)
+plot(MSE.grid,MSE.llr.1,pch=3,xaxt="n",yaxt="n",xlab="",ylab="")
+axis(4)
+mtext("MSE (y|D=1)",side=4,line=3)
+@
+
+According to the CV results, we get the optimal bandwidth is \bm{0.6}.
+\clearpage
+
+\begin{itemize}
+  \item  Build a plot showing the discontinuity in the linear sample using LLR
+\end{itemize}
+
+<<plot.rdd.llr.nonlin.1,eval=TRUE,echo=FALSE,results='hide',fig.cap='RDD LLR',fig.align='center',out.width='.5\\textwidth',out.height='.5\\textwidth',fig.width=8,fig.height=8,fig.pos='htbp'>>=
+plot(yB[Ds==0],y[Ds==0],pch=1,xlim=c(4,11),ylim=c(4,11),xlab="yB",ylab="Outcomes")
+points(yB[Ds==1],y[Ds==1],pch=3)
+points(yB[Ds==0],y0.llr,col='blue',pch=1)
+points(yB[Ds==1],y1.llr,col='blue',pch=3)
+abline(v=log(param["barY"]),col=col.unobs)
+text(x=c(log(param["barY"])),y=c(4),labels=c(expression(bar('y'))),pos=c(2),col=c(col.unobs),lty=c(lty.obs))
+legend(4,11,c('y|D=0','y|D=1',expression(hat('y0')),expression(hat('y1'))),pch=c(1,3,1,3),col=c(col.obs,col.obs,'blue','blue'),ncol=2)
+@
+
+\begin{itemize}
+  \item  Estimate TT(z) using the simplified Local OLS estimator of Imbens and Lemieux
+\end{itemize}
+
+<<rdd.local.ols.precision,eval=TRUE,echo=FALSE,results='hide'>>=
+bw <- 0.6
+y.h <- y[log(param['barY'])-bw<yB & yB<log(param['barY'])+bw]
+Ds.h <- Ds[log(param['barY'])-bw<yB & yB<log(param['barY'])+bw]
+yB.l <- (yB[log(param['barY'])-bw<yB & yB<log(param['barY'])+bw]-log(param['barY']))*Ds[log(param['barY'])-bw<yB & yB<log(param['barY'])+bw]
+yB.r <- (yB[log(param['barY'])-bw<yB & yB<log(param['barY'])+bw]-log(param['barY']))*(1-Ds[log(param['barY'])-bw<yB & yB<log(param['barY'])+bw])
+
+reg.rdd.local.ols <- lm(y.h ~ Ds.h + yB.l + yB.r)
+reg.rdd.local.ols$coef[2]
+@
+
+The estimated value of TT(z) by simplified LLR is \bm{\Sexpr{reg.rdd.local.ols$coef[[2]]}}.
+
+\begin{itemize}
+  \item  Compute precision using the local OLS robust standard error
+\end{itemize}
+
+The estimated 99\% sampling noise is: \bm{\Sexpr{2*qnorm((.99+1)/2)*sqrt(vcov(reg.rdd.local.ols)[2,2])}}.
+
+      \subsection{Fuzzy RDD}
+
+<<simul.fuzzy.rdd,eval=TRUE,echo=FALSE,results='hide'>>=
+set.seed(2345)
+NO <-1500
+muo <- rnorm(NO,param["barmu"],sqrt(param["sigma2mu"]))
+UBo <- rnorm(NO,0,sqrt(param["sigma2U"]))
+yBo <- muo + UBo 
+YBo <- exp(yBo)
+Dsc <- rep(0,NO)
+Vo <- rnorm(NO,0,sqrt(param["sigma2mu"]+param["sigma2U"]))
+Dsc[yBo+Vo<=log(param["barY"])] <- 1 
+epsilono <- rnorm(NO,0,sqrt(param["sigma2epsilon"]))
+etao<- rnorm(NO,0,sqrt(param["sigma2eta"]))
+U0o <- param["rho"]*UBo + epsilono
+y0o <- muo +  U0o + param["delta"]
+alphao <- param["baralpha"]+  param["theta"]*muo + etao
+y1o <- y0o+alphao
+Y0o <- exp(y0o)
+Y1o <- exp(y1o)
+yc <- y1o*Dsc+y0o*(1-Dsc)
+Yc <- Y1o*Dsc+Y0o*(1-Dsc)
+@
+
+\begin{itemize}
+  \item  Choose optimal bandwidth using CV for each of the 4 regression functions
+\end{itemize}
+<<LLR.fuzzy.pscore,eval=TRUE,echo=FALSE,results='hide',cache=TRUE>>=
+kernel <- 'gaussian'
+MSE.grid <- seq(0.1,1,by=.1)
+Z <- ifelse(yBo<=log(param['barY']),1,0)
+MSE.pr.llr.0 <- sapply(MSE.grid,MSE.llr,y=Dsc,D=Z,x=yBo,kernel=kernel,d=0)
+MSE.pr.llr.1 <- sapply(MSE.grid,MSE.llr,y=Dsc,D=Z,x=yBo,kernel=kernel,d=1)
+
+Pr.D0.llr <- llr(Dsc[Z==0],yBo[Z==0],yBo[Z==0],bw=MSE.grid[MSE.pr.llr.0==min(MSE.pr.llr.0)],kernel=kernel)    
+Pr.D1.llr <- llr(Dsc[Z==1],yBo[Z==1],yBo[Z==1],bw=MSE.grid[MSE.pr.llr.1==min(MSE.pr.llr.1)],kernel=kernel)    
+@
+
+<<rdd.fuzzy.local.iv,eval=FALSE,echo=FALSE,results='hide'>>=
+bw.f <- min(c(MSE.grid[MSE.pr.llr.0==min(MSE.pr.llr.0)],MSE.grid[MSE.pr.llr.1==min(MSE.pr.llr.1)],MSE.grid[MSE.llr.0==min(MSE.llr.0)],MSE.grid[MSE.llr.1==min(MSE.llr.1)]))
+# bw.f<-0.3
+y.h <- yc[log(param['barY'])-bw.f<yBo & yBo<log(param['barY'])+bw.f]
+Ds.h <- Dsc[log(param['barY'])-bw.f<yBo & yBo<log(param['barY'])+bw.f]
+
+yB.l <- (yBo[log(param['barY'])-bw.f<yBo & yBo<log(param['barY'])+bw.f]-log(param['barY']))*Z[log(param['barY'])-bw.f<yBo & yBo<log(param['barY'])+bw.f]
+
+yB.r <- (yBo[log(param['barY'])-bw.f<yBo & yBo<log(param['barY'])+bw.f]-log(param['barY']))*(1-Z[log(param['barY'])-bw.f<yBo & yBo<log(param['barY'])+bw.f])
+
+Z.h <- Z[log(param['barY'])-bw.f<yBo & yBo<log(param['barY'])+bw.f]
+
+reg.fuzzy.rdd.local.iv <- ivreg(y.h  ~ Ds.h + yB.l + yB.r | Z.h + yB.l + yB.r)
+delta.rdd.fuzzy.il <- reg.fuzzy.rdd.local.iv$coef[2]
+@
+The optimal bandwidth is \bm{0.3}.
+
+%\begin{itemize}
+ % \item  Build a plot of $\Pr(D_i=1|y_i^B)$ using LLR on each side of the discontinuity
+%\end{itemize}
+\clearpage
+
+\begin{itemize}
+  \item  Build a plot of the expected outcomes on each side of the discontinuity using LLR
+\end{itemize}
+
+<<plot.fuzzy.rdd.1,eval=FALSE,echo=FALSE,results='hide',fig.cap='Fuzzy RDD',fig.align='center',out.width='.65\\textwidth',fig.pos='htbp'>>=
+plot(yBo[Dsc==0],y0o[Dsc==0],pch=1,xlim=c(5,11),ylim=c(5,11),xlab="yB",ylab="Outcomes")
+points(yBo[Dsc==1],yc[Dsc==1],pch=3,col=col.obs)
+abline(v=log(param["barY"]),col=col.unobs)
+legend(5,10.5,c('y0|D=0','y1|D=1','D'),pch=c(1,3,2),col=c(col.obs,col.obs,col.unobs),ncol=1)
+par(new=TRUE)
+plot(yBo,Dsc,pch=2,col=col.unobs,xlim=c(5,11),xaxt="n",yaxt="n",xlab="",ylab="")
+axis(4)
+mtext("D",side=4,line=3)
+@
+
+<<plot.fuzzy.rdd.2,dependson='LLR.fuzzy.pscore',eval=FALSE,echo=FALSE,results='hide',fig.cap='Fuzzy RDD',fig.align='center',out.width='.65\\textwidth',fig.pos='htbp'>>=
+plot(yBo[Dsc==0],y0o[Dsc==0],pch=1,xlim=c(5,11),ylim=c(5,11),xlab="yB",ylab="Outcomes")
+points(yBo[Dsc==1],yc[Dsc==1],pch=3,col=col.obs)
+abline(v=log(param["barY"]),col=col.unobs)
+legend(5,10.5,c('y0|D=0','y1|D=1','D'),pch=c(1,3,2),col=c(col.obs,col.obs,col.unobs),ncol=1)
+par(new=TRUE)
+plot(yBo,Dsc,pch=2,col=col.unobs,xlim=c(5,11),xaxt="n",yaxt="n",xlab="",ylab="")
+points(yBo[yBo>log(param['barY'])],Pr.D0.llr,col='red')
+points(yBo[yBo<=log(param['barY'])],Pr.D1.llr,col='red',pch=3)
+axis(4)
+mtext("D",side=4,line=3)
+@
+
+<<LLR.fuzzy.y,eval=FALSE,echo=FALSE,results='hide',cache=TRUE>>=
+MSE.llr.0.f <- sapply(MSE.grid,MSE.llr,y=yc,D=Z,x=yBo,kernel=kernel,d=0)
+MSE.llr.1.f <- sapply(MSE.grid,MSE.llr,y=yc,D=Z,x=yBo,kernel=kernel,d=1)
+
+y.Z0.llr <- llr(yc[Z==0],yBo[Z==0],yBo[Z==0],bw=MSE.grid[MSE.llr.0==min(MSE.llr.0.f)],kernel=kernel)    
+y.Z1.llr <- llr(yc[Z==1],yBo[Z==1],yBo[Z==1],bw=MSE.grid[MSE.llr.1==min(MSE.llr.1.f)],kernel=kernel)    
+@
+
+<<plot.fuzzy.rdd.3,dependson='LLR.fuzzy.pscore',eval=FALSE,echo=FALSE,results='hide',fig.cap='Fuzzy RDD',fig.align='center',out.width='.5\\textwidth',out.height='.5\\textwidth',fig.width=8,fig.height=8,fig.pos='htbp'>>=
+plot(yBo[Dsc==0],y0o[Dsc==0],pch=1,xlim=c(4,10.5),ylim=c(4,10.5),xlab="yB",ylab="Outcomes")
+points(yBo[Dsc==1],yc[Dsc==1],pch=3,col=col.obs)
+points(yBo[Z==0],y.Z0.llr,col='blue')
+points(yBo[Z==1],y.Z1.llr,col='blue',pch=3)
+abline(v=log(param["barY"]),col=col.unobs)
+legend(4,10.5,c('y0|D=0','y1|D=1','D'),pch=c(1,3,2),col=c(col.obs,'blue',col.unobs),ncol=1)
+par(new=TRUE)
+plot(yBo,Dsc,pch=2,col=col.unobs,xlim=c(4,10.5),xaxt="n",yaxt="n",xlab="",ylab="")
+points(yBo[yBo>log(param['barY'])],Pr.D0.llr,col='red')
+points(yBo[yBo<=log(param['barY'])],Pr.D1.llr,col='red',pch=3)
+axis(4)
+mtext("D",side=4,line=3)
+@
+
+% It's really strange that I can get the right graph in R, but when I compile it in PDF, it doesn't work.
+% Thus I have to insert it as following.
+
+\begin{figure}[htb]
+\centering
+\includegraphics[height=8.6cm]{plotfuzzyrdd3}
+\caption{Fuzzy RDD}
+\end{figure}
+
+% \begin{itemize}
+  % \item  Use LLR to build the Wald estimate of LATE(z)
+% \end{itemize}
+
+% not sure...
+<<plot.wald.rdd.llr.il,eval=FALSE,echo=FALSE,results='hide',fig.cap='Simplified Wald RDD LLR',fig.align='center',out.width='.65\\textwidth',fig.pos='htbp'>>=
+plot(1, type="n", xlab="", ylab="", xlim=c(0.4,1), ylim=c(0, 10))
+abline(v=delta.y.tt.z(param),col=col.unobs,lty=lty.unobs)
+abline(v=delta.rdd.fuzzy.il,col=col.obs,lty=lty.obs)
+text(x=c(delta.y.tt.z(param),delta.rdd.fuzzy.il),y=c(adj),labels=c('TT(z)',expression(hat('E'))),pos=c(2,4),col=c(col.unobs,col.obs),lty=c(lty.unobs,lty.obs))
+@
+
+% As what happened before, it exports different graph from what it actually did in R, I insert the right gragh.
+% \begin{figure}[htb]
+% \centering
+% \includegraphics[height=8.6cm]{WaldRDDLLR}
+% \caption{Simplified Wald RDD LLR}
+% \end{figure}
+% \clearpage
+
+% \begin{itemize}
+  % \item  Use the simplified Imbens and Lemieux 2SLS estimator to estimate LATE(z) and precision
+% \end{itemize}
+
+% not sure...
+% we have gotten delta.rdd.fuzzy.il<-0.005781747 and 2*qnorm((.99+1)/2)*sqrt(vcov(reg.fuzzy.rdd.local.iv)[2,2])<-3.360884
+% The estimated value of LATE(z) by simplified LLR IV is $\bm{0.005781747}$. The estimated 99\% sampling noise is $\bm{3.360884}$.
+
+
+\part{Conclusion}
+
+
+
+\part{Annex}
+
+  \section*{1 The individual level treatment effects}
+    \subsection*{1.1 The individual level treatment effects of Part II 1.1 The Fundamental Problem of Causal Inference}
+\noindent{\Sexpr{it[1:NC]}}
+    \subsection*{1.2 The individual level treatment effects of Part II 1.2 The Fundamental Problem of Statistical Inference}
+\noindent{\Sexpr{its[1:NS]}}
+
+
+
+
+
+
+\end{document}
