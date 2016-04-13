@@ -41,20 +41,51 @@ library(tmvtnorm)
 \newcommand{\var}[1]{\mathbb{V}[ #1 ]}
 \newcommand\Ind{\protect\mathpalette{\protect\independenT}{\perp}}
 
+% set letters' color
+\usepackage{color}
+
+%% temporary titles
+% command to provide stretchy vertical space in proportion
+\newcommand\nbvspace[1][3]{\vspace*{\stretch{#1}}}
+% allow some slack to avoid under/overfull boxes
+\newcommand\nbstretchyspace{\spaceskip0.5em plus 0.25em minus 0.25em}
+% To improve spacing on titlepages
+\newcommand{\nbtitlestretch}{\spaceskip0.6em}
+
 
 \begin{document}
 
+\pagestyle{empty}
+\begin{center}
+\bfseries
+\nbvspace[1]
+\Huge
+{\nbtitlestretch\huge
+EPE Data Analysis Project} 
+\nbvspace[1]
 
-\title{EPE Data Analysis Project}
-\author{\textbf{Jingwen ZHENG}\\ Toulouse School of Economics\\ M2 ERNA}
-\maketitle
+\includegraphics{bigstock-Notepad-laptop-and-coffee-cup-46246156+(1).jpg}
+\nbvspace[2]
+\normalsize
+
+% [Author name and information]
+\small BY\\
+\Large \textbf{Jingwen ZHENG}\\[0.5em]
+\small Toulouse School of Economics\\ M2 ERNA
+\nbvspace[1]
+
+\end{center}
+
+% \title{EPE Data Analysis Project}
+% \author{\textbf{Jingwen ZHENG}\\ Toulouse School of Economics\\ M2 ERNA}
+% \maketitle
 
 \tableofcontents
 
 
 \part{Introduction}
 
-  As a student in M2 ERNA of Toulouse School of Economics, during the last half year of study, I'm really honoured to participate the course "Econometrics of Program Evaluation". In this course, I learnt some methods to estimate the effect of an interention on an outcome as the following outline.
+  As a student in M2 ERNA of Toulouse School of Economics, during the last half year of study, I'm really honoured to participate the course 'Econometrics of Program Evaluation'. In this course, I learnt some methods to estimate the effect of an interention on an outcome as the following outline.
   
   \begin{itemize}
     \item The Two Fundamental Problems of Inference
@@ -69,13 +100,13 @@ library(tmvtnorm)
 \noindent{\textit{\textbf{Methods}}}
 
 \vspace{.5em}  
-  \underline{The Two Fundamental Problems of Inference} indicate the Fundamental Problem of Causal Inference(FPCI) and the Fundamental Problem of Statistical Inference(FPSI). In the lecture \underline{Observational Methods of Causal Inference}, we learnt how to estimate the effect of an intervention on an outcome using observational methods, this method tries to correct for selection bias by accounting for as many observed confounders as possible. There are several ways to leverage on Selection on Observables to build estimators for TT; "Parametric Observational Method: OLS", "Nonparametric Observational Method: Matching" and "Semiparametric Observational Method: Synthetic Control (SCM)".
+  \underline{The Two Fundamental Problems of Inference} indicate the Fundamental Problem of Causal Inference(FPCI) and the Fundamental Problem of Statistical Inference(FPSI). In the lecture \underline{Observational Methods of Causal Inference}, we learnt how to estimate the effect of an intervention on an outcome using observational methods, this method tries to correct for selection bias by accounting for as many observed confounders as possible. There are several ways to leverage on Selection on Observables to build estimators for TT; 'Parametric Observational Method: OLS', 'Nonparametric Observational Method: Matching' and 'Semiparametric Observational Method: Synthetic Control (SCM)'.
 
 \vspace{.5em}  
-  A \underline{natural experiment} is an empirical study in which individuals (or clusters of individuals) exposed to the experimental and control conditions are determined by nature or by other factors outside the control of the investigators, yet the process governing the exposures arguably resembles random assignment. Thus, natural experiments are observational studies and are not controlled in the traditional sense of a randomized experiment. In the lecture "Natural Experiments", we learnt how to estimate the effect of an intervention on an outcome using natural experiments, this methods tries to correct for selection bias by finding situations analog to randomized experiments but due to the natural course of events. It covers three ways: Regression Discontinuity Designs (RDD), Difference in Differences (DID) and Instrumental Variables (IV). Natural experiments are most useful when there has been a clearly defined exposure involving a well defined subpopulation (and the absence of exposure in a similar subpopulation) such that changes in outcomes may be plausibly attributed to the exposure.
+  A \underline{natural experiment} is an empirical study in which individuals (or clusters of individuals) exposed to the experimental and control conditions are determined by nature or by other factors outside the control of the investigators, yet the process governing the exposures arguably resembles random assignment. Thus, natural experiments are observational studies and are not controlled in the traditional sense of a randomized experiment. In the lecture 'Natural Experiments', we learnt how to estimate the effect of an intervention on an outcome using natural experiments, this methods tries to correct for selection bias by finding situations analog to randomized experiments but due to the natural course of events. It covers three ways: Regression Discontinuity Designs (RDD), Difference in Differences (DID) and Instrumental Variables (IV). Natural experiments are most useful when there has been a clearly defined exposure involving a well defined subpopulation (and the absence of exposure in a similar subpopulation) such that changes in outcomes may be plausibly attributed to the exposure.
 
 \vspace{.5em}  
-  Besides, a \underline{Randomized Controlled Trial} is a type of scientific (often medical) experiment, where the people being studied are randomly allocated one or other of the different treatments under study. In the lecture "Randomized Controlled Trials", we learnt how to estimate the effect of an intervention on an outcome using randomized experiments. We especially learnt the various types of designs and what can be recovered from them using which technique. RCTs are often used to test the efficacy or effectiveness of various types of medical intervention and may provide information about adverse effects, such as drug reactions. 
+  Besides, a \underline{Randomized Controlled Trial} is a type of scientific (often medical) experiment, where the people being studied are randomly allocated one or other of the different treatments under study. In the lecture 'Randomized Controlled Trials', we learnt how to estimate the effect of an intervention on an outcome using randomized experiments. We especially learnt the various types of designs and what can be recovered from them using which technique. RCTs are often used to test the efficacy or effectiveness of various types of medical intervention and may provide information about adverse effects, such as drug reactions. 
 
 \vspace{.5em}  
   Moreover, we learnt how to choose the size of our sample (mainly in a RCT) and how to gauge the size of sampling noise before conducting a study in the lecture \underline{Power Analysis: Choosing Sample Size and Gauging Sampling Noise Ex Ante}. There are two ways; one is using test statistics, the other is gauging sampling noise or choosing sample size to reach a given sampling noise. 
@@ -97,7 +128,7 @@ library(tmvtnorm)
 \noindent{\textit{\textbf{For this project}}}
 
 \vspace{.5em}
-  Since I didn't choose Paul and Cesar's class, I didn't do the report for that course. In this report, I generate data as Mr. Chabé-Ferret did. I did analysis with "The Two Fundamental Problems of Inference", the method "Observational Methods of Causal Inference" and the method "Regression Discontinuity Designs(RDD)" of "Natural Experiments".
+  Since I didn't choose Paul and Cesar's class, I didn't do the report for that course. In this report, I generate data as Mr. Chabé-Ferret did. Then I followed the questions that asked by prof on the moodle and did analysis with 'The Two Fundamental Problems of Inference', the method 'Observational Methods of Causal Inference' and the method 'Regression Discontinuity Designs(RDD)' of 'Natural Experiments'.
 
 \vspace{.5em}  
   In this project, I firstly generated data, then I used different methods to analyse and estimate the effect of an interention on an outcome. I will explaine the result with graphs and text in the following part.
@@ -107,7 +138,6 @@ library(tmvtnorm)
 
   \chapter{The Two Fundamental Problems of Inference}
     \section{The Fundamental Problem of Causal Inference}  
-
       \subsection{generate data with selection rule $D_i = \uns{y_i^B\leq\bar{y}}$}
 
 <<param,eval=TRUE,echo=FALSE,results='hide'>>=
@@ -169,7 +199,7 @@ In order to compute individual level treatment effects in the sample, I use the 
 it<- y1-y0
 @
 
-Because of the large amount of data, here I just show the first 20 and last 20 individual level treatment effects as following, the completed individual level treatment effects are in "Annex". \\ 
+Because of the large amount of data, here I just show the first 20 and last 20 individual level treatment effects as following, the completed individual level treatment effects are in 'Annex'. \\ 
 
 \noindent{\Sexpr{it[1:20]} \\ ... \\ \Sexpr{it[1980:NC]}}
 
@@ -300,7 +330,7 @@ In order to compute individual level treatment effects in the sample, I use the 
 its<- y1s-y0s
 @
 
-Because of the large amount of data, here I just show the first 20 and last 20 individual level treatment effects as following, the completed individual level treatment effects are in "Annex". \\ 
+Because of the large amount of data, here I just show the first 20 and last 20 individual level treatment effects as following, the completed individual level treatment effects are in 'Annex'. \\ 
 
 \noindent{\Sexpr{its[1:20]} \\ ... \\ \Sexpr{its[1480:NS]}}
 
@@ -587,7 +617,6 @@ Comparing the results above, we can easily observe that for the same confidence 
 
   \chapter{Observational Methods of Causal Inference}
     \section{Parametric Observational Methods: OLS}
-    
       \subsection{Compute the OLS estimators (step by step and direct) and compare their values with the theoretical TT.}
 
 I firstly compute the OLS estimator step by step (by graphs)
@@ -883,7 +912,7 @@ axis(4)
 mtext("D",side=4,line=3)
 @
 
-According to this graph, we can observe that there is an overlapped part, which indicates common support holds.\\
+According to this graph, we can observe that some treated and untreated individuals are overlapped, which indicates common support holds.\\
 
 \noindent{\textbf{Remark:}\ Set or Query Graphical Parameters\\
 par {graphics}:par can be used to set or query graphical parameters. Parameters can be set by specifying them as arguments to par in tag = value form, or by passing them as a list of tagged values.\\
@@ -1021,6 +1050,8 @@ axis(4)
 mtext("Common Support",side=4,line=3)
 @
 
+According to this graph, we can observe that there exists lots of common support between the density of treated and untreated individuals.
+
 \noindent{\textbf{LLR matching on the trimmed sample}}
 <<LLR.trim,eval=TRUE,echo=FALSE,results='hide',cache=TRUE>>=
 llr.match.trim <- function(y,D,x,t,bw,kernel){
@@ -1098,12 +1129,36 @@ for (i in 1:length(simuls.llr.trim)){
 }
 @
 
+Since it will take lots of time to do the bootstrap for larger sample, so here I just take a sample of 100 individuals as an example. Obviously, because of the sample size is not big enough, there exists a large sampling noise.
+
 
   \chapter{Natural Experiments}
+  
+In this chapter, we learnt 3 methods of Natural Experiments: Regression Discontinuity Designs (RDD), Difference in Differences (DID) and Instrumental Variables (IV). In this project, I only used Regression Discontinuity Designs(RDD) to do the analysis.
+  
     \section{Regression Discontinuity Designs(RDD)}
-      
+
+In statistics, econometrics, political science, epidemiology, and related disciplines, a regression discontinuity design (RDD) is a quasi-experimental pretest-posttest design that elicits the causal effects of interventions by assigning a cutoff or threshold above or below which an intervention is assigned. By comparing observations lying closely on either side of the threshold, it is possible to estimate the local Average treatment effect in environments in which randomization was unfeasible. 
+
+\vspace{.5em}     
+RDD uses situations where there is a discontinuity in the probability of receiving the treatment. If there is also a discontinuity in outcomes, it is interpreted as the effect of the treatment.
+
+\vspace{.5em} 
+We distinguish two RD Designs:
+  \begin{itemize}
+    \item Sharp Designs (probability transitions from 0 to 1)
+    \item Fuzzy Designs (probability transitions from values strictly between 0 and 1)
+  \end{itemize}  
+  
+\vspace{.5em} 
+The identification of causal effects hinges on the crucial assumption that there is indeed a sharp cut-off, around which there is a discontinuity in the probability of assignment from 0 to 1. In reality, however, cut-offs are often not strictly implemented (e.g. exercised discretion for students who just fell short of passing the threshold) and the estimates will hence be biased.
+
+\vspace{.5em} 
+In contrast to the sharp regression discontinuity design, a fuzzy regression discontinuity design (FRDD) does not require a sharp discontinuity in the probability of assignment but is applicable as long as the probability of assignment is different. The intuition behind it is related to the instrumental variable strategy and intention to treat.
+
+\clearpage
+
       \subsection{Sharp RDD}
-        
         \subsubsection{Linear sample}
 
 \begin{itemize}
@@ -1134,7 +1189,7 @@ text(x=c(log(param["barY"])),y=c(5),labels=c(expression(bar('y'))),pos=c(2),col=
 legend(4,10.5,c('y0|D=0','y1|D=1',expression(hat('y0'))),pch=c(1,3,1),col=c(col.obs,col.obs,'blue'),ncol=2)
 @
 
-<<identification.sharp.yB.3,eval=TRUE,echo=FALSE,results='hide',fig.align='center',out.width='.65\\textwidth',fig.pos='htbp'>>=
+<<identification.sharp.yB.3,eval=TRUE,echo=FALSE,results='hide',fig.align='center',out.width='.5\\textwidth',fig.pos='htbp'>>=
 plot(yB[Ds==0],y[Ds==0],pch=1,xlim=c(4,10.5),ylim=c(4,10.5),xlab="yB",ylab="Outcomes")
 points(yB[Ds==1],y[Ds==1],pch=3)
 points(yB[Ds==0],reg.yB.00$fitted.values,col='blue',pch=1)
@@ -1143,7 +1198,6 @@ abline(v=log(param["barY"]),col=col.unobs)
 text(x=c(log(param["barY"])),y=c(5),labels=c(expression(bar('y'))),pos=c(2),col=c(col.unobs),lty=c(lty.obs))
 legend(4,10.5,c('y0|D=0','y1|D=1',expression(hat('y0')),expression(hat('y1'))),pch=c(1,3,1,3),col=c(col.obs,col.obs,'blue','blue'),ncol=2)
 @
-\clearpage
 
 \begin{itemize}
   \item Build a plot showing the discontinuity in the linear sample using OLS
@@ -1173,7 +1227,7 @@ text(x=c(log(param["barY"])),y=c(4),labels=c(expression(bar('y'))),pos=c(2),col=
 legend(4,10.5,c('y0|D=0','y1|D=1',expression(hat('y0'))),pch=c(1,3,1),col=c(col.obs,col.obs,'blue'),ncol=2)
 @
 
-<<identification.sharp.ols.3,eval=TRUE,echo=FALSE,results='hide',fig.cap='the discontinuity in the linear sample using OLS',fig.align='center',out.width='.65\\textwidth',fig.width=8,fig.height=8,fig.pos='htbp'>>=
+<<identification.sharp.ols.3,eval=TRUE,echo=FALSE,results='hide',fig.cap='the discontinuity in the linear sample using OLS',fig.align='center',out.width='.5\\textwidth',fig.width=8,fig.height=8,fig.pos='htbp'>>=
 plot(yBo[Dso==0],yo[Dso==0],pch=1,xlim=c(4,10.5),ylim=c(4,10.5),xlab="yB",ylab="Outcomes")
 points(yBo[Dso==1],yo[Dso==1],pch=3)
 points(yBo[Dso==0],reg.ols.00$fitted.values,col='blue',pch=1)
@@ -1182,6 +1236,7 @@ abline(v=log(param["barY"]),col=col.unobs)
 text(x=c(log(param["barY"])),y=c(4),labels=c(expression(bar('y'))),pos=c(2),col=c(col.unobs),lty=c(lty.obs))
 legend(4,10.5,c('y0|D=0','y1|D=1',expression(hat('y0')),expression(hat('y1'))),pch=c(1,3,1,3),col=c(col.obs,col.obs,'blue','blue'),ncol=2)
 @
+\clearpage
 
 \begin{itemize}
   \item Estimate TT(z) using OLS predicted at the discontinuity
@@ -1193,8 +1248,9 @@ y1.bary.pred <- reg.ols.11$coef[[1]]+reg.ols.11$coef[[2]]*log(param['barY'])
 delta.y.rddols <- y1.bary.pred-y0.bary.pred
 @
 
-\noindent{According to R, I get $\esph{y^1_i|y^B_i=\bar{y}}=$\Sexpr{y1.bary.pred} and $\esph{y_i^0|y_i^B=\bar{y}}=$\Sexpr{y0.bary.pred}, so the estimated TT is $\hat{\Delta^{y}_{RDDOLS}}=$\Sexpr{delta.y.rddols}.\\
-Then I calculate $\bm{TT(z)}$ with the following formula:\\}
+According to R, I get $\esph{y^1_i|y^B_i=\bar{y}}=$\Sexpr{y1.bary.pred} and $\esph{y_i^0|y_i^B=\bar{y}}=$\Sexpr{y0.bary.pred}, so the estimated TT is $\hat{\Delta^{y}_{RDDOLS}}=$\Sexpr{delta.y.rddols}.
+
+Then I calculate $\bm{TT(z)}$ with the following formula:\\
 
 \centerline{$\Delta^y_{TT}(\bar{z}) = \bar{\alpha} + \theta\bar{\mu}+\theta\displaystyle\frac{\sigma^2_{\mu}}{\sigma^2_{\mu}+\sigma^2_{U}}(\bar{y}-\bar{\mu})$}
 
@@ -1204,10 +1260,11 @@ delta.y.tt.z <- function(param){
 }
 @
 
-\noindent{So $\bm{TT(z)=\Sexpr{delta.y.tt.z(param)}}$.\\
-Moreover, I show the graph of the results of RDD using OLS as following:}
+So $\bm{TT(z)=\Sexpr{delta.y.tt.z(param)}}$.
 
-<<plot.RDD.sharp.ols,eval=FALSE,echo=FALSE,results='hide',fig.cap='Sharp RDD Using OLS',fig.align='center',out.width='.65\\textwidth',fig.pos='htbp'>>=
+Moreover, I show the graph of the results of RDD using OLS as following:
+
+<<plot.RDD.sharp.ols,eval=TRUE,echo=FALSE,results='hide',fig.cap='Sharp RDD Using OLS',fig.align='center',out.width='.65\\textwidth',fig.pos='htbp'>>=
 plot(1, type="n", xlab="", ylab="", xlim=c(0.4,1), ylim=c(0, 10))
 abline(v=delta.y.tt.z(param),col=col.unobs,lty=lty.unobs)
 abline(v=delta.y.rddols,col=col.obs,lty=lty.obs)
@@ -1312,7 +1369,7 @@ y0.llr <- llr(y[Ds==0],yB[Ds==0],yB[Ds==0],bw=MSE.grid[MSE.llr.0==min(MSE.llr.0)
 y1.llr <- llr(y[Ds==1],yB[Ds==1],yB[Ds==1],bw=MSE.grid[MSE.llr.1==min(MSE.llr.1)],kernel=kernel)    
 @
 
-<<plot.rdd.llr.cv,eval=TRUE,echo=FALSE,results='hide',fig.cap='Cross Validation Results',fig.align='center',out.width='.5\\textwidth',out.height='.5\\textwidth',fig.width=8,fig.height=8,fig.pos='htbp'>>=
+<<plot.rdd.llr.cv,eval=TRUE,echo=FALSE,results='hide',fig.cap='Cross Validation Results',fig.align='center',out.width='.5\\textwidth',out.height='.5\\textwidth',fig.width=7,fig.height=7,fig.pos='htbp'>>=
 plot(MSE.grid,MSE.llr.0,xlab='Bandwidth',ylab='MSE (y|D=0)')
 legend(0.8,31.6,c('y|D=0','y|D=1'),pch=c(1,3),col=c(col.obs,col.obs),ncol=1)
 par(new=TRUE)
@@ -1322,13 +1379,12 @@ mtext("MSE (y|D=1)",side=4,line=3)
 @
 
 According to the CV results, we get the optimal bandwidth is \bm{0.6}.
-\clearpage
 
 \begin{itemize}
   \item  Build a plot showing the discontinuity in the linear sample using LLR
 \end{itemize}
 
-<<plot.rdd.llr.nonlin.1,eval=TRUE,echo=FALSE,results='hide',fig.cap='RDD LLR',fig.align='center',out.width='.5\\textwidth',out.height='.5\\textwidth',fig.width=8,fig.height=8,fig.pos='htbp'>>=
+<<plot.rdd.llr.nonlin.1,eval=TRUE,echo=FALSE,results='hide',fig.cap='RDD LLR',fig.align='center',out.width='.5\\textwidth',out.height='.5\\textwidth',fig.width=7,fig.height=7,fig.pos='htbp'>>=
 plot(yB[Ds==0],y[Ds==0],pch=1,xlim=c(4,11),ylim=c(4,11),xlab="yB",ylab="Outcomes")
 points(yB[Ds==1],y[Ds==1],pch=3)
 points(yB[Ds==0],y0.llr,col='blue',pch=1)
@@ -1337,6 +1393,7 @@ abline(v=log(param["barY"]),col=col.unobs)
 text(x=c(log(param["barY"])),y=c(4),labels=c(expression(bar('y'))),pos=c(2),col=c(col.unobs),lty=c(lty.obs))
 legend(4,11,c('y|D=0','y|D=1',expression(hat('y0')),expression(hat('y1'))),pch=c(1,3,1,3),col=c(col.obs,col.obs,'blue','blue'),ncol=2)
 @
+\clearpage
 
 \begin{itemize}
   \item  Estimate TT(z) using the simplified Local OLS estimator of Imbens and Lemieux
@@ -1401,7 +1458,7 @@ Pr.D1.llr <- llr(Dsc[Z==1],yBo[Z==1],yBo[Z==1],bw=MSE.grid[MSE.pr.llr.1==min(MSE
 
 <<rdd.fuzzy.local.iv,eval=FALSE,echo=FALSE,results='hide'>>=
 bw.f <- min(c(MSE.grid[MSE.pr.llr.0==min(MSE.pr.llr.0)],MSE.grid[MSE.pr.llr.1==min(MSE.pr.llr.1)],MSE.grid[MSE.llr.0==min(MSE.llr.0)],MSE.grid[MSE.llr.1==min(MSE.llr.1)]))
-# bw.f<-0.3
+# bw.f<-0.2
 y.h <- yc[log(param['barY'])-bw.f<yBo & yBo<log(param['barY'])+bw.f]
 Ds.h <- Dsc[log(param['barY'])-bw.f<yBo & yBo<log(param['barY'])+bw.f]
 
@@ -1414,12 +1471,14 @@ Z.h <- Z[log(param['barY'])-bw.f<yBo & yBo<log(param['barY'])+bw.f]
 reg.fuzzy.rdd.local.iv <- ivreg(y.h  ~ Ds.h + yB.l + yB.r | Z.h + yB.l + yB.r)
 delta.rdd.fuzzy.il <- reg.fuzzy.rdd.local.iv$coef[2]
 @
-The optimal bandwidth is \bm{0.3}.
+The optimal bandwidth is \bm{0.2}. 
+% It's really strange that when I typed "\bm{\Sexpr{bw.f}}", there was a fault shown in log:
+% "Error in eval(expr, envir, enclos): object 'bw.f' nor found".
+% Thus I had to type "0.2" directly.
 
 %\begin{itemize}
  % \item  Build a plot of $\Pr(D_i=1|y_i^B)$ using LLR on each side of the discontinuity
 %\end{itemize}
-\clearpage
 
 \begin{itemize}
   \item  Build a plot of the expected outcomes on each side of the discontinuity using LLR
@@ -1481,6 +1540,8 @@ mtext("D",side=4,line=3)
 \caption{Fuzzy RDD}
 \end{figure}
 
+\clearpage
+
 % \begin{itemize}
   % \item  Use LLR to build the Wald estimate of LATE(z)
 % \end{itemize}
@@ -1506,12 +1567,26 @@ text(x=c(delta.y.tt.z(param),delta.rdd.fuzzy.il),y=c(adj),labels=c('TT(z)',expre
 % \end{itemize}
 
 % not sure...
-% we have gotten delta.rdd.fuzzy.il<-0.005781747 and 2*qnorm((.99+1)/2)*sqrt(vcov(reg.fuzzy.rdd.local.iv)[2,2])<-3.360884
-% The estimated value of LATE(z) by simplified LLR IV is $\bm{0.005781747}$. The estimated 99\% sampling noise is $\bm{3.360884}$.
+% we have gotten delta.rdd.fuzzy.il<-2.171848 and 2*qnorm((.99+1)/2)*sqrt(vcov(reg.fuzzy.rdd.local.iv)[2,2])<-3.360884
+% The estimated value of LATE(z) by simplified LLR IV is $\bm{2.171848}$. The estimated 99\% sampling noise is $\bm{3.360884}$.
 
 
 \part{Conclusion}
 
+By doing this project, I have a better understanding in the theoreme and estimating the effect of an interention on an outcome in different methods, which enrich my knowledge on econometrics.
+
+\vspace{.5em}
+In Chapter 1, I focused on Two Fundamental Problems of Inference: the Fundamental Problem of Causal Inference (FPCI) and the Fundamental Problem of Statistical Inference (FPSI). For both methods, I learnt some theoritical formulas, computed the individual level treatment effect, selection bias, WW estimator and BA estimator. Besides, for the Fundamental Problem of Statistical Inference (FPSI), I also used the Central Limit Theorem (CLT) formula to estimate the effect of sampling noise on WW or compute sample size with different confidence level. Comparing the results above, we can easily observe that for the same confidence level, sample size decreases with sampling noise; for the same sampling noise, sample size increases with confidence level.
+
+\vspace{.5em}
+In Chapter 2, I analysed in Parametric and Nonparametric Observational Methods, which are OLS and Matching, respectively. For Parametric Observational Methods, I computed the OLS estimators, the robust standard errors and sampling noise. Then I observed that with the increasing of sample size, the sampling noise becomes much smaller (the precision of the OLS estimator with increases with sample size). For Nonparametric Observational Methods, I computed the LLR estimator on the sample with common support and understood how to choose the bandwidth. Moreover, I computed the standard errors and sampling noise using the
+bootstrap.
+
+\vspace{.5em}
+Finally, in Chapter 3, I chose one method of Natural Experiments, Regression Discontinuity Designs(RDD), to do the analysis. Furthermore, We distinguished two RD Designs during the class, Sharp RDD (probability transitions from 0 to 1) and Fuzzy RDD (probability transitions from values strictly between 0 and 1). In this section, I used Cross Validation to choose the bandwidth.
+
+\vspace{.5em}  
+Moreover, I should also use other methods that been taught in the class to do the analysis afterwords, and try to use the real data as well. So that I can understand the application of the theritical knowledge even better.
 
 
 \part{Annex}
@@ -1521,10 +1596,6 @@ text(x=c(delta.y.tt.z(param),delta.rdd.fuzzy.il),y=c(adj),labels=c('TT(z)',expre
 \noindent{\Sexpr{it[1:NC]}}
     \subsection*{1.2 The individual level treatment effects of Part II 1.2 The Fundamental Problem of Statistical Inference}
 \noindent{\Sexpr{its[1:NS]}}
-
-
-
-
 
 
 \end{document}
