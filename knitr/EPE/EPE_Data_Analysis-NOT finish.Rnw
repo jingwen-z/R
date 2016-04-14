@@ -18,7 +18,7 @@ library(tmvtnorm)
 \hbadness=10000
 
 \usepackage{geometry}
-\geometry{left=2cm,right=2cm,top=2cm,bottom=2cm}
+\geometry{left=2.3cm,right=2.3cm,top=2.5cm,bottom=2.5cm}
 \renewcommand{\baselinestretch}{1.25}
 
 \usepackage{graphicx}
@@ -28,9 +28,6 @@ library(tmvtnorm)
 
 % sous titres
 \usepackage{subfig}
-
-% indention
-\usepackage{indentfirst}
 
 % package to generate commands with double letters in maths
 \usepackage{dsfont}
@@ -42,7 +39,7 @@ library(tmvtnorm)
 \newcommand\Ind{\protect\mathpalette{\protect\independenT}{\perp}}
 
 % set letters' color
-\usepackage{color}
+\usepackage{xcolor}
 
 %% temporary titles
 % command to provide stretchy vertical space in proportion
@@ -69,10 +66,10 @@ EPE Data Analysis Project}
 \normalsize
 
 % [Author name and information]
-\small BY\\
-\Large \textbf{Jingwen ZHENG}\\[0.5em]
-\small Toulouse School of Economics\\ M2 ERNA
-\nbvspace[1]
+\small \textcolor{gray}{BY\\
+\Large Jingwen ZHENG\\[0.5em]
+\small Toulouse School of Economics\\ M2 ERNA}
+% \nbvspace[1]
 
 \end{center}
 
@@ -85,7 +82,7 @@ EPE Data Analysis Project}
 
 \part{Introduction}
 
-  As a student in M2 ERNA of Toulouse School of Economics, during the last half year of study, I'm really honoured to participate the course 'Econometrics of Program Evaluation'. In this course, I learnt some methods to estimate the effect of an interention on an outcome as the following outline.
+\noindent{As a student in M2 ERNA of Toulouse School of Economics, during the last half year of study, I'm really honoured to participate the course 'Econometrics of Program Evaluation'. In this course, I learnt some methods to estimate the effect of an interention on an outcome as the following outline.}
   
   \begin{itemize}
     \item The Two Fundamental Problems of Inference
@@ -100,58 +97,78 @@ EPE Data Analysis Project}
 \noindent{\textit{\textbf{Methods}}}
 
 \vspace{.5em}  
-  \underline{The Two Fundamental Problems of Inference} indicate the Fundamental Problem of Causal Inference(FPCI) and the Fundamental Problem of Statistical Inference(FPSI). In the lecture \underline{Observational Methods of Causal Inference}, we learnt how to estimate the effect of an intervention on an outcome using observational methods, this method tries to correct for selection bias by accounting for as many observed confounders as possible. There are several ways to leverage on Selection on Observables to build estimators for TT; 'Parametric Observational Method: OLS', 'Nonparametric Observational Method: Matching' and 'Semiparametric Observational Method: Synthetic Control (SCM)'.
+\noindent{\underline{The Two Fundamental Problems of Inference} indicate the Fundamental Problem of Causal Inference(FPCI) and the Fundamental Problem of Statistical Inference(FPSI). In the lecture \underline{Observational Methods of Causal Inference}, we learnt how to estimate the effect of an intervention on an outcome using observational methods, this method tries to correct for selection bias by accounting for as many observed confounders as possible. There are several ways to leverage on Selection on Observables to build estimators for TT; 'Parametric Observational Method: OLS', 'Nonparametric Observational Method: Matching' and 'Semiparametric Observational Method: Synthetic Control (SCM)'.}
 
 \vspace{.5em}  
-  A \underline{natural experiment} is an empirical study in which individuals (or clusters of individuals) exposed to the experimental and control conditions are determined by nature or by other factors outside the control of the investigators, yet the process governing the exposures arguably resembles random assignment. Thus, natural experiments are observational studies and are not controlled in the traditional sense of a randomized experiment. In the lecture 'Natural Experiments', we learnt how to estimate the effect of an intervention on an outcome using natural experiments, this methods tries to correct for selection bias by finding situations analog to randomized experiments but due to the natural course of events. It covers three ways: Regression Discontinuity Designs (RDD), Difference in Differences (DID) and Instrumental Variables (IV). Natural experiments are most useful when there has been a clearly defined exposure involving a well defined subpopulation (and the absence of exposure in a similar subpopulation) such that changes in outcomes may be plausibly attributed to the exposure.
+\noindent{A \underline{natural experiment} is an empirical study in which individuals (or clusters of individuals) exposed to the experimental and control conditions are determined by nature or by other factors outside the control of the investigators, yet the process governing the exposures arguably resembles random assignment. Thus, natural experiments are observational studies and are not controlled in the traditional sense of a randomized experiment. In the lecture 'Natural Experiments', we learnt how to estimate the effect of an intervention on an outcome using natural experiments, this methods tries to correct for selection bias by finding situations analog to randomized experiments but due to the natural course of events. It covers three ways: Regression Discontinuity Designs (RDD), Difference in Differences (DID) and Instrumental Variables (IV). Natural experiments are most useful when there has been a clearly defined exposure involving a well defined subpopulation (and the absence of exposure in a similar subpopulation) such that changes in outcomes may be plausibly attributed to the exposure.}
 
 \vspace{.5em}  
-  Besides, a \underline{Randomized Controlled Trial} is a type of scientific (often medical) experiment, where the people being studied are randomly allocated one or other of the different treatments under study. In the lecture 'Randomized Controlled Trials', we learnt how to estimate the effect of an intervention on an outcome using randomized experiments. We especially learnt the various types of designs and what can be recovered from them using which technique. RCTs are often used to test the efficacy or effectiveness of various types of medical intervention and may provide information about adverse effects, such as drug reactions. 
+\noindent{Besides, a \underline{Randomized Controlled Trial} is a type of scientific (often medical) experiment, where the people being studied are randomly allocated one or other of the different treatments under study. In the lecture 'Randomized Controlled Trials', we learnt how to estimate the effect of an intervention on an outcome using randomized experiments. We especially learnt the various types of designs and what can be recovered from them using which technique. RCTs are often used to test the efficacy or effectiveness of various types of medical intervention and may provide information about adverse effects, such as drug reactions.}
 
 \vspace{.5em}  
-  Moreover, we learnt how to choose the size of our sample (mainly in a RCT) and how to gauge the size of sampling noise before conducting a study in the lecture \underline{Power Analysis: Choosing Sample Size and Gauging Sampling Noise Ex Ante}. There are two ways; one is using test statistics, the other is gauging sampling noise or choosing sample size to reach a given sampling noise. 
+\noindent{Moreover, we learnt how to choose the size of our sample (mainly in a RCT) and how to gauge the size of sampling noise before conducting a study in the lecture \underline{Power Analysis: Choosing Sample Size and Gauging Sampling Noise Ex Ante}. There are two ways; one is using test statistics, the other is gauging sampling noise or choosing sample size to reach a given sampling noise.}
 
 \vspace{.5em}  
-  By \underline{Placebo Tests and Power Analysis for Natural Experiments and Observational Studies}, we know how to test for the validity and estimate the power of observational studies and natural experiments. 
+\noindent{By \underline{Placebo Tests and Power Analysis for Natural Experiments and Observational Studies}, we know how to test for the validity and estimate the power of observational studies and natural experiments.}
 
 \vspace{.5em}  
-  Finally, we get how to estimate the precision of an estimator by studying lecture \underline{Estimating Precision In Group Designs With Autocorrelated Errors}, when the treatment has been allocated to groups of observations whose outcomes are correlated.\\
+\noindent{Finally, we get how to estimate the precision of an estimator by studying lecture \underline{Estimating Precision In Group Designs With Autocorrelated Errors}, when the treatment has been allocated to groups of observations whose outcomes are correlated.} \\
 
 \noindent{\textit{\textbf{Software}}}
 
 \vspace{.5em}
-  When writing a paper, slides or a report, we generally have a separate file for our statistical code and for our text (paper or slides). In general, the statistical files are in .R and the text in .tex. It's not convenient to use and is a waste of time.
+\noindent{When writing a paper, slides or a report, we generally have a separate file for our statistical code and for our text (paper or slides). In general, the statistical files are in .R and the text in .tex. It's not convenient to use and is a waste of time.}
 
 \vspace{.5em}
-  Thanks to this course, I master how to use \textbf{Knitr} package in RStudio in order to completely sidestep this problem by intertwining the .R code with .tex code within an .Rnw file.\\
+\noindent{Thanks to this course, I master how to use \textbf{Knitr} package in RStudio in order to completely sidestep this problem by intertwining the .R code with .tex code within an .Rnw file.} \\
 
 \noindent{\textit{\textbf{For this project}}}
 
 \vspace{.5em}
-  Since I didn't choose Paul and Cesar's class, I didn't do the report for that course. In this report, I generate data as Mr. Chabé-Ferret did. Then I followed the questions that asked by prof on the moodle and did analysis with 'The Two Fundamental Problems of Inference', the method 'Observational Methods of Causal Inference' and the method 'Regression Discontinuity Designs(RDD)' of 'Natural Experiments'.
+\noindent{Since I didn't choose Paul and Cesar's class, I didn't do the report for that course. In this report, I generate data as Mr. Chabé-Ferret did. Then I followed the questions that asked by prof on the moodle and did analysis with 'The Two Fundamental Problems of Inference', the method 'Observational Methods of Causal Inference' and the method 'Regression Discontinuity Designs(RDD)' of 'Natural Experiments'.}
 
 \vspace{.5em}  
-  In this project, I firstly generated data, then I used different methods to analyse and estimate the effect of an interention on an outcome. I will explaine the result with graphs and text in the following part.
+\noindent{In this project, I firstly generated data, then I used different methods to analyse and estimate the effect of an interention on an outcome. I will explaine the result with graphs and text in the following part.}
 
 
 \part{Data Analysis in different methods}
 
   \chapter{The Two Fundamental Problems of Inference}
+  
+\nbvspace[0.5]
+In this lecture, we studied the two fundamentals problems that we face when estimating the effect of an intervention on an outcome. We are also going to study the properties of two intuitive estimators. The plan of this chapter is:
+
+    \begin{itemize}
+      \item The Fundamental Problem of Causal Inference
+      \item The Fundamental Problem of Statistical Inference
+    \end{itemize}
+
+\nbvspace[2]
+
+\clearpage
+
     \section{The Fundamental Problem of Causal Inference}  
       \subsection{generate data with selection rule $D_i = \uns{y_i^B\leq\bar{y}}$}
+I generated data with following codes
 
-<<param,eval=TRUE,echo=FALSE,results='hide'>>=
+<<param,eval=TRUE,echo=TRUE,results='hide'>>=
 param <- c(7,.77,.1,1700,0.5,0.1,0.05,0.07,0.05,0.01)
-names(param) <- c("barmu","sigma2mu","sigma2U","barY","rho","theta","sigma2epsilon","sigma2eta","delta","baralpha")
+names(param) <- c("barmu","sigma2mu","sigma2U","barY","rho","theta",
+                  "sigma2epsilon","sigma2eta","delta","baralpha")
 @
 
-<<delta.y.tt,eval=TRUE,echo=FALSE,results='hide'>>=
+<<delta.y.tt,eval=TRUE,echo=TRUE,results='hide'>>=
 delta.y.tt <- function(param){
-  return(param["baralpha"]+param["theta"]*param["barmu"]-param["theta"]*((param["sigma2mu"]*dnorm((log(param["barY"])-param["barmu"])/(sqrt(param["sigma2mu"]+param["sigma2U"]))))/(sqrt(param["sigma2mu"]+param["sigma2U"])*pnorm((log(param["barY"])-param["barmu"])/(sqrt(param["sigma2mu"]+param["sigma2U"]))))))
+  return(param["baralpha"]+param["theta"]*param["barmu"]-param["theta"]*
+           ((param["sigma2mu"]*dnorm((log(param["barY"])-param["barmu"])/
+              (sqrt(param["sigma2mu"]+param["sigma2U"]))))/
+                (sqrt(param["sigma2mu"]+param["sigma2U"])*
+                   pnorm((log(param["barY"])-param["barmu"])/
+                     (sqrt(param["sigma2mu"]+param["sigma2U"]))))))
 }
 @
 
-<<data.FPCI,eval=TRUE,echo=FALSE,results='hide'>>=
+<<data.FPCI,eval=TRUE,echo=TRUE,results='hide'>>=
 set.seed(2345)
 NC <-2000
 mu <- rnorm(NC,param["barmu"],sqrt(param["sigma2mu"]))
@@ -170,9 +187,10 @@ Y1 <- exp(y1)
 y <- y1*Ds+y0*(1-Ds)
 Y <- Y1*Ds+Y0*(1-Ds)
 @
+\clearpage
 
       \subsection{plot potential outcomes and observed outcomes}
-<<Pot.obs.out.FPCI,eval=TRUE,fig.cap='Potential outcomes and observed outcomes',fig.subcap=c('Potential outcomes','Observed outcomes'),fig.align='center',out.width='.45\\linewidth',echo=FALSE,results='hide',fig.pos='htbp'>>=
+<<Pot.obs.out.FPCI,eval=TRUE,fig.cap='Potential outcomes and observed outcomes',fig.subcap=c('Potential outcomes','Observed outcomes'),fig.align='center',out.width='.5\\linewidth',echo=FALSE,results='hide',fig.pos='htbp'>>=
 col.obs <- 'black'
 col.unobs <- 'red'
 
@@ -188,60 +206,69 @@ points(yB[Ds==1],y1[Ds==1],pch=3)
 legend(4,11,c('y|D=0','y|D=1'),pch=c(1,3))
 abline(v=log(param["barY"]),col=col.unobs)
 @      
-\clearpage
 
-      \subsection{Compute individual level treatment effects in the sample}
+      \subsection{Individual level treatment effects in the sample}
       
-In order to compute individual level treatment effects in the sample, I use the formula: \\ 
-\centerline{$\Delta_i^Y =Y_i^1 -Y^0_i$} 
+In order to compute individual level treatment effects in the sample, I use the formula: \\ \\ 
+\centerline{$\it{\Delta_i^Y =Y_i^1 -Y^0_i}$} \\
 
 <<ind.tt.NC,eval=TRUE,echo=FALSE>>=
 it<- y1-y0
 @
 
-Because of the large amount of data, here I just show the first 20 and last 20 individual level treatment effects as following, the completed individual level treatment effects are in 'Annex'. \\ 
+\noindent{Because of the large amount of data, here I just show the first 20 and the last 20 individual level treatment effects as following, the completed individual level treatment effects are in 'Annex'.} \\ 
 
-\noindent{\Sexpr{it[1:20]} \\ ... \\ \Sexpr{it[1980:NC]}}
+\noindent{\textcolor{gray}{\Sexpr{it[1:20]} \\ ... \\ \Sexpr{it[1980:NC]}}}
 
-      \subsection{Compute the average treatment effect on the treated in the sample by taking the average of the individual level treatment effects of the treated}
-  
+\clearpage
+
+      \subsection{The average treatment effect on the treated sample}
+
+\textit{Q: Compute the average treatment effect on the treated in the sample by taking the average of the individual level treatment effects of the treated.}
+
 <<avg.tt,eval=TRUE,echo=FALSE>>=
 avg.tt<-mean(it)
 @
-By computing the average of the individual level treatment effects of the treated, I get the average treatment effect on the treated in the sample is \textbf{\Sexpr{avg.tt}}.
+
+\vspace{.5em}
+\noindent{By computing the average of the individual level treatment effects of the treated, I get the average treatment effect on the treated in the sample is \textbf{\Sexpr{avg.tt}}.
 
       \subsection{Compare its value with the theoretical one in the population}
 According to the course, we learnt the theoretical average treatment effect with the following formula:\\
-\centerline{$\Delta_{TT}^y =\bar{\alpha}+\theta\bar{\mu} -\theta\displaystyle\frac{\sigma^2_{\mu}}{\sqrt{\sigma^2_{\mu}+\sigma^2_{U}}}\frac{\displaystyle\phi\left(\frac{\bar{y}-\bar{\mu}}{\sqrt{\sigma^2_{\mu}+\sigma^2_{U}}}\right)}{\displaystyle\Phi\left(\frac{\bar{y}-\bar{\mu}}{\sqrt{\sigma^2_{\mu}+\sigma^2_{U}}}\right)}$}\\
+\centerline{$\it\Delta_{TT}^y =\bar{\alpha}+\theta\bar{\mu} -\theta\displaystyle\frac{\sigma^2_{\mu}}{\sqrt{\sigma^2_{\mu}+\sigma^2_{U}}}\frac{\displaystyle\phi\left(\frac{\bar{y}-\bar{\mu}}{\sqrt{\sigma^2_{\mu}+\sigma^2_{U}}}\right)}{\displaystyle\Phi\left(\frac{\bar{y}-\bar{\mu}}{\sqrt{\sigma^2_{\mu}+\sigma^2_{U}}}\right)}}$} \\
 
 <<theo.avg.tt,eval=TRUE,echo=FALSE>>=
 theo.avg.tt<-delta.y.tt(param)
 @
 
-Thus, I get the theoretical average treatment effect is \textbf{\Sexpr{theo.avg.tt}}, which is smaller than the value of last question.
+\vspace{.5em}
+\noindent{Thus, I get the theoretical average treatment effect is \textbf{\Sexpr{theo.avg.tt}}, which is smaller than the value of last question.}
 
       \subsection{Compute the WW estimator in the sample}
-In order to compute the WW estimator in the sample, I use the formula:\\
-\centerline{$\Delta^Y_{WW} = \esp{Y_i|D_i=1} - \esp{Y_i|D_i=0}$}
+In order to compute the WW estimator in the sample, I use the formula:\\ \\
+\centerline{$\it{\Delta^Y_{WW} = \esp{Y_i|D_i=1} - \esp{Y_i|D_i=0}}$} \\
 
 <<WW.esti,eval=TRUE,echo=FALSE>>=
 WW.esti<-mean(y[Ds==1])-mean(y[Ds==0])
 @
 
-Here, I get the WW estimator in the sample is $\bm{\Sexpr{WW.esti}}$.
+\noindent{Here, I get the WW estimator in the sample is $\bm{\Sexpr{WW.esti}}$.}
 
       \subsection{Compute Selection Bias}
-According to the course, we get that $\Delta^Y_{WW} = \Delta^Y_{TT} + \Delta^Y_{SB}$, so $\Delta^Y_{SB} = \Delta^Y_{WW} - \Delta^Y_{TT}$ . 
+According to the course, we get that \\ \\
+\centerline{$\it{\Delta^Y_{WW} = \Delta^Y_{TT} + \Delta^Y_{SB}}$, \ \ so $\it{\Delta^Y_{SB} = \Delta^Y_{WW} - \Delta^Y_{TT}}$.} \\
 
 <<SB,eval=TRUE,echo=FALSE>>=
 SB<-abs(WW.esti-avg.tt)
 @
 
-With the $\Delta^Y_{TT}$ and $\Delta^Y_{WW}$ that I got before, I can get the Selecton Bias is $\bm{\Sexpr{SB}}$.
+\noindent{With the $\it{\Delta^Y_{TT}}$ and $\it{\Delta^Y_{WW}}$ that I got before, I can get the Selecton Bias is $\bm{\Sexpr{SB}}$.}
+
+\clearpage
 
       \subsection{Compare its value to the theoretical one in the sample}
 According to the course, we learnt the theoretical selection bias with the following formula:\\ \\
-\centerline{$\Delta_{SB}^y = -\displaystyle\frac{\sigma^2_{\mu}+\rho\sigma^2_{U}}{\sqrt{\sigma^2_{\mu}+\sigma^2_{U}}}\left(\frac{\displaystyle\phi\left(\frac{\bar{y}-\bar{\mu}}{\sqrt{\sigma^2_{\mu}+\sigma^2_{U}}}\right)}{\displaystyle\Phi\left(\frac{\bar{y}-\bar{\mu}}{\sqrt{\sigma^2_{\mu}+\sigma^2_{U}}}\right)}+\frac{\displaystyle\phi\left(\frac{\bar{y}-\bar{\mu}}{\sqrt{\sigma^2_{\mu}+\sigma^2_{U}}}\right)}{1-\displaystyle\Phi\left(\frac{\bar{y}-\bar{\mu}}{\sqrt{\sigma^2_{\mu}+\sigma^2_{U}}}\right)}\right)$} \\
+\centerline{$\it{\Delta_{SB}^y = -\displaystyle\frac{\sigma^2_{\mu}+\rho\sigma^2_{U}}{\sqrt{\sigma^2_{\mu}+\sigma^2_{U}}}\left(\frac{\displaystyle\phi\left(\frac{\bar{y}-\bar{\mu}}{\sqrt{\sigma^2_{\mu}+\sigma^2_{U}}}\right)}{\displaystyle\Phi\left(\frac{\bar{y}-\bar{\mu}}{\sqrt{\sigma^2_{\mu}+\sigma^2_{U}}}\right)}+\frac{\displaystyle\phi\left(\frac{\bar{y}-\bar{\mu}}{\sqrt{\sigma^2_{\mu}+\sigma^2_{U}}}\right)}{1-\displaystyle\Phi\left(\frac{\bar{y}-\bar{\mu}}{\sqrt{\sigma^2_{\mu}+\sigma^2_{U}}}\right)}\right)}$} \\
 
 <<WW.SB,eval=TRUE,echo=FALSE,results='hide'>>=
 delta.y.sb <- function(param){
@@ -253,37 +280,43 @@ delta.y.sb <- function(param){
 theo.SB<-abs(delta.y.sb(param))
 @
 
-Thus, I get the theoretical average treatment effect is $\bm{\Sexpr{theo.SB}}$, which is smaller than the value of last question.
+\vspace{.5em}
+\noindent{Thus, I get the theoretical average treatment effect is $\bm{\Sexpr{theo.SB}}$, which is smaller than the value of last question.}
 
       \subsection{Compute the BA estimator in the sample}
-In order to compute the BA estimator in the sample, I use the formula:\\
-\centerline{$\Delta^Y_{BA} = \esp{Y_i|D_i=1} - \esp{Y_i^B|D_i=1}$}
+In order to compute the BA estimator in the sample, I use the formula:\\ \\
+\centerline{$\it{\Delta^Y_{BA} = \esp{Y_i|D_i=1} - \esp{Y_i^B|D_i=1}}$} \\
 
 <<BA.esti,eval=TRUE,echo=FALSE>>=
 BA.esti<-mean(y[Ds==1])-mean(yB[Ds==1])
 @
 
-Here, I get the BA estimator in the sample is $\bm{\Sexpr{BA.esti}}$.
+\noindent{Here, I get the BA estimator in the sample is $\bm{\Sexpr{BA.esti}}$.}
 
       \subsection{Compute its bias}
-According to the course, we get that $\Delta^Y_{BA} = \Delta^Y_{TT} + \Delta^Y_{TB}$, so $\Delta^Y_{TB} = \Delta^Y_{BA} - \Delta^Y_{TT}$ . 
+According to the course, we get that \\ \\
+\centerline{$\it{\Delta^Y_{BA} = \Delta^Y_{TT} + \Delta^Y_{TB}}$, \ \ so $\it{\Delta^Y_{TB} = \Delta^Y_{BA} - \Delta^Y_{TT}}$.} \\
 
 <<TB,eval=TRUE,echo=FALSE>>=
 TB<-BA.esti-avg.tt
 @
 
-With the $\Delta^Y_{TT}$ and $\Delta^Y_{BA}$ that I got before, I can get the Time Trend Bias is $\bm{\Sexpr{TB}}$.
+\noindent{With the $\it{\Delta^Y_{TT}}$ and $\it{\Delta^Y_{BA}}$ that I got before, I can get the Time Trend Bias is $\bm{\Sexpr{TB}}$.}
 
+\clearpage
 
   \section{The Fundamental Problem of Statistical Inference}
     
     \subsection{Generate data with selection rule $D_i = \uns{V_i\leq\bar{y}}$}
-<<param.FPSI,eval=TRUE,echo=FALSE,results='hide'>>=
+I generated data with following codes
+
+<<param.FPSI,eval=TRUE,echo=TRUE,results='hide'>>=
 paramS <- c(5,.45,.3,600,0.8,0.06,0.05,0.2,0.05,0.1)
-names(paramS) <- c("barmu","sigma2mu","sigma2U","barY","rho","theta","sigma2epsilon","sigma2eta","delta","baralpha")
+names(paramS) <- c("barmu","sigma2mu","sigma2U","barY","rho","theta",
+                   "sigma2epsilon","sigma2eta","delta","baralpha")
 @
 
-<<data.FPSI,eval=TRUE,echo=FALSE,results='hide'>>=
+<<data.FPSI,eval=TRUE,echo=TRUE,results='hide'>>=
 set.seed(2345)
 NS <-1500
 mus <- rnorm(NS,paramS["barmu"],sqrt(paramS["sigma2mu"]))
@@ -305,7 +338,7 @@ Ys <- Y1s*Dss+Y0s*(1-Dss)
 \clearpage
 
       \subsection{Plot potential outcomes and observed outcomes}
-<<Pot.obs.out.FPSI,eval=TRUE,fig.cap='Potential outcomes and observed outcomes',fig.subcap=c('Potential outcomes','Observed outcomes'),fig.align='center',out.width='.45\\textwidth',echo=FALSE,results='hide',fig.pos='htbp'>>=
+<<Pot.obs.out.FPSI,eval=TRUE,fig.cap='Potential outcomes and observed outcomes',fig.subcap=c('Potential outcomes','Observed outcomes'),fig.align='center',out.width='.5\\textwidth',echo=FALSE,results='hide',fig.pos='htbp'>>=
 col.obs <- 'black'
 col.unobs <- 'red'
 
@@ -323,17 +356,18 @@ abline(v=log(paramS["barY"]),col=col.unobs)
 @
 
       \subsection{Compute Individual level treatment effects in the sample}
-In order to compute individual level treatment effects in the sample, I use the formula: \\ 
-\centerline{$\Delta_i^Y =Y_i^1 -Y^0_i$} 
+In order to compute individual level treatment effects in the sample, I use the formula: \\ \\
+\centerline{$\it{\Delta_i^Y =Y_i^1 -Y^0_i}$} \\
 
 <<ind.tt.NS,eval=TRUE,echo=FALSE>>=
 its<- y1s-y0s
 @
 
-Because of the large amount of data, here I just show the first 20 and last 20 individual level treatment effects as following, the completed individual level treatment effects are in 'Annex'. \\ 
+\noindent{Because of the large amount of data, here I just show the first 20 and the last 20 individual level treatment effects as following, the completed individual level treatment effects are in 'Annex'.} \\ 
 
-\noindent{\Sexpr{its[1:20]} \\ ... \\ \Sexpr{its[1480:NS]}}
+\noindent{\textcolor{gray}{\Sexpr{its[1:20]} \\ ... \\ \Sexpr{its[1480:NS]}}}
 
+\clearpage
 
       \subsection{Compute TT in the sample}
 <<avg.tt.NS,eval=TRUE,echo=FALSE>>=
@@ -343,27 +377,28 @@ By computing the average of the individual level treatment effects of the treate
 
       \subsection{Compare with the theoretical value in the population}
 According to the course, we learnt the theoretical average treatment effect with the following formula:\\
-\centerline{$\Delta_{TT}^y =\bar{\alpha}+\theta\bar{\mu} -\theta\displaystyle\frac{\sigma^2_{\mu}}{\sqrt{\sigma^2_{\mu}+\sigma^2_{U}}}\frac{\displaystyle\phi\left(\frac{\bar{y}-\bar{\mu}}{\sqrt{\sigma^2_{\mu}+\sigma^2_{U}}}\right)}{\displaystyle\Phi\left(\frac{\bar{y}-\bar{\mu}}{\sqrt{\sigma^2_{\mu}+\sigma^2_{U}}}\right)}$}\\
+\centerline{$\it{\Delta_{TT}^y =\bar{\alpha}+\theta\bar{\mu} -\theta\displaystyle\frac{\sigma^2_{\mu}}{\sqrt{\sigma^2_{\mu}+\sigma^2_{U}}}\frac{\displaystyle\phi\left(\frac{\bar{y}-\bar{\mu}}{\sqrt{\sigma^2_{\mu}+\sigma^2_{U}}}\right)}{\displaystyle\Phi\left(\frac{\bar{y}-\bar{\mu}}{\sqrt{\sigma^2_{\mu}+\sigma^2_{U}}}\right)}}$}\\
 
 <<theo.avg.tts,eval=TRUE,echo=FALSE>>=
 theo.avg.tts<-delta.y.tt(paramS)
 @
 
-Thus, I get the theoretical average treatment effect is \textbf{\Sexpr{theo.avg.tts}}, which is bigger than the value of last question.
+\vspace{.5em}
+\noindent{Thus, I get the theoretical average treatment effect is \textbf{\Sexpr{theo.avg.tts}}, which is bigger than the value of last question.}
 
       \subsection{Compute the WW estimator}
-In order to compute the WW estimator in the sample, I use the formula:\\
-\centerline{$\Delta^Y_{WW} = \esp{Y_i|D_i=1} - \esp{Y_i|D_i=0}$}
+In order to compute the WW estimator in the sample, I use the formula:\\ \\
+\centerline{$\it{\Delta^Y_{WW} = \esp{Y_i|D_i=1} - \esp{Y_i|D_i=0}}$} \\
 
 <<WW.estiS,eval=TRUE,echo=FALSE>>=
 WW.estiS<-mean(ys[Dss==1])-mean(ys[Dss==0])
 @
 
-Here, I get the WW estimator in the sample is $\bm{\Sexpr{WW.estiS}}$.
+\noindent{Here, I get the WW estimator in the sample is $\bm{\Sexpr{WW.estiS}}$.}
 
       \subsection{Compute the OLS of beta in $\bm{y_i = \alpha + \beta D_i + U_i}$}
 According to the course, we learn the formula as following:\\ \\
-\centerline{$\hat{\beta}_{OLS} = \displaystyle\frac{\frac{1}{N}\sum_{i=1}^N\left(Y_i-\frac{1}{N}\sum_{i=1}^NY_i\right)\left(D_i-\frac{1}{N}\sum_{i=1}^ND_i\right)}{\frac{1}{N}\sum_{i=1}^N\left(D_i-\frac{1}{N}\sum_{i=1}^ND_i\right)^2}$} \\
+\centerline{$\it{\hat{\beta}_{OLS} = \displaystyle\frac{\frac{1}{N}\sum_{i=1}^N\left(Y_i-\frac{1}{N}\sum_{i=1}^NY_i\right)\left(D_i-\frac{1}{N}\sum_{i=1}^ND_i\right)}{\frac{1}{N}\sum_{i=1}^N\left(D_i-\frac{1}{N}\sum_{i=1}^ND_i\right)^2}}$} \\
 
 <<btols,eval=TRUE,echo=FALSE>>=
 a<-ys-sum(ys)/NS
@@ -371,34 +406,40 @@ b<-Dss-sum(Dss)/NS
 betaOLS<-(sum(a*b)/NS)/(sum(b^2)/NS)
 @
 
-Thus, I get the value of $\hat{\beta}_{OLS}$ is $\bm{\Sexpr{betaOLS}}$, which is the same as WW.}
+\vspace{.5em}
+\noindent{Thus, I get the value of $\hat{\beta}_{OLS}$ is $\bm{\Sexpr{betaOLS}}$, which is the same as WW.}}
 
-      \subsection{Use the CLT formula to estimate the effect of sampling noise on WW with 99\% confidence. For this, estimate the variances of the outcomes of the treated and of the untreated in the sample. Do you find a result similar to mine?}
+\clearpage
 
-According to the course, we learnt the CLT formula to estimate the effect of sampling noise on WW: \\
-\centerline{$\displaystyle\tilde{\epsilon} = \Phi^{-1}\left(\displaystyle\frac{\delta+1}{2}\right)\displaystyle\frac{1}{\sqrt{N}}\sqrt{\displaystyle\frac{\var{Y_i^1|D_i=1}}{\Pr(D_i=1)}+\displaystyle\frac{\var{Y_i^0|D_i=0}}{1-\Pr(D_i=1)}}$} \\
+      \subsection{Estimate the effect of sampling noise on WW with 99\% confidence}
+      
+\textit{Q: Use the CLT formula to estimate the effect of sampling noise on WW with 99\% confidence. For this, estimate the variances of the outcomes of the treated and of the untreated in the sample. Do you find a result similar to mine?}
 
-In order to compute the value of $\tilde{\epsilon}$, I firstly compute $\var{Y_i^1|D_i=1}$ and $\var{Y_i^0|D_i=0}$.}
+\vspace{.5em}
+\noindent{According to the course, we learnt the CLT formula to estimate the effect of sampling noise on WW:} \\ \\
+\centerline{$\it{\displaystyle\tilde{\epsilon} = \Phi^{-1}\left(\displaystyle\frac{\delta+1}{2}\right)\displaystyle\frac{1}{\sqrt{N}}\sqrt{\displaystyle\frac{\var{Y_i^1|D_i=1}}{\Pr(D_i=1)}+\displaystyle\frac{\var{Y_i^0|D_i=0}}{1-\Pr(D_i=1)}}}$} \\
+
+\vspace{.5em}
+\noindent{In order to compute the value of $\tilde{\epsilon}$, I firstly compute $\var{Y_i^1|D_i=1}$ and $\var{Y_i^0|D_i=0}$.}}
 
 <<vars,eval=TRUE,echo=FALSE>>=
 var1<-var(ys[Dss==1])
 var0<-var(ys[Dss==0])
 @
 
-According to R, I get $\bm{\var{Y_i^1|D_i=1}=\Sexpr{var1}}$ and $\bm{\var{Y_i^0|D_i=0}=\Sexpr{var0}}$.
+\noindent{According to R, I get $\bm{\var{Y_i^1|D_i=1}=\Sexpr{var1}}$ and $\bm{\var{Y_i^0|D_i=0}=\Sexpr{var0}}$.}
 
 <<probas,eval=TRUE,echo=FALSE>>=
 proba1<-length(Dss[Dss==1])/NS
 @
 
-Moreover, I get $\bm{\Pr(D_i=1)=\Sexpr{proba1}}$.
+\noindent{Moreover, I get $\bm{\Pr(D_i=1)=\Sexpr{proba1}}$.}
 
 <<tilde.epsilon.WW,eval=TRUE,echo=FALSE>>=
 tilde.epsilon.WW<-qnorm((0.99+1)/2)*(1/NS)*sqrt((var1/proba1)+(var0/(1-proba1)))
 @
-Finally, I estimate the effect of sampling noise on WW with 99\% confidence is $\bm{\Sexpr{tilde.epsilon.WW}}$.
-
-In order to show the effect of sampling noise better, I do the graph as following:
+\noindent{Finally, I estimate the effect of sampling noise on WW with 99\% confidence is $\bm{\Sexpr{tilde.epsilon.WW}}$. \\
+In order to show the effect of sampling noise better, I do the graph as following:}
 
 <<monte.carlo,eval=TRUE,echo=FALSE,warning=FALSE,error=FALSE,message=FALSE,results='hide',cache=TRUE>>=
 monte.carlo.ww <- function(s,N,param){
@@ -495,38 +536,51 @@ ggplot(precision, aes(x=as.factor(N), y=TT)) +
   xlab("Sample Size") 
 @
 
-According to this graph, we observe that the result is similar to the one of prof.\\
-It indicates that the sampling noise of the WW estimator decreases with increasing of sample size.
+\noindent{According to this graph, we observe that the result is similar to the one of prof. It indicates that the sampling noise of the WW estimator decreases with increasing of sample size.}
 
-      \subsection{Estimate sampling noise using the same formula but for a confidence of 95\%. Has sampling noise increased or decreased?}
+\clearpage
+
+      \subsection{Estimate sampling noise with a confidence of 95\%}
+
+\textit{Q: Estimate sampling noise using the same formula but for a confidence of 95\%. Has sampling noise increased or decreased?}
       
 <<tilde.epsilon.WW.95,eval=TRUE,echo=FALSE>>=
 tilde.epsilon.WW.95<-qnorm((0.95+1)/2)*(1/NS)*sqrt((var1/proba1)+(var0/(1-proba1)))
 @
-With the formula that I showed in the last question, I estimate the effect of sampling noise on WW with 95\% confidence is $\bm{\Sexpr{tilde.epsilon.WW.95}}$, which means the sampling noise has decreased.
 
-      \subsection{Use the CLT formula to compute the sample size required to reach the amount of sampling noise that you have derived in question 9 with 99\% confidence. For this, use the variance of $\text{y^B}$ for the treated and untreated as an estimate of the two variances. Do you find a results similar to mine?}
+\vspace{.5em}
+\noindent{With the formula that I showed in the last question, I estimate the effect of sampling noise on WW with 95\% confidence is $\bm{\Sexpr{tilde.epsilon.WW.95}}$, which means the sampling noise has decreased.}
 
-According to the course, we learnt the CLT formula to compute the sample size required to reach the amount of sampling noise: \\
-\centerline{$\displaystyle\tilde{N} = \displaystyle\frac{1}{\epsilon^2}\left(\Phi^{-1}\left(\displaystyle\frac{\delta+1}{2}\right)\right)^2\left(\displaystyle\frac{\var{Y_i^1|D_i=1}}{\Pr(D_i=1)}+\displaystyle\frac{\var{Y_i^0|D_i=0}}{1-\Pr(D_i=1)}\right)$} \\
+      \subsection{Compute the sample size required to reach the sampling noise $\bm{\Sexpr{tilde.epsilon.WW}}$}
 
-In \textbf{1.2.8}, I have already gotten $\Pr(D_i=1)=\Sexpr{proba1}$ and $\tilde{\epsilon}=\Sexpr{tilde.epsilon.WW}$.
-Since the question ask us to use the variance of $\text{y^B}$ for the treated and untreated as an estimate of the two variances, then I will firstly compute the variance of $\text{y^B}$ for the treated and untreated.
+\textit{Q: Use the CLT formula to compute the sample size required to reach the amount of sampling noise that you have derived in question 9 with 99\% confidence. For this, use the variance of $\text{y^B}$ for the treated and untreated as an estimate of the two variances. Do you find a results similar to mine?}
+
+\vspace{.5em}
+\noindent{According to the course, we learnt the CLT formula to compute the sample size required to reach the amount of sampling noise:} \\ \\
+\centerline{$\it{\displaystyle\tilde{N} = \displaystyle\frac{1}{\epsilon^2}\left(\Phi^{-1}\left(\displaystyle\frac{\delta+1}{2}\right)\right)^2\left(\displaystyle\frac{\var{Y_i^1|D_i=1}}{\Pr(D_i=1)}+\displaystyle\frac{\var{Y_i^0|D_i=0}}{1-\Pr(D_i=1)}\right)}$} \\
+
+\noindent{In \textbf{1.2.8}, I have already gotten $\Pr(D_i=1)=\Sexpr{proba1}$ and $\tilde{\epsilon}=\Sexpr{tilde.epsilon.WW}$.
+Since the question ask us to use the variance of $\text{y^B}$ for the treated and untreated as an estimate of the two variances, then I will firstly compute the variance of $\text{y^B}$ for the treated and untreated.}
 
 <<varyB,eval=TRUE,echo=FALSE>>=
 varyB1<-var(yB[Ds==1])
 varyB0<-var(yB[Ds==0])
 @
 
-According to the calculating in R, I get $\bm{\var{yB|D_i=1}=\Sexpr{varyB1}}$ and $\bm{\var{yB|D_i=0}=\Sexpr{varyB0}}$.
+\vspace{.5em}
+\noindent{According to the calculating in R, I get $\bm{\var{yB|D_i=1}=\Sexpr{varyB1}}$ and $\bm{\var{yB|D_i=0}=\Sexpr{varyB0}}$.}
 
 <<tilde.N,eval=TRUE,echo=FALSE>>=
 tilde.N<-(1/(tilde.epsilon.WW^2))*(qnorm((0.99+1)/2))^2*((varyB1/proba1)+(varyB0/(1-proba1)))
 @
 
-According to the formula above, I get $\bm{\tilde{N}=\Sexpr{tilde.N}}$, so the sample size should be $\bm{\Sexpr{tilde.N}}$.
+\vspace{.5em}
+\noindent{According to the formula above, I get $\bm{\tilde{N}=\Sexpr{tilde.N}}$, so the sample size should be $\bm{\Sexpr{tilde.N}}$.}
 
-Moreover, I would like to do the following graph like what prof did in the course.
+\vspace{.5em}
+\noindent{Moreover, I would like to do the following graph like what prof did in the class}
+
+\clearpage
 
 <<CLTsamp,eval=TRUE,echo=FALSE,results='hide'>>=
 CLT.samp <- function(epsilon,delta,v1,v0,p){
@@ -566,30 +620,41 @@ ggplot(sample.size.CLT, aes(x=precision, y=N,fill=Method)) +
 #  scale_y_continuous(trans='log10')
 @
 
-According to this graph, we can get that the result is similar to the one of prof.\\
-It indicates that with Central Limit Theorem (CLT), the precision increases with sample size, which is near to the precision of truth.
-\clearpage
+\noindent{According to this graph, we can get that the result is similar to the one of prof. It indicates that with Central Limit Theorem (CLT), the precision increases with sample size, which is near to the precision of truth.}
 
-      \subsection{What happens to sample size if you use the same variance (that of $\text{y^B}$ overall)?}
+      \subsection{What happens to sample size if you use the same variance?}
+
+\textit{Q: What happens to sample size if you use the same variance (that of $\text{y^B}$ overall)?}
 
 <<tilde.N.bis,eval=TRUE,echo=FALSE>>=
 N.bis<-(1/(tilde.epsilon.WW^2))*(qnorm((0.99+1)/2))^2*((var(yB)/proba1)+(var(yB)/(1-proba1)))
 @
 
-If I use the same variance $\var{y^B}$, then the sample size is $\bm{\Sexpr{N.bis}}$, which means the sample size increases.
+\vspace{.5em}
+\noindent{If I use the same variance $\var{y^B}$, then the sample size is $\bm{\Sexpr{N.bis}}$, which means the sample size increases.}
 
-      \subsection{Estimate sample size with a smaller sampling noise but the same level of confidence. Does sample size increase or decrease?}
+\clearpage
 
-The sampling noise in 1.2.10 is $\Sexpr{tilde.epsilon.WW}$, now I suppose a smaller sampling noise $\bm{0.002087}$. Then I will estimate sample size with this new smaller sampling noise and the same level of confidence 99\%.}
+      \subsection{Estimate sample size with a smaller sampling noise but the same level of confidence}
+
+\textit{Q: Estimate sample size with a smaller sampling noise but the same level of confidence. Does sample size increase or decrease?}
+
+\vspace{.5em}
+\noindent{The sampling noise in 1.2.10 is $\Sexpr{tilde.epsilon.WW}$, now I suppose a smaller sampling noise $\bm{0.002087}$. Then I will estimate sample size with this new smaller sampling noise and the same level of confidence 99\%.}}
 
 <<tilde.N.new,eval=TRUE,echo=FALSE>>=
 N.new<-(1/(0.002087^2))*(qnorm((0.99+1)/2))^2*((varyB1/proba1)+(varyB0/(1-proba1)))
 @
 
-The new sample size is $\bm{\Sexpr{N.new}}$, which is bigger than the sample size in 1.2.10, so the sample size increases.
+\vspace{.5em}
+\noindent{The new sample size is $\bm{\Sexpr{N.new}}$, which is bigger than the sample size in 1.2.10, so the sample size increases.}
 
-      \subsection{Estimate sample size with 95\% confidence for the same values of sampling noise as in questions 10 and 12. Does sample size increase or decrease?}
-The sampling noise in question 10 is $\Sexpr{tilde.epsilon.WW}$, the one in question 12 is 0.002087.
+      \subsection{Estimate sample size with 95\% confidence for the sampling noise $\bm{\Sexpr{tilde.epsilon.WW}}$ and 0.002087}
+
+\textit{Q: Estimate sample size with 95\% confidence for the same values of sampling noise as in questions 10 and 12. Does sample size increase or decrease?}
+
+\vspace{.5em}
+\noindent{The sampling noise in question 10 is $\Sexpr{tilde.epsilon.WW}$, the one in question 12 is 0.002087.}
 
 <<N.10,eval=TRUE,echo=FALSE>>=
 N.10<-(1/(tilde.epsilon.WW^2))*(qnorm((0.95+1)/2))^2*((varyB1/proba1)+(varyB0/(1-proba1)))
@@ -600,26 +665,42 @@ N.12<-(1/(0.002087^2))*(qnorm((0.95+1)/2))^2*((varyB1/proba1)+(varyB0/(1-proba1)
 @
 
 \vspace{.5em}
-Using R, I estimate the sample size with the sampling noise in question 10 is $\bm{\Sexpr{N.10}}$, the one with the sampling noise in question 12 is $\bm{\Sexpr{N.12}}$.
+\noindent{Using R, I estimate the sample size with the sampling noise in question 10 is $\bm{\Sexpr{N.10}}$, the one with the sampling noise in question 12 is $\bm{\Sexpr{N.12}}$.}
 
 \vspace{.5em}
-Now, I will compare the sample size in different situation.
+\noindent{Now, I will compare the sample size in different situation.}
 
 \vspace{.5em}
-With 99\% confidence, when the sampling noise is $\Sexpr{tilde.epsilon.WW}$, the sample size is $\Sexpr{tilde.N}$; when the sampling noise is 0.002087, the sample size is $\Sexpr{N.new}$.
+\noindent{With 99\% confidence, when the sampling noise is $\Sexpr{tilde.epsilon.WW}$, the sample size is $\Sexpr{tilde.N}$; when the sampling noise is 0.002087, the sample size is $\Sexpr{N.new}$.}
 
 \vspace{.5em}
-With 95\% confidence, when the sampling noise is $\Sexpr{tilde.epsilon.WW}$, the sample size is $\Sexpr{N.10}$; when the sampling noise is 0.002087, the sample size is $\Sexpr{N.12}$.
+\noindent{With 95\% confidence, when the sampling noise is $\Sexpr{tilde.epsilon.WW}$, the sample size is $\Sexpr{N.10}$; when the sampling noise is 0.002087, the sample size is $\Sexpr{N.12}$.}
 
 \vspace{.5em}
-Comparing the results above, we can easily observe that for the same confidence level, sample size decreases with sampling noise; for the same sampling noise, sample size increases  with confidence level.
+\noindent{Comparing the results above, we can easily observe that \textit{for the same confidence level, sample size decreases with sampling noise; for the same sampling noise, sample size increases  with confidence level.}}
 
 
   \chapter{Observational Methods of Causal Inference}
-    \section{Parametric Observational Methods: OLS}
-      \subsection{Compute the OLS estimators (step by step and direct) and compare their values with the theoretical TT.}
+  
+\nbvspace[0.5]
+In this lecture, we studied how to estimate the effect of an intervention on an outcome using observational methods, that is methods that try to correct for selection bias by accounting for as many observed confounders as possible. The plan of this chapter is:
 
-I firstly compute the OLS estimator step by step (by graphs)
+    \begin{itemize}
+      \item Parametric Observational Methods: OLS
+      \item Nonparametric Observational Methods: Matching
+    \end{itemize}
+
+\nbvspace[2]
+
+\clearpage
+  
+    \section{Parametric Observational Methods: OLS}
+      \subsection{Compute the OLS estimators and compare with the theoretical TT}
+
+\textit{Q: Compute the OLS estimators (step by step and direct) and compare their values with the theoretical TT.}
+
+\vspace{.5em}
+\noindent{I firstly compute the OLS estimator step by step (by graphs)}
 
 % preparing data
 <<simul.ols.estim,eval=TRUE,echo=FALSE,results='hide'>>=
@@ -643,7 +724,9 @@ yo <- y1o*Dso+y0o*(1-Dso)
 Yo <- Y1o*Dso+Y0o*(1-Dso)
 @
 
-<<plot.ols.estim.step.0-1,eval=TRUE,fig.cap='compute the OLS estimator step by step',fig.subcap=c('Step 0','Step 1'),fig.align='center',out.width='.45\\textwidth',echo=FALSE,results='hide',fig.pos='htbp'>>=
+<<plot.ols.estim.step.0-1,eval=TRUE,fig.cap='compute the OLS estimator step by step',fig.align='center',out.width='.9\\textwidth',out.height='.9\\textwidth',fig.width=12,fig.height=12,echo=FALSE,results='hide',fig.pos='htbp'>>=
+# par(mar=c(4,3,2,3),oma=c(0.5,0,0.5,0))
+par(mfrow=c(2,2))
 # Step 0
 col.obs <- 'black'
 col.unobs <- 'red'
@@ -653,7 +736,7 @@ xlim.big <- c(-1.5,0.5)
 xlim.small <- c(-0.15,0.55)
 adj <- 0
 
-plot(yBo[Dso==0],y0o[Dso==0],pch=1,xlim=c(4,10),ylim=c(4,10),xlab="yB",ylab="Outcomes")
+plot(yBo[Dso==0],y0o[Dso==0],pch=1,xlim=c(4,10),ylim=c(4,10),xlab="yB",ylab="Outcomes",main="Step 0")
 points(yBo[Dso==1],y0o[Dso==1],pch=1,col=col.unobs)
 abline(v=log(param["barY"]),col=col.unobs)
 legend(4,10,c('y0|D=0','y0|D=1'),pch=c(1,1),col=c(col.obs,col.unobs),ncol=1)
@@ -662,19 +745,16 @@ legend(4,10,c('y0|D=0','y0|D=1'),pch=c(1,1),col=c(col.obs,col.unobs),ncol=1)
 ols.reg.0 <- lm(yo[Dso==0]~yBo[Dso==0])
 summary(ols.reg.0)
 
-plot(yBo[Dso==0],y0o[Dso==0],pch=1,xlim=c(4,10),ylim=c(4,10),xlab="yB",ylab="Outcomes")
+plot(yBo[Dso==0],y0o[Dso==0],pch=1,xlim=c(4,10),ylim=c(4,10),xlab="yB",ylab="Outcomes",main="Step 1")
 points(yBo[Dso==1],y0o[Dso==1],pch=1,col=col.unobs)
 points(yBo[Dso==0],ols.reg.0$fitted.values,col='blue')
 abline(v=log(param["barY"]),col=col.unobs)
 legend(4,10,c('y0|D=0','y0|D=1',expression(hat('y0|D=0'))),pch=c(1,1,1),col=c(col.obs,col.unobs,'blue'),ncol=2)
-@      
-\clearpage
 
-<<plot.ols.estim.step.2-3,eval=TRUE,fig.cap='compute the OLS estimator step by step',fig.subcap=c('Step 2','Step 3'),fig.align='center',out.width='.45\\textwidth',echo=FALSE,results='hide',fig.pos='htbp'>>=
 # Step 2
 y.pred <- ols.reg.0$coef[[1]]+ols.reg.0$coef[[2]]*yBo[Dso==1]
 
-plot(yBo[Dso==0],y0o[Dso==0],pch=1,xlim=c(4,10),ylim=c(4,10),xlab="yB",ylab="Outcomes")
+plot(yBo[Dso==0],y0o[Dso==0],pch=1,xlim=c(4,10),ylim=c(4,10),xlab="yB",ylab="Outcomes",main="Step 2")
 points(yBo[Dso==1],y0o[Dso==1],pch=1,col=col.unobs)
 points(yBo[Dso==0],ols.reg.0$fitted.values,col='blue')
 points(yBo[Dso==1],y.pred,pch=3,col='blue')
@@ -682,7 +762,7 @@ abline(v=log(param["barY"]),col=col.unobs)
 legend(4,10,c('y0|D=0','y0|D=1',expression(hat('y0|D=0')),expression(hat('y0|D=1'))),pch=c(1,1,1,3),col=c(col.obs,col.unobs,'blue','blue'),ncol=2)
 
 # Step 3
-plot(yBo[Dso==0],y0o[Dso==0],pch=1,xlim=c(4,10),ylim=c(4,10),xlab="yB",ylab="Outcomes")
+plot(yBo[Dso==0],y0o[Dso==0],pch=1,xlim=c(4,10),ylim=c(4,10),xlab="yB",ylab="Outcomes",main="Step 3")
 points(yBo[Dso==1],y0o[Dso==1],pch=1,col=col.unobs)
 points(yBo[Dso==0],ols.reg.0$fitted.values,col='blue')
 points(yBo[Dso==1],y.pred,col='blue')
@@ -690,48 +770,52 @@ points(yBo[Dso==1],yo[Dso==1],pch=3,col='black')
 abline(v=log(param["barY"]),col=col.unobs)
 legend(4,10,c('y0|D=0','y0|D=1','y1|D=1',expression(hat('y0|D=0')),expression(hat('y0|D=1'))),pch=c(1,1,3,1,3),col=c(col.obs,col.unobs,col.obs,'blue','blue'),ncol=2)
 @
+\clearpage
 
 % Step 4
 <<ww.ols,eval=TRUE,echo=FALSE,results='hide'>>=
 ww.ols <- mean(yo[Dso==1]-y.pred)
 @
 
-<<plot.ols.estim.step.4,eval=TRUE,echo=FALSE,results='hide',fig.cap='Step 4',fig.align='center',out.width='.49\\textwidth',out.height='.49\\textwidth',fig.width=5.5,fig.height=5.5,fig.pos='htbp'>>=
-plot(1, type="n", xlab="", ylab="", xlim=c(0.3,0.9), ylim=c(0, 10))
+<<plot.ols.estim.step.4,eval=TRUE,echo=FALSE,results='hide',fig.cap='compute the OLS estimator step by step',fig.align='center',out.width='.5\\textwidth',out.height='.5\\textwidth',fig.width=7,fig.height=7,fig.pos='htbp'>>=
+plot(1, type="n", xlab="", ylab="", xlim=c(0.3,0.9), ylim=c(0, 10),main="Step 4")
 abline(v=delta.y.tt(param),col=col.unobs,lty=lty.unobs)
 abline(v=ww.ols,col=col.obs,lty=lty.obs)
 text(x=c(delta.y.tt(param),ww.ols),y=c(adj),labels=c('TT',expression(hat('E'))),pos=c(4,2),col=c(col.unobs,col.obs),lty=c(lty.unobs,lty.obs))
 @
 
-\clearpage
+\vspace{.5em}
+\noindent{Then, I'll compute the OLS estimator directly.According to the course, I get the following assumptions:}
 
-Then, I'll compute the OLS estimator directly.According to the course, I get the following assumptions:\\
-\textbf{Selection on Observables}
+\noindent{\textbf{Selection on Observables}}\\
+\noindent{We assume that there exists a known set of observable covariates $X_i$ such that:} \\ \\
+\centerline{$\it{\esp{Y_i^0|X_i,D_i=1} = \esp{Y_i^0|X_i,D_i=0}}$} \\ 
 
-We assume that there exists a known set of observable covariates $X_i$ such that:\\
-\centerline{$\esp{Y_i^0|X_i,D_i=1} = \esp{Y_i^0|X_i,D_i=0}$}\\
-And \textbf{Parametric Functional Form}
+\noindent{And \textbf{Parametric Functional Form}}
 
-We assume that there exists a known set of observable covariates $X_i$ such that:\\
-\centerline{$\esp{Y_i^0|X_i} = \alpha_0+\beta_0'X_i$}
+\noindent{We assume that there exists a known set of observable covariates $X_i$ such that:} \\ \\
+\centerline{$\it{\esp{Y_i^0|X_i} = \alpha_0+\beta_0'X_i}$} \\
 
-According to these two assumptions, we get the following theorem:\\
-\textbf{Identification of TT using OLS}
+\noindent{According to these two assumptions, we get the following theorem:}
 
-Under Selection on Observables and Parametric Functional Form, TT is identified using the WW comparison adjusted by the OLS projection.\\
-\centerline{$\Delta^Y_{WWOLS(X)} = \Delta^Y_{TT}$}\\
+\noindent{\textbf{Identification of TT using OLS}}\\
+\noindent{Under Selection on Observables and Parametric Functional Form, TT is identified using the WW comparison adjusted by the OLS projection.} \\ \\
+\centerline{$\it{\Delta^Y_{WWOLS(X)} = \Delta^Y_{TT}}$} \\
 
 <<tt,eval=TRUE,echo=FALSE>>=
 tt<-mean(y1o-y0o)
 @
-According to R, I get $\bm{\Delta^Y_{TT}=\Sexpr{tt}}$, which means $\bm{\Delta^Y_{WWOLS(X)}=\Sexpr{tt}}$.
+\noindent{According to R, I get $\bm{\Delta^Y_{TT}=\Sexpr{tt}}$, which means $\bm{\Delta^Y_{WWOLS(X)}=\Sexpr{tt}}$.}
 
-Moreover, thanks to another assumption \textbf{Parametric functional form for the Treated} and theorem \textbf{WWOLS is OLS}, I get\\
-\centerline{$\hat{\delta}_{OLS} = \hat{\Delta^Y_{WWOLS(X)}}$}
+\clearpage
 
-So I get the OLS estimator $\bm{\hat{\delta}_{OLS} = \hat{\Delta^Y_{WWOLS(X)}}=\Sexpr{tt}$.
+\noindent{Moreover, thanks to another assumption \textbf{Parametric functional form for the Treated} and theorem \textbf{WWOLS is OLS}, I get} \\ \\
+\centerline{$\it{\hat{\delta}_{OLS} = \hat{\Delta^Y_{WWOLS(X)}}}$} \\
 
-Furthermore, I get the following graph:
+\noindent{So I get the OLS estimator $\bm{\hat{\delta}_{OLS} = \hat{\Delta^Y_{WWOLS(X)}}=\Sexpr{tt}$.}
+
+\vspace{.5em}
+\noindent{Furthermore, I get the following graph:}
 
 <<ww.ols.direct,eval=TRUE,echo=FALSE,results='hide'>>=
 yB.Ds <-(yBo-mean(yBo[Dso==1]))*Dso
@@ -739,23 +823,23 @@ ols.direct <- lm(yo~yBo+Dso+yB.Ds)
 ww.ols.direct <- ols.direct$coef[[3]]
 @
 
-<<plot.ols.estim.direct,eval=TRUE,echo=FALSE,results='hide',fig.cap='Direct OLS Estimation',fig.align='center',out.width='.65\\textwidth',fig.pos='htbp'>>=
+<<plot.ols.estim.direct,eval=TRUE,echo=FALSE,results='hide',fig.cap='Direct OLS Estimation',fig.align='center',out.width='.6\\textwidth',fig.pos='htbp'>>=
 plot(1, type="n", xlab="", ylab="", xlim=c(0.3,0.9), ylim=c(0, 10))
 abline(v=delta.y.tt(param),col=col.unobs,lty=lty.unobs)
 abline(v=ww.ols.direct,col=col.obs,lty=lty.obs)
 text(x=c(delta.y.tt(param),ww.ols.direct),y=c(adj),labels=c('TT',expression(hat('E'))),pos=c(4,2),col=c(col.unobs,col.obs),lty=c(lty.unobs,lty.obs))
 @
 
-\clearpage
-
-Now I compare their values with the theoretical TT. According to the course, we learnt the theoretical TT with the following formula:\\
-\centerline{$\Delta_{TT}^y =\bar{\alpha}+\theta\bar{\mu} -\theta\displaystyle\frac{\sigma^2_{\mu}}{\sqrt{\sigma^2_{\mu}+\sigma^2_{U}}}\frac{\displaystyle\phi\left(\frac{\bar{y}-\bar{\mu}}{\sqrt{\sigma^2_{\mu}+\sigma^2_{U}}}\right)}{\displaystyle\Phi\left(\frac{\bar{y}-\bar{\mu}}{\sqrt{\sigma^2_{\mu}+\sigma^2_{U}}}\right)}$}
+\noindent{Now I compare their values with the theoretical TT. According to the course, we learnt the theoretical TT with the following formula:} \\
+\centerline{$\it{\Delta_{TT}^y =\bar{\alpha}+\theta\bar{\mu} -\theta\displaystyle\frac{\sigma^2_{\mu}}{\sqrt{\sigma^2_{\mu}+\sigma^2_{U}}}\frac{\displaystyle\phi\left(\frac{\bar{y}-\bar{\mu}}{\sqrt{\sigma^2_{\mu}+\sigma^2_{U}}}\right)}{\displaystyle\Phi\left(\frac{\bar{y}-\bar{\mu}}{\sqrt{\sigma^2_{\mu}+\sigma^2_{U}}}\right)}}$} \\
 
 <<theo.tt,eval=TRUE,echo=FALSE>>=
 theo.tt<-delta.y.tt(param)
 @
 
-Thus, I get the theoretical TT is \textbf{\Sexpr{theo.tt}}, which is smaller than the value that I calculated just now.
+\noindent{Thus, I get the theoretical TT is \textbf{\Sexpr{theo.tt}}, which is smaller than the value that I calculated just now.}
+
+\clearpage
 
       \subsection{Compute the robust standard errors and sampling noise}
 
@@ -765,7 +849,8 @@ I first compute the robust standard errors with sandwich package in R.
 ols.direct.HC1 <- vcovHC(ols.direct,type='HC1')
 @
 
-The robust standard error using HC1 is thus $\bm{\Sexpr{sqrt(ols.direct.HC1[3,3])}}$. Then, I'll compute the sampling noise and show it in the following graph.
+\vspace{.5em}
+\noindent{The robust standard error using HC1 is thus $\bm{\Sexpr{sqrt(ols.direct.HC1[3,3])}}$. Then, I'll compute the sampling noise and show it in the following graph.}
 
 <<monte.carlo.ols,eval=TRUE,echo=FALSE,warning=FALSE,error=FALSE,message=FALSE,results='hide',cache=TRUE>>=
 monte.carlo.ols <- function(s,N,param){
@@ -855,14 +940,17 @@ ggplot(precision.ols, aes(x=as.factor(N), y=TT)) +
   xlab("Sample Size") 
 @
 
-It indicates that the precision of the OLS estimator with 99\% confidence increases with sample size.
+\noindent{It indicates that the precision of the OLS estimator with 99\% confidence increases with sample size.}
 
   \section{Nonparametric Observational Methods: Matching}
   For this approach, in order to avoid specification bias, we only rely on local comparisons, that is on the parts of the sample where treated and untreated observations overlap.
 
-    \subsection{Compute the LLR estimator on the sample with common support.}
+    \subsection{Compute the LLR estimator with common support.}
 
-For that, I will do the following step by step:
+\textit{Q: Compute the LLR estimator on the sample with common support.}
+
+\vspace{.5em}
+\noindent{For that, I will do the following step by step:
 \begin{enumerate}
   \item estimate the propensity score
   \item common support and trimming
@@ -875,7 +963,7 @@ For that, I will do the following step by step:
 <<propen.score,eval=TRUE,echo=FALSE>>=
 propen.score<-length(Dso[Dso==1])/NO
 @
-According to R, I get the propensity score is $\bm{\Sexpr{propen.score}}$.
+\noindent{According to R, I get the propensity score is $\bm{\Sexpr{propen.score}}$.} \\
 
 \noindent{\textbf{common support and trimming}\\
 \emph{Common Support: Illustration}}
@@ -912,7 +1000,7 @@ axis(4)
 mtext("D",side=4,line=3)
 @
 
-According to this graph, we can observe that some treated and untreated individuals are overlapped, which indicates common support holds.\\
+\noindent{According to this graph, we can observe that some treated and untreated individuals are overlapped, which indicates common support holds.} \\
 
 \noindent{\textbf{Remark:}\ Set or Query Graphical Parameters\\
 par {graphics}:par can be used to set or query graphical parameters. Parameters can be set by specifying them as arguments to par in tag = value form, or by passing them as a list of tagged values.\\
@@ -1039,7 +1127,7 @@ t<- 0.05  # t is the trimming level (5% in general)
 com.supp.yB <- com.supp(yBo[Dsc==0],yBo[Dsc==1],t=t,bw=bw.nrd(yBo[Dsc==0]),kernel='b')
 @
 
-<<plot.trimming,eval=TRUE,echo=FALSE,results='hide',fig.cap='Trimming and Common Support',fig.align='center',out.width='.5\\textwidth',out.height='.5\\textwidth',fig.width=7,fig.height=7,fig.pos='htbp'>>=
+<<plot.trimming,eval=TRUE,echo=FALSE,results='hide',fig.cap='Trimming and Common Support',fig.align='center',out.width='.5\\textwidth',out.height='.5\\textwidth',fig.width=6,fig.height=6,fig.pos='htbp'>>=
 par(mar=c(4,4,2,4),oma=c(0.3,0,0.3,0))
 plot(yBo[Dsc==1],dens.yB.D0,pch=1,xlim=c(4,10),ylim=c(0,0.6),xlab="yB",ylab="density")
 points(yBo[Dsc==1],dens.yB.D1,pch=3)
@@ -1050,7 +1138,7 @@ axis(4)
 mtext("Common Support",side=4,line=3)
 @
 
-According to this graph, we can observe that there exists lots of common support between the density of treated and untreated individuals.
+\noindent{According to this graph, we can observe that there exists lots of common support between the density of treated and untreated individuals.} \\
 
 \noindent{\textbf{LLR matching on the trimmed sample}}
 <<LLR.trim,eval=TRUE,echo=FALSE,results='hide',cache=TRUE>>=
@@ -1062,7 +1150,7 @@ llr.match.trim <- function(y,D,x,t,bw,kernel){
 ww.llr.trim <- llr.match.trim(yc,Dsc,yBo,t=t,bw=bw,kernel=kernel)
 @
 
-<<plot.LLR.trimming,dependson='LLR.trim',eval=TRUE,echo=FALSE,results='hide',fig.cap='LLR Matching with Trimming',fig.align='center',out.width='.5\\textwidth',out.height='.5\\textwidth',fig.width=7,fig.height=7,fig.pos='htbp'>>=
+<<plot.LLR.trimming,dependson='LLR.trim',eval=TRUE,echo=FALSE,results='hide',fig.cap='LLR Matching with Trimming',fig.align='center',out.width='.45\\textwidth',out.height='.45\\textwidth',fig.width=6,fig.height=6,fig.pos='htbp'>>=
 plot(1, type="n", xlab="", ylab="", xlim=c(0.3,0.9), ylim=c(0, 10))
 abline(v=delta.y.tt.com.supp(param),col=col.unobs,lty=lty.unobs)
 abline(v=ww.llr.trim,col=col.obs,lty=lty.obs)
@@ -1070,6 +1158,7 @@ text(x=c(delta.y.tt.com.supp(param),ww.llr.trim),y=c(adj),labels=c('TT',expressi
 @
 
 \noindent{with bandwidth$=$\Sexpr{bw}, \Sexpr{kernel} kernel and trimming level \Sexpr{t*100}\%.}
+
 \clearpage
 
     \subsection{Compute the standard errors and sampling noise using the bootstrap.}
@@ -1129,7 +1218,7 @@ for (i in 1:length(simuls.llr.trim)){
 }
 @
 
-Since it will take lots of time to do the bootstrap for larger sample, so here I just take a sample of 100 individuals as an example. Obviously, because of the sample size is not big enough, there exists a large sampling noise.
+\noindent{Since it will take lots of time to do the bootstrap for larger sample, so here I just take a sample of 100 individuals as an example. Obviously, because of the sample size is not big enough, there exists a large sampling noise.}
 
 
   \chapter{Natural Experiments}
@@ -1141,7 +1230,7 @@ In this chapter, we learnt 3 methods of Natural Experiments: Regression Disconti
 In statistics, econometrics, political science, epidemiology, and related disciplines, a regression discontinuity design (RDD) is a quasi-experimental pretest-posttest design that elicits the causal effects of interventions by assigning a cutoff or threshold above or below which an intervention is assigned. By comparing observations lying closely on either side of the threshold, it is possible to estimate the local Average treatment effect in environments in which randomization was unfeasible. 
 
 \vspace{.5em}     
-RDD uses situations where there is a discontinuity in the probability of receiving the treatment. If there is also a discontinuity in outcomes, it is interpreted as the effect of the treatment.
+\noindent{RDD uses situations where there is a discontinuity in the probability of receiving the treatment. If there is also a discontinuity in outcomes, it is interpreted as the effect of the treatment.}
 
 \vspace{.5em} 
 We distinguish two RD Designs:
@@ -1151,12 +1240,10 @@ We distinguish two RD Designs:
   \end{itemize}  
   
 \vspace{.5em} 
-The identification of causal effects hinges on the crucial assumption that there is indeed a sharp cut-off, around which there is a discontinuity in the probability of assignment from 0 to 1. In reality, however, cut-offs are often not strictly implemented (e.g. exercised discretion for students who just fell short of passing the threshold) and the estimates will hence be biased.
+\noindent{The identification of causal effects hinges on the crucial assumption that there is indeed a sharp cut-off, around which there is a discontinuity in the probability of assignment from 0 to 1. In reality, however, cut-offs are often not strictly implemented (e.g. exercised discretion for students who just fell short of passing the threshold) and the estimates will hence be biased.}
 
 \vspace{.5em} 
-In contrast to the sharp regression discontinuity design, a fuzzy regression discontinuity design (FRDD) does not require a sharp discontinuity in the probability of assignment but is applicable as long as the probability of assignment is different. The intuition behind it is related to the instrumental variable strategy and intention to treat.
-
-\clearpage
+\noindent{In contrast to the sharp regression discontinuity design, a fuzzy regression discontinuity design (FRDD) does not require a sharp discontinuity in the probability of assignment but is applicable as long as the probability of assignment is different. The intuition behind it is related to the instrumental variable strategy and intention to treat.}
 
       \subsection{Sharp RDD}
         \subsubsection{Linear sample}
@@ -1210,7 +1297,7 @@ reg.ols.10 <- lm(y1o[Dso==0]~yBo[Dso==0])
 reg.ols.11 <- lm(y1o[Dso==1]~yBo[Dso==1])
 @
 
-<<identification.sharp.ols.1,eval=FALSE,echo=FALSE,results='hide',fig.cap='the discontinuity in the linear sample using OLS',fig.align='center',out.width='.65\\textwidth',fig.pos='htbp'>>=
+<<identification.sharp.ols.1,eval=FALSE,echo=FALSE,results='hide',fig.align='center',out.width='.65\\textwidth',fig.pos='htbp'>>=
 plot(yBo[Dso==0],yo[Dso==0],pch=1,xlim=c(4,10.5),ylim=c(4,10.5),xlab="yB",ylab="Outcomes")
 points(yBo[Dso==1],yo[Dso==1],pch=3)
 abline(v=log(param["barY"]),col=col.unobs)
@@ -1248,11 +1335,13 @@ y1.bary.pred <- reg.ols.11$coef[[1]]+reg.ols.11$coef[[2]]*log(param['barY'])
 delta.y.rddols <- y1.bary.pred-y0.bary.pred
 @
 
-According to R, I get $\esph{y^1_i|y^B_i=\bar{y}}=$\Sexpr{y1.bary.pred} and $\esph{y_i^0|y_i^B=\bar{y}}=$\Sexpr{y0.bary.pred}, so the estimated TT is $\hat{\Delta^{y}_{RDDOLS}}=$\Sexpr{delta.y.rddols}.
+According to R, I get $\esph{y^1_i|y^B_i=\bar{y}}=$\Sexpr{y1.bary.pred} and $\esph{y_i^0|y_i^B=\bar{y}}=$\Sexpr{y0.bary.pred}, \\
+\indent{so the estimated TT is $\hat{\Delta^{y}_{RDDOLS}}=$\Sexpr{delta.y.rddols}.}
 
-Then I calculate $\bm{TT(z)}$ with the following formula:\\
+\vspace{.5em} 
+Then I calculate $\bm{TT(z)}$ with the following formula: \\
 
-\centerline{$\Delta^y_{TT}(\bar{z}) = \bar{\alpha} + \theta\bar{\mu}+\theta\displaystyle\frac{\sigma^2_{\mu}}{\sigma^2_{\mu}+\sigma^2_{U}}(\bar{y}-\bar{\mu})$}
+\centerline{$\it{\Delta^y_{TT}(\bar{z}) = \bar{\alpha} + \theta\bar{\mu}+\theta\displaystyle\frac{\sigma^2_{\mu}}{\sigma^2_{\mu}+\sigma^2_{U}}(\bar{y}-\bar{\mu})}$} \\
 
 <<delta.y.tt.z,eval=TRUE,echo=FALSE,results='hide'>>=
 delta.y.tt.z <- function(param){
@@ -1260,8 +1349,10 @@ delta.y.tt.z <- function(param){
 }
 @
 
+\vspace{.5em} 
 So $\bm{TT(z)=\Sexpr{delta.y.tt.z(param)}}$.
 
+\vspace{.5em} 
 Moreover, I show the graph of the results of RDD using OLS as following:
 
 <<plot.RDD.sharp.ols,eval=TRUE,echo=FALSE,results='hide',fig.cap='Sharp RDD Using OLS',fig.align='center',out.width='.65\\textwidth',fig.pos='htbp'>>=
@@ -1301,7 +1392,7 @@ Y <- Y1*Ds+Y0*(1-Ds)
 @
 
 \begin{itemize}
-  \item Compute the optimal bandwidth using CV
+  \item Compute the optimal bandwidth using CV (Cross Validation)
 \end{itemize}
 
 <<LLR.nonlin,eval=TRUE,echo=FALSE,results='hide',cache=TRUE>>=
@@ -1369,7 +1460,7 @@ y0.llr <- llr(y[Ds==0],yB[Ds==0],yB[Ds==0],bw=MSE.grid[MSE.llr.0==min(MSE.llr.0)
 y1.llr <- llr(y[Ds==1],yB[Ds==1],yB[Ds==1],bw=MSE.grid[MSE.llr.1==min(MSE.llr.1)],kernel=kernel)    
 @
 
-<<plot.rdd.llr.cv,eval=TRUE,echo=FALSE,results='hide',fig.cap='Cross Validation Results',fig.align='center',out.width='.5\\textwidth',out.height='.5\\textwidth',fig.width=7,fig.height=7,fig.pos='htbp'>>=
+<<plot.rdd.llr.cv,eval=TRUE,echo=FALSE,results='hide',fig.align='center',out.width='.55\\textwidth',out.height='.55\\textwidth',fig.width=6,fig.height=6,fig.pos='htbp'>>=
 plot(MSE.grid,MSE.llr.0,xlab='Bandwidth',ylab='MSE (y|D=0)')
 legend(0.8,31.6,c('y|D=0','y|D=1'),pch=c(1,3),col=c(col.obs,col.obs),ncol=1)
 par(new=TRUE)
@@ -1384,7 +1475,7 @@ According to the CV results, we get the optimal bandwidth is \bm{0.6}.
   \item  Build a plot showing the discontinuity in the linear sample using LLR
 \end{itemize}
 
-<<plot.rdd.llr.nonlin.1,eval=TRUE,echo=FALSE,results='hide',fig.cap='RDD LLR',fig.align='center',out.width='.5\\textwidth',out.height='.5\\textwidth',fig.width=7,fig.height=7,fig.pos='htbp'>>=
+<<plot.rdd.llr.nonlin.1,eval=TRUE,echo=FALSE,results='hide',fig.cap='RDD LLR',fig.align='center',out.width='.55\\textwidth',out.height='.55\\textwidth',fig.width=6,fig.height=6,fig.pos='htbp'>>=
 plot(yB[Ds==0],y[Ds==0],pch=1,xlim=c(4,11),ylim=c(4,11),xlab="yB",ylab="Outcomes")
 points(yB[Ds==1],y[Ds==1],pch=3)
 points(yB[Ds==0],y0.llr,col='blue',pch=1)
@@ -1573,29 +1664,33 @@ text(x=c(delta.y.tt.z(param),delta.rdd.fuzzy.il),y=c(adj),labels=c('TT(z)',expre
 
 \part{Conclusion}
 
-By doing this project, I have a better understanding in the theoreme and estimating the effect of an interention on an outcome in different methods, which enrich my knowledge on econometrics.
+\noindent{By doing this project, I have a better understanding in the theoreme and estimating the effect of an interention on an outcome in different methods, which enrich my knowledge on econometrics.}
 
 \vspace{.5em}
-In Chapter 1, I focused on Two Fundamental Problems of Inference: the Fundamental Problem of Causal Inference (FPCI) and the Fundamental Problem of Statistical Inference (FPSI). For both methods, I learnt some theoritical formulas, computed the individual level treatment effect, selection bias, WW estimator and BA estimator. Besides, for the Fundamental Problem of Statistical Inference (FPSI), I also used the Central Limit Theorem (CLT) formula to estimate the effect of sampling noise on WW or compute sample size with different confidence level. Comparing the results above, we can easily observe that for the same confidence level, sample size decreases with sampling noise; for the same sampling noise, sample size increases with confidence level.
+\noindent{In Chapter 1, I focused on Two Fundamental Problems of Inference: the Fundamental Problem of Causal Inference (FPCI) and the Fundamental Problem of Statistical Inference (FPSI). For both methods, I learnt some theoritical formulas, computed the individual level treatment effect, selection bias, WW estimator and BA estimator. Besides, for the Fundamental Problem of Statistical Inference (FPSI), I also used the Central Limit Theorem (CLT) formula to estimate the effect of sampling noise on WW or compute sample size with different confidence level. Comparing the results above, we can easily observe that for the same confidence level, sample size decreases with sampling noise; for the same sampling noise, sample size increases with confidence level.}
 
 \vspace{.5em}
-In Chapter 2, I analysed in Parametric and Nonparametric Observational Methods, which are OLS and Matching, respectively. For Parametric Observational Methods, I computed the OLS estimators, the robust standard errors and sampling noise. Then I observed that with the increasing of sample size, the sampling noise becomes much smaller (the precision of the OLS estimator with increases with sample size). For Nonparametric Observational Methods, I computed the LLR estimator on the sample with common support and understood how to choose the bandwidth. Moreover, I computed the standard errors and sampling noise using the
-bootstrap.
+\noindent{In Chapter 2, I analysed in Parametric and Nonparametric Observational Methods, which are OLS and Matching, respectively. For Parametric Observational Methods, I computed the OLS estimators, the robust standard errors and sampling noise. Then I observed that with the increasing of sample size, the sampling noise becomes much smaller (the precision of the OLS estimator with increases with sample size). For Nonparametric Observational Methods, I computed the LLR estimator on the sample with common support and understood how to choose the bandwidth. Moreover, I computed the standard errors and sampling noise using the bootstrap.}
 
 \vspace{.5em}
-Finally, in Chapter 3, I chose one method of Natural Experiments, Regression Discontinuity Designs(RDD), to do the analysis. Furthermore, We distinguished two RD Designs during the class, Sharp RDD (probability transitions from 0 to 1) and Fuzzy RDD (probability transitions from values strictly between 0 and 1). In this section, I used Cross Validation to choose the bandwidth.
+\noindent{Finally, in Chapter 3, I chose one method of Natural Experiments, Regression Discontinuity Designs(RDD), to do the analysis. Furthermore, We distinguished two RD Designs during the class, Sharp RDD (probability transitions from 0 to 1) and Fuzzy RDD (probability transitions from values strictly between 0 and 1). In this section, I used Cross Validation to choose the bandwidth.}
 
 \vspace{.5em}  
-Moreover, I should also use other methods that been taught in the class to do the analysis afterwords, and try to use the real data as well. So that I can understand the application of the theritical knowledge even better.
+\noindent{Moreover, I should also use other methods that been taught in the class to do the analysis afterwords, and try to use the real data as well. So that I can understand the application of the theritical knowledge even better.}
 
 
 \part{Annex}
 
   \section*{1 The individual level treatment effects}
     \subsection*{1.1 The individual level treatment effects of Part II 1.1 The Fundamental Problem of Causal Inference}
-\noindent{\Sexpr{it[1:NC]}}
+      \begin{flushleft}
+        \noindent{\Sexpr{it}}
+      \end{flushleft}
+
     \subsection*{1.2 The individual level treatment effects of Part II 1.2 The Fundamental Problem of Statistical Inference}
-\noindent{\Sexpr{its[1:NS]}}
+      \begin{flushleft}
+        \noindent{\Sexpr{its}}
+      \end{flushleft}
 
 
 \end{document}
