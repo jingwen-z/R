@@ -53,6 +53,10 @@ library(tmvtnorm)
 \begin{document}
 
 \pagestyle{empty}
+
+\headheight 3pt
+\headpic{\includegraphics[height=2cm]{TSElogo.jpg}}
+
 \begin{center}
 \bfseries
 \nbvspace[1]
@@ -72,6 +76,8 @@ EPE Data Analysis Project}
 % \nbvspace[1]
 
 \end{center}
+
+\clearpage
 
 % \title{EPE Data Analysis Project}
 % \author{\textbf{Jingwen ZHENG}\\ Toulouse School of Economics\\ M2 ERNA}
