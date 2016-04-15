@@ -131,7 +131,7 @@ EPE Data Analysis Project}
 \noindent{\textit{\textbf{For this project}}}
 
 \vspace{.5em}
-\noindent{Since I didn't choose Paul and Cesar's class, I didn't do the report for that course. In this report, I generate data as Mr. Chabé-Ferret did. Then I followed the questions that asked by prof on the moodle and did analysis with 'The Two Fundamental Problems of Inference', the method 'Observational Methods of Causal Inference' and the method 'Regression Discontinuity Designs(RDD)' of 'Natural Experiments'.}
+\noindent{Since I didn't choose Paul and Cesar's class, I didn't do the report for that course. In this report, I generate data as Mr. Chab??-Ferret did. Then I followed the questions that asked by prof on the moodle and did analysis with 'The Two Fundamental Problems of Inference', the method 'Observational Methods of Causal Inference' and the method 'Regression Discontinuity Designs(RDD)' of 'Natural Experiments'.}
 
 \vspace{.5em}  
 \noindent{In this project, I firstly generated data, then I used different methods to analyse and estimate the effect of an interention on an outcome. I will explaine the result with graphs and text in the following part.}
@@ -142,7 +142,7 @@ EPE Data Analysis Project}
   \chapter{The Two Fundamental Problems of Inference}
   
 \nbvspace[0.5]
-In this lecture, we studied the two fundamentals problems that we face when estimating the effect of an intervention on an outcome. We are also going to study the properties of two intuitive estimators. The plan of this chapter is:
+In this chapter, we studied the two fundamentals problems that we face when estimating the effect of an intervention on an outcome. We are also going to study the properties of two intuitive estimators. The plan of this chapter is:
 
     \begin{itemize}
       \item The Fundamental Problem of Causal Inference
@@ -154,7 +154,7 @@ In this lecture, we studied the two fundamentals problems that we face when esti
 \clearpage
 
     \section{The Fundamental Problem of Causal Inference}  
-      \subsection{generate data with selection rule $D_i = \uns{y_i^B\leq\bar{y}}$}
+      \subsection{Generate data with selection rule $D_i = \uns{y_i^B\leq\bar{y}}$}
 I generated data with following codes
 
 <<param,eval=TRUE,echo=TRUE,results='hide'>>=
@@ -195,7 +195,7 @@ Y <- Y1*Ds+Y0*(1-Ds)
 @
 \clearpage
 
-      \subsection{plot potential outcomes and observed outcomes}
+      \subsection{Plot potential outcomes and observed outcomes}
 <<Pot.obs.out.FPCI,eval=TRUE,fig.cap='Potential outcomes and observed outcomes',fig.subcap=c('Potential outcomes','Observed outcomes'),fig.align='center',out.width='.5\\linewidth',echo=FALSE,results='hide',fig.pos='htbp'>>=
 col.obs <- 'black'
 col.unobs <- 'red'
@@ -655,7 +655,7 @@ N.new<-(1/(0.002087^2))*(qnorm((0.99+1)/2))^2*((varyB1/proba1)+(varyB0/(1-proba1
 \vspace{.5em}
 \noindent{The new sample size is $\bm{\Sexpr{N.new}}$, which is bigger than the sample size in 1.2.10, so the sample size increases.}
 
-      \subsection{Estimate sample size with 95\% confidence for the sampling noise $\bm{\Sexpr{tilde.epsilon.WW}}$ and 0.002087}
+      \subsection{Estimate sample size with 95\% confidence for the sampling noise $\bm{\Sexpr{tilde.epsilon.WW}}$ and $\bm{0.002087}$}
 
 \textit{Q: Estimate sample size with 95\% confidence for the same values of sampling noise as in questions 10 and 12. Does sample size increase or decrease?}
 
@@ -689,7 +689,7 @@ N.12<-(1/(0.002087^2))*(qnorm((0.95+1)/2))^2*((varyB1/proba1)+(varyB0/(1-proba1)
   \chapter{Observational Methods of Causal Inference}
   
 \nbvspace[0.5]
-In this lecture, we studied how to estimate the effect of an intervention on an outcome using observational methods, that is methods that try to correct for selection bias by accounting for as many observed confounders as possible. The plan of this chapter is:
+In this chapter, we studied how to estimate the effect of an intervention on an outcome using observational methods, that is methods that try to correct for selection bias by accounting for as many observed confounders as possible. The plan of this chapter is:
 
     \begin{itemize}
       \item Parametric Observational Methods: OLS
