@@ -1,3 +1,5 @@
+## Exercice 1
+
 #Clear everything and load the needed libraries;
 #if the libraries are not installed then install them at first.
 rm(list=ls())
@@ -187,3 +189,55 @@ random_effects_plm<-plm(INVESTMENTS~LOANS+LONG_TERM_DEBT+CREDITORS+NUMBER_OF_EMP
 phtest(fixed_effects_plm, random_effects_plm)
 ##Reject the null, hence should prefer fixed effects estimation.
 # the order in the paratheses is not important
+
+## Exercice 2
+
+#Clear everything:
+rm(list=ls())
+
+#Load the needed libraries:
+library(foreign)
+
+#Start the main analysis:
+setwd("C:/Users/21104327/Downloads/")
+
+#Read the data:
+data<-read.dta("K:/M1/APPLIED ECONOMETRICS/td3/fastfood.dta")
+View(data)
+
+#Create employment variables:
+data$employment_before<-data$empft+data$emppt/2+data$nmgrs
+data$employment_after<-data$empft2+data$emppt2/2+data$nmgrs2
+# c.f. site web in the exo2: EMPPT & EMPPT2
+
+#Reshape data so we can analyse it:
+data_full<-subset(data,select=c(sheet,employment_before,employment_after,state))
+View(data_full)
+
+data_full_long<-reshape(data, dir = "long", varying = seq(2,3), sep = "_")
+data_full_long<-melt(data_full,id.vars=c("sheet","state"),
+                     measure.vars = names(data_full)[2:3],
+                     variable.name="time",
+                     value.name="employment")
+View(data_full_long)
+
+data_full_long$time<-as.character(data_full_long$time)
+data_full_long$time<-ifelse(data_full_long$time=="employment_after",1,0)
+View(data_full_long$time)
+
+#Create interaction dummy:
+data_full_long$INTERACTON<-data_full_long$time*data_full_long$state
+
+#Run the regression by state:
+model_state_0<-lm(employment~time,data=subset(data_full_long,state==0))
+model_state_1<-lm(employment~time,data=subset(data_full_long,state==1))
+
+
+#Present results:
+cbind(coefficients(model_state_0),coefficients(model_state_1))
+
+#Do the differences in differences estimation:
+model_diff_in_diff<-lm(employment~state+time+INTERACTON,data=data_full_long)
+summary(model_diff_in_diff)
+
+summary(lm(employment~state+time+state*time,data=data_full_long))
