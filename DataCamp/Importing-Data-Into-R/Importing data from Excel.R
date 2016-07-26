@@ -93,4 +93,42 @@ summary(urban_clean)
 
 ######################################## The XLConnect package ########################################
 
-#################  #################
+################# Import a workbook #################
+# latitude.xlsx is available in your working directory
+
+# Load the XLConnect package
+library(XLConnect)
+
+# Build connection to latitude.xlsx: my_book
+my_book <- loadWorkbook("latitude.xlsx")
+
+# Print out the class of my_book
+class(my_book)
+
+################# List and read Excel sheets #################
+# List the sheets in my_book
+getSheets(my_book)
+
+# Import the second sheet in my_book
+readWorksheet(my_book, sheet = 2)
+
+################# Add and populate worksheets #################
+# Build connection to latitude.xlsx
+library(XLConnect)
+my_book <- loadWorkbook("latitude.xlsx")
+
+# Create data frame: summ
+dims1 <- dim(readWorksheet(my_book, 1))
+dims2 <- dim(readWorksheet(my_book, 2))
+summ <- data.frame(sheets = getSheets(my_book), 
+                   nrows = c(dims1[1], dims2[1]), 
+                   ncols = c(dims1[2], dims2[2]))
+
+# Add a worksheet to my_book, named "data_summary"
+createSheet(my_book, name = "data_summary")
+
+# Populate "data_summary" with summ
+writeWorksheet(my_book, summ, sheet = "data_summary")
+
+# Save workbook as latitude_with_summ.xlsx
+saveWorkbook(my_book, "latitude_with_summ.xlsx")
