@@ -189,25 +189,51 @@ fromJSON(json4)
 ## Different JSON data structures will lead to different data structures in R.
 
 ################# Ask OMDb #################
+# The package jsonlite is already loaded
 
+# Definition of the URLs
+url_sw4 <- "http://www.omdbapi.com/?i=tt0076759&r=json"
+url_sw3 <- "http://www.omdbapi.com/?i=tt0121766&r=json"
 
+# Import two URLs with fromJSON(): sw4 and sw3
+sw4 <- fromJSON(url_sw4)
+sw3 <- fromJSON(url_sw3)
 
+# Print out the Title element of both lists
+sw4$Title
+sw3$Title
 
+# Is the release year of sw4 later than sw3?
+sw4$Year > sw3$Year
 
-
+# The fourth episode of the Star Wars saga was released before the third one!
 
 ################# From R to JSON #################
+# jsonlite is already loaded
 
+# URL pointing to the .csv file
+url_csv <- "http://s3.amazonaws.com/assets.datacamp.com/course/importing_data_into_r/water.csv"
 
+# Import the .csv file located at url_csv
+water <- read.csv(url_csv, stringsAsFactors = FALSE)
 
-
-
-
+# Convert the data file according to the requirements
+water_json <- toJSON(water)
+   
+# Print out water_json
+water_json
 
 ################# Minify and prettify #################
+# jsonlite is already loaded
 
+# Convert mtcars to a pretty JSON: pretty_json
+pretty_json <- toJSON(mtcars, pretty = TRUE)
 
+# Print pretty_json
+pretty_json
 
+# Minify pretty_json: mini_json
+mini_json <- minify(pretty_json)
 
-
-
+# Print mini_json
+mini_json
