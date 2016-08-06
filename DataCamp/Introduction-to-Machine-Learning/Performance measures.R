@@ -119,6 +119,7 @@ km_seeds$tot.withinss / km_seeds$betweenss
 
 
 
+
 ###############  ###############
 
 
