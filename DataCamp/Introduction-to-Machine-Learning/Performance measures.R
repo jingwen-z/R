@@ -112,7 +112,7 @@ km_seeds$tot.withinss / km_seeds$betweenss
 
 ################################# Training set and test set #################################
 
-###############  ###############
+############### Split the sets ###############
 
 
 
