@@ -113,14 +113,28 @@ km_seeds$tot.withinss / km_seeds$betweenss
 ################################# Training set and test set #################################
 
 ############### Split the sets ###############
+# The titanic dataset is already loaded into your workspace
 
+# Set random seed. Don't remove this line.
+set.seed(1)
 
+# Shuffle the dataset, call the result shuffled
+n <- nrow(titanic)
+shuffled <- titanic[sample(n),]
 
+# Split the data in train and test
+# Use a 70/30 split
+train_indices <- 1:round(0.7 * n)
+train <- shuffled[train_indices,]
 
+test_indices <- (round(0.7 * n) + 1):n
+test <- shuffled[test_indices,]
 
+# Print the structure of train and test
+str(train)
+str(test)
 
-
-###############  ###############
+############### First you train, then you test ###############
 
 
 
