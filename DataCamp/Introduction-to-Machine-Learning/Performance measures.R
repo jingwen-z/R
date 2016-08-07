@@ -135,6 +135,85 @@ str(train)
 str(test)
 
 ############### First you train, then you test ###############
+# The titanic dataset is already loaded into your workspace
+
+# Set random seed. Don't remove this line.
+set.seed(1)
+
+# Shuffle the dataset; build train and test
+n <- nrow(titanic)
+shuffled <- titanic[sample(n),]
+train <- shuffled[1:round(0.7 * n),]
+test <- shuffled[(round(0.7 * n) + 1):n,]
+
+# Fill in the model that has been learned.
+tree <- rpart(Survived ~ ., train, method = "class")
+
+# Predict the outcome on the test set with tree: pred
+pred <- predict(tree, test, type = "class")
+
+# Calculate the confusion matrix: conf
+conf <- table(test$Survived, pred)
+
+# Print this confusion matrix
+conf
+
+# The confusion matrix reveals an accuracy of (58+102)/(58+31+23+102) = 74.76%.
+# This is less than the 81.65% I calculated in the first section of this chapter.
+# However, this is a much more trustworthy estimate of the model's true predictive power.
+
+############### Using Cross Validation ###############
+# The shuffled dataset is already loaded into your workspace
+
+# Set random seed. Don't remove this line.
+set.seed(1)
+
+# Initialize the accs vector
+accs <- rep(0,6)
+
+for (i in 1:6) {
+  # These indices indicate the interval of the test set
+  indices <- (((i-1) * round((1/6)*nrow(shuffled))) + 1):((i*round((1/6) * nrow(shuffled))))
+  
+  # Exclude them from the train set
+  train <- shuffled[-indices,]
+  
+  # Include them in the test set
+  test <- shuffled[indices,]
+  
+  # A model is learned using each training set
+  tree <- rpart(Survived ~ ., train, method = "class")
+  
+  # Make a prediction on the test set using tree
+  pred <- predict(tree, test, type = "class")
+  
+  # Assign the confusion matrix to conf
+  conf <- table(test$Survived, pred)
+  
+  # Assign the accuracy of this model to the ith index in accs
+  accs[i] <- sum(diag(conf))/sum(conf)
+}
+
+# Print out the mean of accs
+mean(accs)  # 0.8011204
+
+############### How many folds? ###############
+# "n" is the total number of observation
+# "tr" is the number of observation contained in training set
+n <- 22680
+tr <- 21420
+
+# Question: How many folds can you use for your cross validation?
+# In other words, how many iterations with other test sets can you do on the dataset?
+folds <- 1 / ( (n - tr) / n )
+# 18
+# The test set fits in the complete dataset exactly 18 times.
+
+################################# Bias and Variance #################################
+
+###############  ###############
+
+
 
 
 
@@ -142,6 +221,27 @@ str(test)
 
 
 ###############  ###############
+
+
+
+
+
+
+
+###############  ###############
+
+
+
+
+
+
+
+
+
+
+###############  ###############
+
+
 
 
 
