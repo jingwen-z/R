@@ -172,13 +172,77 @@ which.max(accs)
 
 ##################################### The ROC curve #####################################
 
-################  ################
+################ Creating the ROC curve ################
+# train and test are pre-loaded
 
+# Set random seed. Don't remove this line
+set.seed(1)
 
+# Build a tree on the training set: tree
+tree <- rpart(income ~ ., train, method = "class")
 
+# Predict probability values using the model: all_probs
+all_probs <- predict(tree, test, type = "prob")
 
+# Print out all_probs
+all_probs
 
+# Select second column of all_probs: probs
+probs <- all_probs[ , 2]
 
+# Load the ROCR library
+library(ROCR)
 
+# Make a prediction object: pred
+pred <- prediction(probs, test$income)
 
-################  ################
+# Make a performance object: perf
+perf <- performance(pred, "tpr", "fpr")
+
+# Plot this curve
+plot(perf)
+
+################ The area under the curve (AUC) ################
+# test and train are loaded into your workspace
+
+# Build tree and predict probability values for the test set
+set.seed(1)
+tree <- rpart(income ~ ., train, method = "class")
+probs <- predict(tree, test, type = "prob")[,2]
+
+# Load the ROCR library
+library(ROCR)
+
+# Make a prediction object: pred
+pred <- prediction(probs, test$income)
+
+# Make a performance object: perf
+perf <- performance(pred, "auc")
+
+# Print out the AUC
+AUC <- perf@y.values[[1]]
+AUC  # 0.8463732
+
+################ Comparing the methods (a decision tree model VS a k-Nearest Neighbor model) ################
+# Load the ROCR library
+library(ROCR)
+
+# The assigned probabilities for the observations in the test set are loaded into the workspace: 
+# probs_t for the decision tree model, probs_k for k-Nearest Neighbors.
+
+# Make the prediction objects for both models: pred_t, pred_k
+pred_t <- prediction(probs_t, test$spam)
+pred_k <- prediction(probs_k, test$spam)
+
+# Make the performance objects for both models: perf_t, perf_k
+perf_t <- performance(pred_t, "tpr", "fpr")
+perf_k <- performance(pred_k, "tpr", "fpr")
+
+# A predefined functions has been defined for you: draw_roc_lines(). 
+# It takes two arguments: the first is the performance object of the tree model, perf_t, 
+# and the second is the performance object of the k-Nearest Neighbor model, perf_k.
+
+# Draw the ROC lines using draw_roc_lines()
+draw_roc_lines(perf_t, perf_k)
+
+# Decision tree works best.
