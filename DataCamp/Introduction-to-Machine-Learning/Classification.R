@@ -86,31 +86,91 @@ acc_i  # 0.8963768
 
 # using a different splitting criterion can influence the resulting model of your learning algorithm
 
-################  ################
+##################################### k-Nearest Neighbors (k-NN) #####################################
 
+################ Preprocess the data ################
+# train and test are pre-loaded
 
+# Store the Survived column of train and test in train_labels and test_labels
+train_labels <- train$Survived
+test_labels <- test$Survived
 
+# Copy train and test to knn_train and knn_test
+knn_train <- train
+knn_test <- test
 
+# Drop Survived column for knn_train and knn_test
+# dropping a column named column in a data frame named df can be done as follows: df$column <- NULL
+knn_train$Survived <- NULL
+knn_test$Survived <- NULL
 
+# To define the minimum and maximum, only the training set is used;
+# we can't use information on the test set (like the minimums or maximums) to normalize the data.
 
+# Normalize Pclass
+min_class <- min(knn_train$Pclass)
+max_class <- max(knn_train$Pclass)
+knn_train$Pclass <- (knn_train$Pclass - min_class) / (max_class - min_class)
+knn_test$Pclass <- (knn_test$Pclass - min_class) / (max_class - min_class)
 
-################  ################
+# Normalize Age
+min_age <- min(knn_train$Age)
+max_age <- max(knn_train$Age)
+knn_train$Age <- (knn_train$Age - min_age) / (max_age - min_age)
+knn_test$Age <- (knn_test$Age - min_age) / (max_age - min_age)
 
+# the variable Sex already took values between 0 and 1, hence did not require normalization
 
+################ The knn() function ################
+# knn_train, knn_test, train_labels and test_labels are pre-loaded
 
+# Set random seed. Don't remove this line.
+set.seed(1)
 
+# Load the class package
+library(class)
 
+# Fill in the ___, make predictions using knn: pred
+pred <- knn(train = knn_train, test = knn_test, cl = train_labels, k = 5)
+    
+# Construct the confusion matrix: conf
+conf <- table(test_labels, pred)
 
+# Print out the confusion matrix
+conf
 
+################ K's choice ################
+# knn_train, knn_test, train_labels and test_labels are pre-loaded
 
-################  ################
+# Set random seed. Don't remove this line.
+set.seed(1)
 
+# Load the class package, define range and accs
+library(class)
+range <- 1:round(0.2 * nrow(knn_train))
+accs <- rep(0, length(range))
 
+for (k in range) {
+  
+  # Fill in the ___, make predictions using knn: pred
+  pred <- knn(train = knn_train, test = knn_test, cl = train_labels, k = k)
+    
+  # Fill in the ___, construct the confusion matrix: conf
+  conf <- table(test_labels, pred)
+    
+  # Fill in the ___, calculate the accuracy and store it in accs[k]
+  accs[k] <- sum( diag(conf) ) / sum(conf)
+}
 
+# Plot the accuracies. Title of x-axis is "k".
+plot(range, accs, xlab = "k")
 
+# Calculate the best k
+# find out which index is highest in the accs vector
+which.max(accs)
+# the best k is 73
 
-
-
+##################################### The ROC curve #####################################
 
 ################  ################
 
