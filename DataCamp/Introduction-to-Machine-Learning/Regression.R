@@ -104,12 +104,23 @@ predict(lm_wb, cgdp_afg)  # 25.86759
 
 ##################################### Multivariable Linear Regression #####################################
 
-###############  ###############
+############### Going all-in with predictors! ###############
+# shop_data has been loaded in your workspace
 
+# Add a plot: sales as a function of inventory. Is linearity plausible?
+plot(sales ~ sq_ft, shop_data)
+plot(sales ~ size_dist, shop_data)
+plot(sales ~ inv, shop_data)
 
+# Build a linear model for net sales based on all other variables: lm_shop
+lm_shop <- lm(sales ~ ., shop_data)
 
+# Summarize lm_shop
+summary(lm_shop)
+# Multiple R-squared:  0.9932
+# Adjusted R-squared:  0.9916 
 
-###############  ###############
+############### Are all predictors relevant? ###############
 
 
 
