@@ -122,6 +122,98 @@ summary(lm_shop)
 
 ############### Are all predictors relevant? ###############
 
+# exo 1
+# shop_data, shop_new and lm_shop have been loaded in your workspace
+
+# Plot the residuals in function of your fitted observations
+plot(x = lm_shop$fitted.values, y = lm_shop$residuals)
+
+# Make a Q-Q plot of your residual quantiles
+qqnorm(x = lm_shop$fitted.values, y = lm_shop$residuals, ylab = "Residual Quantiles")
+
+# Summarize your model, are there any irrelevant predictors?
+summary(lm_shop)
+
+# Predict the net sales based on shop_new.
+predict(lm_shop, shop_new)  # 262.5006
+
+## There is no clear pattern in your residuals.
+## Moreover, the residual quantiles are approximately on one line.
+## From the small p-values you can conclude that every predictor is important!
+
+# exo 2
+# choco_data has been loaded in your workspace
+
+# Add a plot:  energy/100g as function of total size. Linearity plausible?
+plot(energy ~ protein, choco_data)
+plot(energy ~ fat, choco_data)
+plot(energy ~ size, choco_data)
+
+# Build a linear model for the energy based on all other variables: lm_choco
+lm_choco <- lm(energy ~ ., choco_data)
+
+# Plot the residuals in function of your fitted observations
+plot(x = lm_choco$fitted.values, y = lm_choco$residuals)
+
+# Make a Q-Q plot of your residual quantiles
+qqnorm(x = lm_choco$fitted.values, y = lm_choco$residuals)
+
+# Summarize lm_choco
+summary(lm_choco)
+
+## Call:
+## lm(formula = energy ~ ., data = choco_data)
+
+## Residuals:
+##      Min       1Q   Median       3Q      Max 
+## -107.084  -35.756   -8.323   36.100  104.660 
+
+## Coefficients:
+##              Estimate Std. Error t value Pr(>|t|)    
+## (Intercept) 1338.3334    40.0928  33.381  < 2e-16 ***
+## protein       23.0019     3.6636   6.279 6.97e-08 ***
+## fat           24.4662     1.6885  14.490  < 2e-16 ***
+## size          -0.8183     0.6035  -1.356    0.181    
+## ---
+## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+
+## Residual standard error: 52.2 on 52 degrees of freedom
+## Multiple R-squared:  0.9019,	Adjusted R-squared:  0.8962 
+## F-statistic: 159.3 on 3 and 52 DF,  p-value: < 2.2e-16
+
+# The predictor size is statistically insignificant, it is best to remove it.
+
+##################################### Regression: simple and linear! #####################################
+
+###############  ###############
+
+
+
+
+
+###############  ###############
+
+
+
+
+
+
+###############  ###############
+
+
+
+
+
+
+###############  ###############
+
+
+
+
+
+
+###############  ###############
+
 
 
 
