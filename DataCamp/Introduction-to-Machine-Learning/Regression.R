@@ -183,46 +183,87 @@ summary(lm_choco)
 
 # The predictor size is statistically insignificant, it is best to remove it.
 
-##################################### Regression: simple and linear! #####################################
+##################################### k-Nearest Neighbors and Generalization #####################################
 
-###############  ###############
+############### Does your model generalize? ###############
+# world_bank_train, world_bank_test and lm_wb_log are pre-loaded
 
+# Build the log-linear model
+lm_wb_log <- lm(urb_pop ~ log(cgdp), data = world_bank_train)
 
+# Calculate rmse_train
+rmse_train <- sqrt(mean(lm_wb_log$residuals ^ 2))
 
+# The real percentage of urban population in the test set, the ground truth
+world_bank_test_truth <- world_bank_test$urb_pop
 
+# The predictions of the percentage of urban population in the test set
+world_bank_test_input <- data.frame(cgdp = world_bank_test$cgdp)
+world_bank_test_output <- predict(lm_wb_log, world_bank_test_input)
 
-###############  ###############
-
-
-
-
-
-
-###############  ###############
-
-
-
-
-
-
-###############  ###############
+# The residuals: the difference between the ground truth and the predictions
+# Find the ground truth labels and then compare them with predictions that made with lm_wb_log.
+res_test <- world_bank_test_output - world_bank_test_truth
 
 
+# Use res_test to calculate rmse_test
+rmse_test <- sqrt( mean(res_test ^ 2) )
+
+# Print the ratio of the test RMSE over the training RMSE
+rmse_test / rmse_train  # 1.08308
+
+## The test's RMSE is only slightly larger than the training RMSE. 
+## This means that the model generalizes well to unseen observations. 
+## The logarithm transformation did improve your model. 
+## It fits the data better and does a good job at generalizing!
+
+############### Your own k-NN algorithm! ###############
+###
+# You don't have to change this!
+# The algorithm is already coded for you; 
+# inspect it and try to understand how it works!
+
+# x_pred: predictor values of the new observations (this will be the cgdp column of world_bank_test),
+# x: predictor values of the training set (the cgdp column of world_bank_train),
+# y: response values of the training set (the urb_pop column of world_bank_train),
+# k: the number of neighbors (this will be 30).
+# predict_knn: returns the predicted values for the new observations
+
+my_knn <- function(x_pred, x, y, k){
+  m <- length(x_pred)
+  predict_knn <- rep(0, m)
+  for (i in 1:m) {
+    
+    # Calculate the absolute distance between x_pred[i] and x
+    dist <- abs(x_pred[i] - x)
+    
+    # Apply order() to dist, sort_index will contain 
+    # the indices of elements in the dist vector, in 
+    # ascending order. This means sort_index[1:k] will
+    # return the indices of the k-nearest neighbors.
+    sort_index <- order(dist)    
+    
+    # Apply mean() to the responses of the k-nearest neighbors
+    predict_knn[i] <- mean(y[sort_index[1:k]])    
+    
+  }
+  return(predict_knn)
+}
+###
+
+# world_bank_train and world_bank_test are pre-loaded
+
+# Apply your algorithm on the test set: test_output
+test_output <- my_knn(x_pred = world_bank_test$cgdp, x = world_bank_train$cgdp, y =world_bank_train$urb_pop, k = 30)
+
+# Have a look at the plot of the output
+plot(world_bank_train, 
+     xlab = "GDP per Capita", 
+     ylab = "Percentage Urban Population")
+points(world_bank_test$cgdp, test_output, col = "green")
+
+############### Parametric vs non-parametric! ###############
 
 
 
 
-###############  ###############
-
-
-
-
-
-
-###############  ###############
-
-
-
-
-
-###############  ###############
