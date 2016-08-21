@@ -102,24 +102,58 @@ plot(ratio_ss, type = "b", xlab = "k")
 
 ########################### Performance and scaling issues ###########################
 
-#############  #############
+############# Standardized vs non-standardized clustering #############
 
+## exo 1
+# The dataset run_record contains the Olympic run records for 50 countries 
+# for the 100m, 200m ... to the marathon. The records are all denoted in seconds.
 
+# Set random seed. Don't remove this line.
+set.seed(1)
 
+# Explore your data with str() and summary()
+str(run_record)
+summary(run_record)
 
+# Cluster run_record using k-means: run_km. 5 clusters, repeat 20 times
+run_km <- kmeans(run_record, centers = 5, nstart = 20)
 
+# Plot the 100m as function of the marathon. Color using clusters
+plot(x = run_record$marathon, y = run_record$X100m, col = run_km$cluster, 
+    xlab = "run_record$marathon", ylab = "run_record$X100m")
+# As you can see in the plot, the unstandarized clusters are completely dominated by the marathon records; 
+# you can even separate every cluster only based on the marathon records! 
 
-#############  #############
+# Calculate Dunn's index: dunn_km. Print it.
+dunn_km <- dunn(clusters = run_km$cluster, Data = run_record)
+dunn_km  # 0.05651773
+# Dunn's index seems to be quite low. 
+# Compare your results with the standardized version in the next exercise
 
+## exo 2
+# The dataset run_record as well as run_km are available
 
+# Set random seed. Don't remove this line.
+set.seed(1)
 
+# Standardize run_record, transform to a dataframe: run_record_sc
+run_record_sc <- as.data.frame(scale(run_record))
 
-#############  #############
+# Cluster run_record_sc using k-means: run_km_sc. 5 groups, let R start over 20 times
+run_km_sc <- kmeans(run_record_sc, centers = 5, nstart = 20)
 
+# Plot records on 100m as function of the marathon. Color using the clusters in run_km_sc
+plot(x = run_record$marathon, y = run_record$X100m, col = run_km_sc$cluster,
+    xlab = "run_record$marathon", ylab = "run_record$X100m")
+#  The plot now shows the influence of the 100m records on the resulting clusters!
 
+# Compare the resulting clusters in a nice table
+table(run_km$cluster, run_km_sc$cluster)
 
-
-
+# Calculate Dunn's index: dunn_km_sc. Print it.
+dunn_km_sc <- dunn(clusters = run_km_sc$cluster, Data = run_record_sc)
+dunn_km_sc  # 0.1453556
+# Dunn's index is clear about it, the standardized clusters are more compact or/and better separated!
 
 ###########################  ###########################
 
