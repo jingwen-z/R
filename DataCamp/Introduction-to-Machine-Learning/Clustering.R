@@ -155,21 +155,144 @@ dunn_km_sc <- dunn(clusters = run_km_sc$cluster, Data = run_record_sc)
 dunn_km_sc  # 0.1453556
 # Dunn's index is clear about it, the standardized clusters are more compact or/and better separated!
 
-###########################  ###########################
+########################### Hierarchical Clustering ###########################
 
-#############  #############
+############# Single Hierarchical Clustering #############
+# The dataset run_record_sc has been loaded in your workspace
+
+# Apply dist() to run_record_sc: run_dist
+run_dist <- dist(run_record_sc)
+
+# Apply hclust() to run_dist: run_single
+run_single <- hclust(run_dist, method = "single")
+
+# Apply cutree() to run_single: memb_single
+memb_single <- cutree(run_single, k = 5)
+
+# Apply plot() on run_single to draw the dendrogram
+plot(run_single)
+
+# Apply rect.hclust() on run_single to draw the boxes
+rect.hclust(run_single, k = 5, border = 2:6)
+
+# However, it appears the two islands Samoa and Cook's Islands, who are not known for their sports performances, 
+# have both been placed in their own groups. 
+# Maybe, we're dealing with some chaining issues? Let's try a different linkage method in the next exercise!
+
+############# Complete Hierarchical Clustering #############
+# run_record_sc is pre-loaded
+
+# Code for single-linkage
+run_dist <- dist(run_record_sc, method = "euclidean")
+run_single <- hclust(run_dist, method = "single")
+memb_single <- cutree(run_single, 5)
+plot(run_single)
+rect.hclust(run_single, k = 5, border = 2:6)
+
+# Apply hclust() to run_dist: run_complete
+run_complete <- hclust(run_dist, method = "complete")
+
+# Apply cutree() to run_complete: memb_complete
+memb_complete <- cutree(run_complete, k = 5)
+
+# Apply plot() on run_complete to draw the dendrogram
+plot(run_complete)
+
+# Apply rect.hclust() on run_complete to draw the boxes
+rect.hclust(run_complete, k = 5, border = 2:6)
+
+## Compare the two plots. The five clusters differ significantly from the single-linkage clusters. 
+## That one big cluster you had before, is now split up into 4 medium sized clusters. 
 
 
+# table() the clusters memb_single and memb_complete. Put memb_single in the rows
+table(memb_single, memb_complete)
+
+############# Hierarchical vs k-means #############
+## We have clustered the countries based on their Olympic run performances using three different methods: 
+## k-means clustering, hierarchical clustering with single linkage and hierarchical clustering with complete linkage.
+## But which method returns the best separated and the most compact clusters?
+## Let's calculate Dunn's index for all three clusterings and compare the clusters to each other.
+
+# run_record_sc, run_km_sc, memb_single and memb_complete are pre-calculated
+
+# Set random seed. Don't remove this line.
+set.seed(100)
+
+# Dunn's index for k-means: dunn_km
+dunn_km <- dunn(clusters = run_km_sc$cluster, Data = run_record_sc, method = "euclidean")
+# 0.1453556
+
+# Dunn's index for single-linkage: dunn_single
+dunn_single <- dunn(clusters = memb_single, Data = run_record_sc, method = "euclidean")
+# 0.2921946
+
+# Dunn's index for complete-linkage: dunn_complete
+dunn_complete <- dunn(clusters = memb_complete, Data = run_record_sc, method = "euclidean")
+# 0.1808437
 
 
+# Compare k-means with single-linkage
+table(run_km_sc$cluster, memb_single)
+#   memb_single
+#     1  2  3  4  5
+#  1  6  0  0  2  0
+#  2  9  0  1  0  0
+#  3  0  1  0  0  1
+#  4 14  0  0  0  0
+#  5 20  0  0  0  0
+
+# Compare k-means with complete-linkage
+table(run_km_sc$cluster, memb_complete)
+#   memb_complete
+#     1  2  3  4  5
+#  1  0  0  6  0  2
+#  2  0  0  8  0  2
+#  3  0  0  0  2  0
+#  4  7  7  0  0  0
+#  5 20  0  0  0  0
+
+# The table shows that the clusters obtained from the complete linkage method are similar to those of k-means.
 
 
+## Compare the values of Dunn's index,
+## the single-linkage method returned the highest ratio of minimal intercluster-distance to maximal cluster diameter;
+## based on Dunn's index, the single-linkage method returned the highest compact and separated clusters.
+## The single-linkage method that caused chaining effects, actually returned the most compact and separated clusters.
 
-#############  #############
+### The simple linkage method puts every outlier in its own cluster, 
+### increasing the intercluster distances and reducing the diameters, hence giving a higher Dunn's index. 
+### Therefore, you could conclude that the single linkage method did a fine job identifying the outliers. 
+### However, if you'd like to report your clusters to the local newspapers, 
+### then complete linkage or k-means are probably the better choice! 
 
+############# Clustering US states based on criminal activity #############
+# Set random seed. Don't remove this line.
+set.seed(1)
 
+# Scale the dataset: crime_data_sc
+crime_data_sc <- scale(crime_data)
 
+# Perform k-means clustering: crime_km
+crime_km <- kmeans(crime_data_sc, centers = 4, nstart = 20)
 
+# Perform single-linkage hierarchical clustering
+## Calculate the distance matrix: dist_matrix
+dist_matrix <- dist(crime_data_sc)
 
+## Calculate the clusters using hclust(): crime_single
+crime_single <- hclust(dist_matrix, method = "single")
 
-#############  #############
+## Cut the clusters using cutree: memb_single
+memb_single <- cutree(crime_single, k = 4)
+
+# Calculate the Dunn's index for both clusterings: dunn_km, dunn_single
+dunn_km <- dunn(clusters = crime_km$cluster, Data = crime_data_sc)
+dunn_single <- dunn(clusters = memb_single, Data = crime_data_sc)
+
+# Print out the results
+dunn_km  # 0.1604403
+dunn_single  # 0.2438734
+
+## Based on Dunn's index, the single-linkage method returned the highest compact and separated clusters.
+## So I will deliver the hierarchical clustering with single linkage to my client.
