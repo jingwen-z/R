@@ -86,6 +86,21 @@ mej_reg$n_tiers_beneficiaire_primaire <- ifelse(mej_reg$beneficiaire_primaire ==
 # convert percentage(the field "pourcentage_garantie") into numeric
 mej_reg$pourcentage_garantie <- as.numeric(sub("%", "", mej_reg$pourcentage_garantie))/100
 
+# 
+mej_reg$total_indemnisation_en_euro <- mej_reg$total_indemnisation_en_euro/1000
+colnames(mej_reg)[1] <- "total_indemnisation_en_euro(in_thousand)"
+
+mej_reg$autorisation_nette_montant_du_pret_en_euro <- mej_reg$autorisation_nette_montant_du_pret_en_euro/1000
+colnames(mej_reg)[9] <- "autorisation_nette_montant_du_pret_en_euro(in_thousand)"
+
+mej_reg$autorisation_nette_montant_garanti_en_euro <- mej_reg$autorisation_nette_montant_garanti_en_euro/1000
+colnames(mej_reg)[10] <- "autorisation_nette_montant_garanti_en_euro(in_thousand)"
+
+# remove outlier 0 in "total_indemnisation_en_euro"
+mej_reg <- mej_reg[!(mej_reg$`total_indemnisation_en_euro(in_thousand)`) == 0,]  # 166 obs.
+
+
+
 # import dataset "principal"
 prin <- read.delim("/Users/adlz/Documents/RRRRRRR/afd/Table Principale.txt", header = TRUE, sep = ";", dec = ",")
 
@@ -152,14 +167,88 @@ prin_reg <- prin_reg[complete.cases(prin_reg$cours),]  # 1413 obs.
 # merge "mej_reg" and "prin_reg"
 all_reg <- rbind(mej_reg, prin_reg)  # 1673 obs.
 
+View(all_reg)
+summary(all_reg)
+
+# since the values of "total_indemnisation_en_euro", 
+# "autorisation_nette_montant_du_pret_en_euro" and 
+# "autorisation_nette_montant_garanti_en_euro" are large, 
+# I will change the value into the thousands or thousands.
+
+all_reg$total_indemnisation_en_euro <- all_reg$total_indemnisation_en_euro/1000
+colnames(all_reg)[1] <- "total_indemnisation_en_euro(in_thousand)"
+
+all_reg$autorisation_nette_montant_du_pret_en_euro <- all_reg$autorisation_nette_montant_du_pret_en_euro/1000
+colnames(all_reg)[9] <- "autorisation_nette_montant_du_pret_en_euro(in_thousand)"
+
+all_reg$autorisation_nette_montant_garanti_en_euro <- all_reg$autorisation_nette_montant_garanti_en_euro/1000
+colnames(all_reg)[10] <- "autorisation_nette_montant_garanti_en_euro(in_thousand)"
+
+summary(all_reg)
+
+# remove the value 0 in "autorisation_nette_montant_du_pret_en_euro(in_thousand)"
+# and "autorisation_nette_montant_garanti_en_euro(in_thousand)"
+
+all_reg <- all_reg[!(all_reg$autorisation_nette_montant_du_pret_en_euro) == 0,]  # 1475 obs.
+
+summary(all_reg)
+
+# unify name of primary beneficiary "Banque des MASCAREIGNES"
+all_reg$beneficiaire_primaire <- ifelse(all_reg$beneficiaire_primaire == "BANQUE DES MASCAREIGNES", 
+                                        "Banque des MASCAREIGNES", all_reg$beneficiaire_primaire)
 
 ## linear model: lm_all
 # the independent variables are type_de_garantie, pays and beneficiaire_primaire, 
 # autorisation_nette_montant_du_pret_en_euro, 
 # autorisation_nette_montant_garanti_en_euro, pourcentage_garantie, cours
-lm_all <- lm(total_indemnisation_en_euro ~ factor(type_de_garantie) 
+lm_all <- lm(`total_indemnisation_en_euro(in_thousand)` ~ factor(type_de_garantie) 
              + factor(pays) + factor(beneficiaire_primaire)
-             + autorisation_nette_montant_du_pret_en_euro 
-             + autorisation_nette_montant_garanti_en_euro 
+             + `autorisation_nette_montant_du_pret_en_euro(in_thousand)`
+             + `autorisation_nette_montant_garanti_en_euro(in_thousand)`
              + pourcentage_garantie + cours, data = all_reg)
 summary(lm_all)
+
+# R-squared is 0.541
+# according to the summary,
+# we get some variables are significant:
+# type "AI" is statictically significant at the 1% level.
+# country "BURKINA FASO" is statictically significant at the 1% level.
+# country "GHANA" is statictically significant at the 1% level.
+# country "GUINEE" is statictically significant at the 1% level.
+# country "MAURICE" is statictically significant at the 1% level.
+# primary beneficiary "ADVANS CAMEROUN" is statictically significant at the 1% level.
+# primary beneficiary "AFD (ARIA)" is statictically significant at the 1% level.
+# primary beneficiary "AFRASIA BANK LTD" is statictically significant at the 1% level.
+# primary beneficiary "BANK ONE" is statictically significant at the 1% level.
+# primary beneficiary "BICIAB" is statictically significant at the 1% level.
+# primary beneficiary "BICIGUI" is statictically significant at the 1% level.
+# primary beneficiary "BOA Bénin" is statictically significant at the 1% level.
+# primary beneficiary "Banque des MASCAREIGNES" is statictically significant at the 1% level.
+# primary beneficiary "CBAO" is statictically significant at the 1% level.
+# primary beneficiary "ECOBANK Ghana" is statictically significant at the 1% level.
+# primary beneficiary "Fondation Grameen" is statictically significant at the 1% level.
+# primary beneficiary "MCB Ltd" is statictically significant at the 1% level.
+# primary beneficiary "PROPARCO (ARIA)" is statictically significant at the 1% level.
+# primary beneficiary "SG SSB Ltd" is statictically significant at the 1% level.
+# primary beneficiary "SGBG" is statictically significant at the 1% level.
+# primary beneficiary "STANDARD BANK" is statictically significant at the 1% level.
+# primary beneficiary "STANDARD BANK MAURITIUS LTD" is statictically significant at the 1% level.
+# "autorisation_nette_montant_du_pret_en_euro(in_thousand)" is statictically significant at the 1% level.
+# "autorisation_nette_montant_garanti_en_euro(in_thousand)" is statictically significant at the 1% level.
+
+# primary beneficiary "BOA Burkina Faso" is statictically significant at the 5% level.
+# primary beneficiary "SGBB" is statictically significant at the 5% level.
+
+# country "GABON" is statictically significant at the 10% level.
+# primary beneficiary "ALIOS" is statictically significant at the 10% level.
+# primary beneficiary "ALIOS FINANCE GABON / SOGACA" is statictically significant at the 10% level.
+# primary beneficiary "BGFIBank Gabon" is statictically significant at the 10% level.
+# primary beneficiary "BICIG" is statictically significant at the 10% level.
+# primary beneficiary "BOA Sénégal" is statictically significant at the 10% level.
+# primary beneficiary "CORIS BANK" is statictically significant at the 10% level.
+# "pourcentage_garantie" is statictically significant at the 10% level.
+
+# among all variables which are significant at the 1% level,
+# they have different effects on `total_indemnisation_en_euro(in_thousand)`:
+# ceteris paribus, one "AI" guarantee increases 64.19 thousands euros of total conpensation;
+# ceteris paribus, signing one contract with "MAURICE" increases 142.5 thousands euros of total conpensation;
