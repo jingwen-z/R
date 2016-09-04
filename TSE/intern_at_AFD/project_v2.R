@@ -173,7 +173,7 @@ summary(all_reg)
 # since the values of "total_indemnisation_en_euro", 
 # "autorisation_nette_montant_du_pret_en_euro" and 
 # "autorisation_nette_montant_garanti_en_euro" are large, 
-# I will change the value into the thousands or thousands.
+# I will change the value into the thousands.
 
 all_reg$total_indemnisation_en_euro <- all_reg$total_indemnisation_en_euro/1000
 colnames(all_reg)[1] <- "total_indemnisation_en_euro(in_thousand)"
