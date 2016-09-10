@@ -46,7 +46,8 @@ range_EDUC <- cut(data$educ, breaks=c(-1,5,8,12,17) )
 #educ BMI
 table(range_EDUC)
 
-x <- data.frame(educ, man, Northeast, Midwest, South,do_smoke, White, Black, US_Native, Asian, Pacific_Islander,range_BMI, range_EDUC )
+x <- data.frame(educ, man, Northeast, Midwest, South,do_smoke, White, 
+      Black, US_Native, Asian, Pacific_Islander,range_BMI, range_EDUC )
 str(x)
 x[seq(1,10399,1000),]
 
@@ -55,7 +56,7 @@ educ.table <- table(x$educ)
 prop.educ <- prop.table(educ.table)
 prop.educ 
 #man
-table(x$man) -> man.table
+man.table <- table(x$man)
 prop.man <- prop.table(man.table)
 prop.man
 #Northeast
@@ -123,7 +124,7 @@ range_ethnicity <- cut(data$ethnicity, breaks=5)
 #educ BMI
 educ.BMI <- with(x, table(range_EDUC,range_BMI))
 #man BMI
-man.educ <-with(x, table(range_EDUC,man))
+man.educ <- with(x, table(range_EDUC,man))
 man.BMI <- with(x, table(man,range_BMI))
 #REGION BMI
 range_region <- cut(data$region, breaks=c(0,1,2,3,4,5) )
@@ -147,47 +148,50 @@ install.packages("mvnormtest")
 library("mvnormtest")
 
 plot(density(data$age))
-age_sample<-sample(data$age, size = 5000, replace = FALSE, prob = NULL)
+age_sample <- sample(data$age, size = 5000, replace = FALSE, prob = NULL)
 shapiro.test(age_sample)
 qqnorm(age_sample)
 
 plot(density(data$educ))
-educ_sample<-sample(data$educ, size = 5000, replace = FALSE, prob = NULL)
+educ_sample <- sample(data$educ, size = 5000, replace = FALSE, prob = NULL)
 shapiro.test(educ_sample)
 qqnorm(educ_sample)
 
 plot(density(data$BMI))
-BMI_sample<-sample(data$BMI, size = 5000, replace = FALSE, prob = NULL)
+BMI_sample <- sample(data$BMI, size = 5000, replace = FALSE, prob = NULL)
 shapiro.test(BMI_sample)
 qqnorm(BMI_sample)
 
 plot(density(data$hrwork))
-hrwork_sample<-sample(data$hrwork, size = 5000, replace = FALSE, prob = NULL)
+hrwork_sample <- sample(data$hrwork, size = 5000, replace = FALSE, prob = NULL)
 shapiro.test(hrwork_sample)
 qqnorm(hrwork_sample)
 
 plot(density(data$income))
-income_sample<-sample(data$income, size = 5000, replace = FALSE, prob = NULL)
+income_sample <- sample(data$income, size = 5000, replace = FALSE, prob = NULL)
 shapiro.test(income_sample)
 qqnorm(income_sample)
 
 plot(density(data$healthpc))
-healthpc_sample<-sample(data$healthpc, size = 5000, replace = FALSE, prob = NULL)
-ln_healthpc_sample<-log(healthpc_sample)
+healthpc_sample <- sample(data$healthpc, size = 5000, replace = FALSE, prob = NULL)
+ln_healthpc_sample <- log(healthpc_sample)
 shapiro.test(ln_healthpc_sample)
 qqnorm(ln_healthpc_sample)
 
 # OLS using as explanatory variables age(2), educ (5), BMI(6),hrwork(8), income(9), healthpc(10) and 
 # dummy variables (11-20), and the dependent variable is log of quantity. 
 
-form <- as.formula(paste("log(healthpc)~ ", paste(colnames(data)[c(2,5,6,8,9,11:14,20)], collapse="+")))
+form <- as.formula(paste("log(healthpc)~ ", 
+        paste(colnames(data)[c(2,5,6,8,9,11:14,20)], collapse="+")))
 form
 
 ## HAUSMAN TEST FOR ENDOGENEITY and IV REGRESSION
 
 # To do this, we first need to define the model in an appropriate way.
 # Note the first and second stage equations in the syntax of the formula.
-ivform <- as.formula(paste("log(healthpc)~ ", paste(colnames(data)[c(2,5,6,8,9,11:14,20)], collapse="+"), "|",paste(colnames(data)[c(2,5,8,9,11:20)], collapse="+") ))
+ivform <- as.formula(paste("log(healthpc)~ ", 
+          paste(colnames(data)[c(2,5,6,8,9,11:14,20)], collapse="+"),
+          "|",paste(colnames(data)[c(2,5,8,9,11:20)], collapse="+") ))
 ivform
 
 model_iv=ivreg(ivform)
@@ -196,11 +200,13 @@ summary( ivreg(ivform),diagnostics=TRUE)
 
 
 # regression of the IV 
-reg_iv<- lm(BMI~ White+Black+US_Native+Asian+Pacific_Islander)
+reg_iv <- lm(BMI~ White+Black+US_Native+Asian+Pacific_Islander)
 summary (reg_iv)
 
 
 
 # regression of all the variables 
-reg_all<- lm(log(healthpc)~ age + educ + BMI + hrwork + income + man + Northeast + Midwest + South + do_smoke + White + Black + US_Native + Asian + Pacific_Islander)
+reg_all <- lm(log(healthpc)~ age + educ + BMI + hrwork + income + man 
+            + Northeast + Midwest + South + do_smoke + White + Black 
+            + US_Native + Asian + Pacific_Islander)
 summary(reg_all)
