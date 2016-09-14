@@ -67,26 +67,39 @@ ggplot(mtcars, aes(x = wt, y = mpg, col = cyl)) +
 
 ########## Tidy Data ##########
   
-#####  #####
+##### Variables to visuals, part 1 #####
+# Consider the structure of iris, iris.wide and iris.tidy (in that order)
+str(iris)
+str(iris.wide)
+str(iris.tidy)
 
+# Think about which dataset you would use to get the plot shown right
+# Fill in the ___ to produce the plot given to the right
+ggplot(iris.tidy, aes(x = Species, y = Value, col = Part)) +
+  geom_jitter() +
+  facet_grid(. ~ Measure)
 
+##### Variables to visuals, part 1b #####
+# Load the tidyr package
+library(tidyr)
 
+# Fill in the ___ to produce to the correct iris.tidy dataset
+iris.tidy <- iris %>%
+  gather(iris, value = measurement, -Species) %>%
+  separate(iris, c("Part", "Measure"), "\\.")
 
+##### Variables to visuals, part 2 #####
+# Consider the head of iris, iris.wide and iris.tidy (in that order)
+head(iris)
+head(iris.wide)
+head(iris.tidy)
 
+# Think about which dataset you would use to get the plot shown right
+# Fill in the ___ to produce the plot given to the right
+ggplot(iris.wide, aes(x = Length, y = Width, col = Part)) +
+  geom_jitter() +
+  facet_grid(. ~ Species)
+  
+##### Variables to visuals, part 2b #####
 
-
-#####  #####
-
-
-
-
-
-
-#####  #####
-
-
-
-
-
-#####  #####
 
