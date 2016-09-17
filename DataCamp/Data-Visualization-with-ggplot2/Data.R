@@ -101,5 +101,14 @@ ggplot(iris.wide, aes(x = Length, y = Width, col = Part)) +
   facet_grid(. ~ Species)
   
 ##### Variables to visuals, part 2b #####
+# Load the tidyr package
+library(tidyr)
 
+# Add column with unique ids (don't need to change)
+iris$Flower <- 1:nrow(iris)
 
+# Fill in the ___ to produce to the correct iris.wide dataset
+iris.wide <- iris %>%
+  gather(iris, value = value, -Species, -Flower) %>%
+  separate(iris,c("Part", "Measure"), "\\.") %>%
+  spread(Measure, value)
