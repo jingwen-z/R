@@ -1,4 +1,4 @@
-############################## small exercise - FA ################################
+################## small exercise - FA ##################
 
 ### FIRST METHOD ###
 # in fact, we usually use the method "Principle Components Analysis" to estimate loading factors
@@ -68,8 +68,11 @@ factor.analysis(R,4)
 
 factanal(regions.bis,factors = 3)
 
-## According to "factanal(regions.bis,factors = 3)$loadings", we can observe that when the number of factor is 3, the cumulative variance is larger than 0.8.
-## Thus, we could make sure that the number of factor is 3, this result is NOT the same as the one above. 
+## According to "factanal(regions.bis,factors = 3)$loadings", 
+## we can observe that when the number of factor is 3, 
+## the cumulative variance is larger than 0.8.
+## Thus, we could make sure that the number of factor is 3, 
+## this result is NOT the same as the one above. 
 ## But in my opinion, this method is more reasonale. 
 ## Then, we get the following regressions between each factor and variables.
 # F1 = 0.991*popul + 0.442*tact + 0.980*nbentr + 0.907*nbbrev + 0.990*teleph
