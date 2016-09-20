@@ -1,4 +1,4 @@
-############################## small exercise - PCA ################################
+############### small exercise - PCA ###############
 
 install.packages('FactoMineR')
 library('FactoMineR')
@@ -11,7 +11,7 @@ head(regions)
 View(regions)
 summary(regions)
 
-####### PCA with FactoMineR #######
+#### PCA with FactoMineR ####
 regions.pca <- princomp(regions[,2:ncol(regions)],cor = TRUE) 
 # princomp(x, cor=FALSE, scores = TRUE, covmat = NULL, subset = rep(TRUE, nrow(as.matrix(x))), ...)
 # cor = TRUE means the calculation use the correlation matrix.
