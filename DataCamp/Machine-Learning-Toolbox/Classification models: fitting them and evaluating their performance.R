@@ -116,7 +116,11 @@ myControl <- trainControl(
 )
 
 ### Using custom trainControl ###
+# Train glm with custom trainControl: model
+model <- train(Class ~ ., Sonar, method = "glm", trControl = myControl)
 
+# Print model to console
+model
 
 
 
