@@ -2,12 +2,12 @@
 mej <- read.delim("/Users/adlz/Documents/RRRRRRR/afd/MEJ.txt", header = TRUE, sep = ";", dec = ",")
 
 # since I need only several fields of table "mej", I extract these columns and store them in a new table "mej_reg".
-mej_col_nb <- c(73, 7, 5, 8, 10:13, 17, 19, 20, 21)
+mej_col_nb <- c(73, 7, 5, 8, 10:13, 17, 19, 21)
 mej_reg <- mej[,mej_col_nb]
 
 # because of French accent, some letters cannot be displayed, we need to firstly rename these columns.
 # digits of columns in `mej` that need to be renamed
-rename_col_mej <- c(4:9,12)
+rename_col_mej <- c(4:9,11)
 colnames(mej_reg)[rename_col_mej] <- c("pays", "beneficiaire_primaire", 
                                    "n_tiers_beneficiaire_primaire", 
                                    "beneficiaire_final", 
@@ -52,10 +52,6 @@ mej_reg$n_tiers_beneficiaire_primaire <- ifelse(mej_reg$beneficiaire_primaire ==
 mej_reg$n_tiers_beneficiaire_primaire <- ifelse(mej_reg$beneficiaire_primaire == "SGBS", 
                                                 "6511", mej_reg$n_tiers_beneficiaire_primaire)
 
-# convert percentage(the field "pourcentage_garantie") into numeric
-mej_reg$pourcentage_garantie <- as.numeric(sub("%", "", mej_reg$pourcentage_garantie))/100
-str(mej_reg)
-
 # since the values of "total_indemnisation_en_euro", 
 # "autorisation_nette_montant_du_pret_en_euro" and 
 # "autorisation_nette_montant_garanti_en_euro" are large, 
@@ -80,24 +76,10 @@ lm_mej <- lm(`total_indemnisation_en_euro(en_mille)` ~ factor(type_de_garantie)
              + factor(pays) + factor(beneficiaire_primaire)
              + `autorisation_nette_montant_du_pret_en_euro(en_mille)`
              + `autorisation_nette_montant_garanti_en_euro(en_mille)`
-             + pourcentage_garantie + cours, data = mej_reg)
+             + cours, data = mej_reg)
 summary(lm_mej)
 
-# R-squared is 0.8989
-# according to the summary, we get 6 variables are significant:
-# country "MAURICE" is statictically significant at the 1% level.
-# primary beneficiary "BOA Bénin" is statictically significant at the 1% level.
-# primary beneficiary "Banque des MASCAREIGNES" is statictically significant at the 1% level.
-# primary beneficiary "MCB Ltd" is statictically significant at the 1% level.
-# primary beneficiary "ALIOS" is statictically significant at the 5% level.
-# primary beneficiary "CREDIT DU SENEGAL" is statictically significant at the 10% level.
-
-# among the variables which are significant,
-# they have different effects on `total_indemnisation_en_euro(en_mille)`:
-# ceteris paribus, signing one contract with "BOA Bénin" increases 174.3 thousands euros of total compensation
-# ceteris paribus, signing one contract with "Banque des MASCAREIGNES" guarantee increases 708.3 thousands euros of total compensation
-# ceteris paribus, signing one contract with "MCB Ltd" guarantee increases 638.1 thousands euros of total compensation
-# ceteris paribus, signing one contract with "CREDIT DU SENEGAL" guarantee increases 37.91 thousands euros of total compensation
+# R-squared is 0.8982
 
 # moreover, let's check whether the model "lm_mej" is really confidential
 # we first check if the observations are independent (no pattern?):
