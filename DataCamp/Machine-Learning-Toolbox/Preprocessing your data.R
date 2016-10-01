@@ -96,21 +96,44 @@ model2
 # A: To reduce model-fitting time without reducing model accuracy.
 
 ### Remove near zero variance predictors ###
+# Identify near zero variance predictors: remove
+remove <- nearZeroVar(bloodbrain_x, names = TRUE, freqCut = 2, uniqueCut = 20)
+
+# Remove from data: bloodbrain_x_small
+bloodbrain_x_small <- bloodbrain_x[ , setdiff(colnames(bloodbrain_x), remove)]
+
+# we can also use the preProcess argument in caret to remove near-zero variance predictors
+# Set the preProcess argument equal to "nzv".
+
+### Fit model on reduced blood-brain data ###
+# Fit model on reduced data: model
+model <- train(x = bloodbrain_x_small, y = bloodbrain_y, method = "glm")
+
+# Print model to console
+model
+# Resampling results:
+#
+#   RMSE      Rsquared 
+#   1.687734  0.1004408
 
 
+####### Principle components analysis (PCA) #######
 
+### Using PCA as an alternative to nearZeroVar() ###
 
-###  ###
+# Fit glm model using PCA: model
+model <- train(
+  x = bloodbrain_x, y = bloodbrain_y,
+  method = "glm", preProcess = "pca"
+)
 
+# Print model to console
+model
+# Resampling results:
+#
+#   RMSE       Rsquared 
+#   0.6093006  0.4348215
 
-
-
-
-#######  #######
-
-###  ###
-
-
-
-
-
+## The PCA model's accuracy is slightly higher than the nearZeroVar() model 
+## from the previous exercise. PCA is generally a better method for handling 
+## low-information predictors than throwing them out entirely.
