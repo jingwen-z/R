@@ -68,7 +68,7 @@ colnames(mej_reg)[10] <- "autorisation_nette_montant_garanti_en_euro(en_mille)"
 # remove outlier 0 in "total_indemnisation_en_euro"
 mej_reg <- mej_reg[!(mej_reg$`total_indemnisation_en_euro(en_mille)`) == 0,]  # 166 obs.
 
-## linear model: lm_mej
+### linear model: lm_mej
 # the independent variables are type_de_garantie, pays and beneficiaire_primaire, 
 # autorisation_nette_montant_du_pret_en_euro, 
 # autorisation_nette_montant_garanti_en_euro, pourcentage_garantie, cours
@@ -95,3 +95,19 @@ plot(lm_mej$fitted.values, lm_mej$residuals)
 # second, check if all errors are normally distributed with the same variance and mean = 0
 qqnorm(lm_mej$residuals) # approximately a line?
 # this graph compares the quantiles of the residuals to the quantiles of the normal distribution
+
+### Principal Components Analysis (PCA)
+install.packages("FactoMineR")
+library("FactoMineR")
+
+pca_col <- c(1,9,10,11)
+mej_pca <- princomp(mej_reg[, pca_col], cor = TRUE)
+
+summary(mej_pca, loadings = TRUE)
+# since the cumulative proportion is larger than 0.8 for "Comp.2", there are 2 Principle Components.
+# according to the result of "Loadings", we can get the following analysis:
+# F1 = 0.537*X1 + 0.593*X2 + 0.585 * X3 - 0.132 * X4
+# F2 = 0.991 * X4
+
+screeplot(mej_pca, type = "line")
+biplot(mej_pca, choices = 1:2)
