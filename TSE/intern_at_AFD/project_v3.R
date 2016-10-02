@@ -80,6 +80,14 @@ lm_mej <- lm(`total_indemnisation_en_euro(en_mille)` ~ factor(type_de_garantie)
 summary(lm_mej)
 
 # R-squared is 0.8982
+# according to the summary, we get 6 variables are significant:
+# country "MAURICE" is statictically significant at the 1% level.
+# primary beneficiary "BOA Bénin" is statictically significant at the 1% level.
+# primary beneficiary "Banque des MASCAREIGNES" is statictically significant at the 1% level.
+# primary beneficiary "MCB Ltd" is statictically significant at the 1% level.
+# primary beneficiary "ALIOS" is statictically significant at the 5% level.
+# primary beneficiary "CREDIT DU SENEGAL" is statictically significant at the 10% level.
+# "autorisation_nette_montant_du_pret_en_euro(en_mille)" is statictically significant at the 10% level.
 
 # moreover, let's check whether the model "lm_mej" is really confidential
 # we first check if the observations are independent (no pattern?):
