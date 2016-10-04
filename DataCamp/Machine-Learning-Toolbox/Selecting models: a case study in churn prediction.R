@@ -47,17 +47,19 @@ resamples <- resamples(model_list)
 # Summarize the results
 summary(resamples)
 
-#######  #######
+####### More on resamples #######
 
-###  ###
+### Create a box-and-whisker plot ###
+# Create bwplot
+bwplot(resamples, metric = "ROC")
 
+### Create a scatterplot ###
+# Create xyplot
+xyplot(resamples, metric = "ROC")
 
+### Ensembling models ###
+# Create ensemble model: stack
+stack <- caretStack(model_list, method = "glm")
 
-###  ###
-
-
-
-
-###  ###
-
-
+# Look at summary
+summary(stack)
