@@ -39,7 +39,7 @@ model_rf <- train(
 
 ### Create a resamples object ###
 # Create model_list
-model_list <- list(glmnet = model_glmnet, ranger = model_rf)
+model_list <- list(item1 = model_glmnet, item2 = model_rf)
 
 # Pass model_list to resamples(): resamples
 resamples <- resamples(model_list)
