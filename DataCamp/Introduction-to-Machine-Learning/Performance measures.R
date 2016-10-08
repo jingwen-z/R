@@ -1,6 +1,6 @@
-################################# Measuring model performance or error #################################
+####################### Measuring model performance or error #######################
 
-############### The Confusion Matrix ###############
+######## The Confusion Matrix ########
 # The titanic dataset is already loaded into your workspace
 
 # Set random seed. Don't remove this line
@@ -25,7 +25,7 @@ table(titanic$Survived, pred)
 # 212 out of all 265 survivors were correctly predicted to have survived.
 # On the other hand, 371 out of the 449 deceased were correctly predicted to have perished.
 
-############### Deriving ratios from the Confusion Matrix ###############
+######## Deriving ratios from the Confusion Matrix ########
 # The confusion matrix is available in your workspace as conf
 # `conf` is the same as the result of `table(titanic$Survived, pred)` in exo above
 
@@ -47,7 +47,7 @@ prec  # 0.8
 rec <- TP / (TP + FN)
 rec  # 0.7310345
 
-############### The quality of a regression ###############
+######## The quality of a regression ########
 # Measuring the sound pressure produced by an airplane's wing under different settings
 # The results of this experiment are listed in the air dataset (Source: UCIMLR).
 
@@ -71,7 +71,7 @@ rmse <- sqrt(sum( (air$dec - pred) ^ 2) / nrow(air))
 # Print out rmse
 rmse  # 5.215778
 
-############### Adding complexity to increase quality ###############
+######## Adding complexity to increase quality ########
 # Adding new variables "velocity" and "thickness"
 # Your colleague's more complex model
 fit2 <- lm(dec ~ freq + angle + ch_length + velocity + thickness, data = air)
@@ -87,7 +87,7 @@ rmse2  # 4.799244
 
 # Adding complexity seems to have caused the RMSE to decrease, from 5.216 to 4.799.
 
-############### Let's do some clustering! ###############
+######## Let's do some clustering! ########
 # The seeds dataset is already loaded into your workspace
 
 # Set random seed. Don't remove this line
@@ -110,9 +110,9 @@ km_seeds$tot.withinss / km_seeds$betweenss
 # Indicating the clusters are well seperated and overall compact.
 # This is further strengthened by the plot you made, where the clusters you made were visually distinct for these two variables. 
 
-################################# Training set and test set #################################
+####################### Training set and test set #######################
 
-############### Split the sets ###############
+######## Split the sets ########
 # The titanic dataset is already loaded into your workspace
 
 # Set random seed. Don't remove this line.
@@ -134,7 +134,7 @@ test <- shuffled[test_indices,]
 str(train)
 str(test)
 
-############### First you train, then you test ###############
+######## First you train, then you test ########
 # The titanic dataset is already loaded into your workspace
 
 # Set random seed. Don't remove this line.
@@ -162,7 +162,7 @@ conf
 # This is less than the 81.65% I calculated in the first section of this chapter.
 # However, this is a much more trustworthy estimate of the model's true predictive power.
 
-############### Using Cross Validation ###############
+######## Using Cross Validation ########
 # The shuffled dataset is already loaded into your workspace
 
 # Set random seed. Don't remove this line.
@@ -197,7 +197,7 @@ for (i in 1:6) {
 # Print out the mean of accs
 mean(accs)  # 0.8011204
 
-############### How many folds? ###############
+######## How many folds? ########
 # "n" is the total number of observation
 # "tr" is the number of observation contained in training set
 n <- 22680
@@ -209,9 +209,9 @@ folds <- 1 / ( (n - tr) / n )
 # 18
 # The test set fits in the complete dataset exactly 18 times.
 
-################################# Bias and Variance #################################
+####################### Bias and Variance #######################
 
-############### Overfitting the spam! ###############
+######## Overfitting the spam! ########
 # The spam filter that has been 'learned' for you
 spam_classifier <- function(x){
   prediction <- rep(NA,length(x))
@@ -241,7 +241,7 @@ acc_full
 # which is way worse than the 100% you had on the small dataset back in chapter 1.
 # Hence, the model does not generalize at all!
 
-############### Increasing the bias ###############
+######## Increasing the bias ########
 # The all-knowing classifier that has been learned for you
 # You should change the code of the classifier, simplifying it
 spam_classifier <- function(x){
