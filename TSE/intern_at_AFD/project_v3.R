@@ -96,6 +96,55 @@ plot(lm_mej$fitted.values, lm_mej$residuals)
 qqnorm(lm_mej$residuals) # approximately a line?
 # this graph compares the quantiles of the residuals to the quantiles of the normal distribution
 
+
+### Decision trees (CART)
+str(mej_reg)
+summary(mej_reg)
+
+group_indemnisation <- matrix(0, 166, 1)
+group_indemnisation[which(mej_reg$`total_indemnisation_en_euro(en_mille)` < 53)] <- "A"
+group_indemnisation[which(mej_reg$`total_indemnisation_en_euro(en_mille)` >= 200)] <- "C"
+group_indemnisation[which(group_indemnisation == 0)] <- "B"
+
+mej_reg$group_indemnisation <- group_indemnisation  # add "group_indemnisation" into dataset "mej_reg"
+mej_reg[1:10, c(1, 12)]
+
+# for each group, calculate number of observations in test set
+a <- round(1/4*sum(mej_reg$group_indemnisation=="A"))
+b <- round(1/4*sum(mej_reg$group_indemnisation=="B"))
+c <- round(1/4*sum(mej_reg$group_indemnisation=="C"))
+
+a;b;c
+
+install.packages("sampling")
+library(sampling)
+
+# stratified sampling
+sub <- strata(mej_reg, stratanames = "group_indemnisation", size = c(a,b,c), method = "srswor")
+sub[1:10,]
+
+# create training set and test set
+train_mej <- mej_reg[-sub$ID_unit,]
+test_mej <- mej_reg[sub$ID_unit,]
+
+# rows' number in training set and test set
+nrow(train_mej)  # 125
+nrow(test_mej)  # 41
+
+## Regression Tree
+install.packages("rpart")
+install.packages("rpart.plot")
+library(rpart)
+library(rpart.plot)
+
+rp_mej_reg <- rpart(`total_indemnisation_en_euro(en_mille)` ~ type_de_garantie
+                    + pays + beneficiaire_primaire 
+                    + `autorisation_nette_montant_du_pret_en_euro(en_mille)`,
+                    train_mej, method = "anova")
+rp_mej_reg
+rpart.plot(rp_mej_reg, type = 4, branch = 1)
+
+
 ### Principal Components Analysis (PCA)
 install.packages("FactoMineR")
 library("FactoMineR")
