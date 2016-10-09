@@ -142,7 +142,46 @@ rp_mej_reg <- rpart(`total_indemnisation_en_euro(en_mille)` ~ type_de_garantie
                     + `autorisation_nette_montant_du_pret_en_euro(en_mille)`,
                     train_mej, method = "anova")
 rp_mej_reg
-rpart.plot(rp_mej_reg, type = 4, branch = 1)
+rpart.plot(rp_mej_reg, type = 4)
+# According to this plot, we can observe clearly the prediction for the compensation amount at each node.
+# At the first node, the compensation amount is predicted as 52 thousands euros for all cases.
+# Then if the loan amount is less than 762 thousand euros, we can move on to the left branch 
+# and predict the compensation amount is 33 thousand euros, with 93% probability;
+# if not, move on to the right branch, which shows that compensation amount mignt be 296 thousand euros, with probability 7%.
+# Now, let's take all left branches after this node.
+# If the loan amount is less than 261 thousand euros, which means the compensation amount might be 16 thousand euros, 
+# with probability 77%.
+# Next, if the loan amount is less than 122 thousand euros, the compensation amount might be 8.9 thousand euros, with 
+# propability 58%.
+# And so on.
+
+## Classification Tree
+rp_mej_cla <- rpart(group_indemnisation ~ type_de_garantie
+                    + pays + beneficiaire_primaire 
+                    + `autorisation_nette_montant_du_pret_en_euro(en_mille)`, 
+                    train_mej, method = "class")
+rp_mej_cla
+rpart.plot(rp_mej_cla, type = 4)
+# Thanks to this classification tree, we can observe that the banks whose loan amount is less than 250 thousand euros, 
+# their compensation amount are usually lower (group A).
+# Moreover, if the loan amount is larger than 250 thousand euros and the bank is one of following banks: BFV-SG, BICIS, 
+# BOA Bénin, Banque des MASCAREIGNES, Fondation Grameen, PROPARCO(ARIA), the compensation amount might be higher (group C),
+# with 7% probability.
+
+## Measuring model performance or error
+# corner case: the country "OUGANDA", the banks "ALIOS", "SGBB" and "STANDARD BANK Mauritius Ltd" are not included in the training set,
+# so I exclude them temporarily in order to measure the performance.
+ex_row <- c(13, 29, 30, 40)
+test_mej[ex_row,]
+pre_mej_cla <- predict(rp_mej_cla, test_mej[-ex_row,], type = "class")
+
+# calculate the error rate
+sum(as.numeric(pre_mej_cla != test_mej[-ex_row,]$group_indemnisation))/nrow(test_mej[-ex_row,])
+# confusion matrix
+table(test_mej[-ex_row,]$group_indemnisation, pre_mej_cla)
+# thus, the error rate is 13.5%, which means among 37 observations in test_mej[-ex_row,], 5 of them are wrongly predicted
+# the compensation amount: among the wrongly predicted observations, 4 of them are in group B, 1 of them is in group C, 
+# the observations in group A are predicted correctly.
 
 
 ### Principal Components Analysis (PCA)
