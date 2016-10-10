@@ -1,201 +1,181 @@
-# import dataset "mej"
-mej <- read.delim("/Users/adlz/Documents/RRRRRRR/afd/MEJ.txt", header = TRUE, sep = ";", dec = ",")
+# INSTALLATION
+#
+# Uncomment the following lines to install the required packages:
+# install.packages("FactoMineR")
+# install.packages("rpart")
+# install.packages("rpart.plot")
+# install.packages("sampling")
 
-# since I need only several fields of table "mej", I extract these columns and store them in a new table "mej_reg".
-mej_col_nb <- c(73, 7, 5, 8, 10:13, 17, 19, 21)
-mej_reg <- mej[,mej_col_nb]
-
-# because of French accent, some letters cannot be displayed, we need to firstly rename these columns.
-# digits of columns in `mej` that need to be renamed
-rename_col_mej <- c(4:9,11)
-colnames(mej_reg)[rename_col_mej] <- c("pays", "beneficiaire_primaire", 
-                                   "n_tiers_beneficiaire_primaire", 
-                                   "beneficiaire_final", 
-                                   "n_tiers_beneficiaire_final", 
-                                   "autorisation_nette_montant_du_pret_en_euro", 
-                                   "cours")
-
-View(mej_reg)
-str(mej_reg)
-summary(mej_reg)
-
-# convert data.frame columns from factors to characters
-f_m <- sapply(mej_reg, is.factor)
-mej_reg[f_m] <- lapply(mej_reg[f_m], as.character)
-
-## in this new table "mej_reg", there are some missing values.
-# with the supplementary information, I can supplement some of them.
-
-# for the field "total_indemnisation_en_euro"
-# check if there are missing values among "mej_reg$total_indemnisation_en_euro"
-any(is.na(mej_reg$total_indemnisation_en_euro))  # TRUE
-
-# count number of NAs among "mej_reg$total_indemnisation_en_euro"
-sum(is.na(mej_reg$total_indemnisation_en_euro))  # 36
-
-# find rows withno NAs in "mej_reg$total_indemnisation_en_euro"
-complete.cases(mej_reg$total_indemnisation_en_euro)
-
-# subset data, keeping only complete cases in "mej_reg$total_indemnisation_en_euro"
-mej_reg <- mej_reg[complete.cases(mej_reg$total_indemnisation_en_euro),]  # 260 obs.
-
-# for the field "n_tiers_beneficiaire_primaire"
-# supplement some missing values in "n_tiers_beneficiaire_primaire"
-mej_reg$n_tiers_beneficiaire_primaire <- ifelse(mej_reg$beneficiaire_primaire == "BOA Madagascar", 
-                                                "500750", mej_reg$n_tiers_beneficiaire_primaire)
-mej_reg$n_tiers_beneficiaire_primaire <- ifelse(mej_reg$beneficiaire_primaire == "GARRIGUE", 
-                                                "504847", mej_reg$n_tiers_beneficiaire_primaire)
-mej_reg$n_tiers_beneficiaire_primaire <- ifelse(mej_reg$beneficiaire_primaire == "PROPARCO (ARIA)", 
-                                                "NA", mej_reg$n_tiers_beneficiaire_primaire)
-mej_reg$n_tiers_beneficiaire_primaire <- ifelse(mej_reg$beneficiaire_primaire == "SGB", 
-                                                "500838", mej_reg$n_tiers_beneficiaire_primaire)
-mej_reg$n_tiers_beneficiaire_primaire <- ifelse(mej_reg$beneficiaire_primaire == "SGBS", 
-                                                "6511", mej_reg$n_tiers_beneficiaire_primaire)
-
-# since the values of "total_indemnisation_en_euro", 
-# "autorisation_nette_montant_du_pret_en_euro" and 
-# "autorisation_nette_montant_garanti_en_euro" are large, 
-# I will change the value into the thousands.
-mej_reg$total_indemnisation_en_euro <- mej_reg$total_indemnisation_en_euro/1000
-colnames(mej_reg)[1] <- "total_indemnisation_en_euro(en_mille)"
-
-mej_reg$autorisation_nette_montant_du_pret_en_euro <- mej_reg$autorisation_nette_montant_du_pret_en_euro/1000
-colnames(mej_reg)[9] <- "autorisation_nette_montant_du_pret_en_euro(en_mille)"
-
-mej_reg$autorisation_nette_montant_garanti_en_euro <- mej_reg$autorisation_nette_montant_garanti_en_euro/1000
-colnames(mej_reg)[10] <- "autorisation_nette_montant_garanti_en_euro(en_mille)"
-
-# remove outlier 0 in "total_indemnisation_en_euro"
-mej_reg <- mej_reg[!(mej_reg$`total_indemnisation_en_euro(en_mille)`) == 0,]  # 166 obs.
-
-### linear model: lm_mej
-# the independent variables are type_de_garantie, pays and beneficiaire_primaire, 
-# autorisation_nette_montant_du_pret_en_euro, 
-# autorisation_nette_montant_garanti_en_euro, pourcentage_garantie, cours
-lm_mej <- lm(`total_indemnisation_en_euro(en_mille)` ~ factor(type_de_garantie) 
-             + factor(pays) + factor(beneficiaire_primaire)
-             + `autorisation_nette_montant_du_pret_en_euro(en_mille)`
-             + `autorisation_nette_montant_garanti_en_euro(en_mille)`
-             + cours, data = mej_reg)
-summary(lm_mej)
-
-# R-squared is 0.8982
-# according to the summary, we get 6 variables are significant:
-# country "MAURICE" is statictically significant at the 1% level.
-# primary beneficiary "BOA Bénin" is statictically significant at the 1% level.
-# primary beneficiary "Banque des MASCAREIGNES" is statictically significant at the 1% level.
-# primary beneficiary "MCB Ltd" is statictically significant at the 1% level.
-# primary beneficiary "ALIOS" is statictically significant at the 5% level.
-# primary beneficiary "CREDIT DU SENEGAL" is statictically significant at the 10% level.
-# "autorisation_nette_montant_du_pret_en_euro(en_mille)" is statictically significant at the 10% level.
-
-# moreover, let's check whether the model "lm_mej" is really confidential
-# we first check if the observations are independent (no pattern?):
-plot(lm_mej$fitted.values, lm_mej$residuals)
-# second, check if all errors are normally distributed with the same variance and mean = 0
-qqnorm(lm_mej$residuals) # approximately a line?
-# this graph compares the quantiles of the residuals to the quantiles of the normal distribution
-
-
-### Decision trees (CART)
-str(mej_reg)
-summary(mej_reg)
-
-group_indemnisation <- matrix(0, 166, 1)
-group_indemnisation[which(mej_reg$`total_indemnisation_en_euro(en_mille)` < 53)] <- "A"
-group_indemnisation[which(mej_reg$`total_indemnisation_en_euro(en_mille)` >= 200)] <- "C"
-group_indemnisation[which(group_indemnisation == 0)] <- "B"
-
-mej_reg$group_indemnisation <- group_indemnisation  # add "group_indemnisation" into dataset "mej_reg"
-mej_reg[1:10, c(1, 12)]
-
-# for each group, calculate number of observations in test set
-a <- round(1/4*sum(mej_reg$group_indemnisation=="A"))
-b <- round(1/4*sum(mej_reg$group_indemnisation=="B"))
-c <- round(1/4*sum(mej_reg$group_indemnisation=="C"))
-
-a;b;c
-
-install.packages("sampling")
-library(sampling)
-
-# stratified sampling
-sub <- strata(mej_reg, stratanames = "group_indemnisation", size = c(a,b,c), method = "srswor")
-sub[1:10,]
-
-# create training set and test set
-train_mej <- mej_reg[-sub$ID_unit,]
-test_mej <- mej_reg[sub$ID_unit,]
-
-# rows' number in training set and test set
-nrow(train_mej)  # 125
-nrow(test_mej)  # 41
-
-## Regression Tree
-install.packages("rpart")
-install.packages("rpart.plot")
+library(FactoMineR)
 library(rpart)
 library(rpart.plot)
+library(sampling)
 
-rp_mej_reg <- rpart(`total_indemnisation_en_euro(en_mille)` ~ type_de_garantie
-                    + pays + beneficiaire_primaire 
-                    + `autorisation_nette_montant_du_pret_en_euro(en_mille)`,
-                    train_mej, method = "anova")
-rp_mej_reg
-rpart.plot(rp_mej_reg, type = 4)
-# According to this plot, we can observe clearly the prediction for the compensation amount at each node.
-# At the first node, the compensation amount is predicted as 52 thousands euros for all cases.
-# Then if the loan amount is less than 762 thousand euros, we can move on to the left branch 
-# and predict the compensation amount is 33 thousand euros, with 93% probability;
-# if not, move on to the right branch, which shows that compensation amount mignt be 296 thousand euros, with probability 7%.
-# Now, let's take all left branches after this node.
-# If the loan amount is less than 261 thousand euros, which means the compensation amount might be 16 thousand euros, 
-# with probability 77%.
-# Next, if the loan amount is less than 122 thousand euros, the compensation amount might be 8.9 thousand euros, with 
-# propability 58%.
-# And so on.
+# import dataset
+datasetRaw <- read.delim("Documents/R/afd/guarantee_activation.txt",
+                                    header = TRUE,
+                                    sep    = ";",
+                                    dec    = ",")
 
-## Classification Tree
-rp_mej_cla <- rpart(group_indemnisation ~ type_de_garantie
-                    + pays + beneficiaire_primaire 
-                    + `autorisation_nette_montant_du_pret_en_euro(en_mille)`, 
-                    train_mej, method = "class")
-rp_mej_cla
-rpart.plot(rp_mej_cla, type = 4)
-# Thanks to this classification tree, we can observe that the banks whose loan amount is less than 250 thousand euros, 
-# their compensation amount are usually lower (group A).
-# Moreover, if the loan amount is larger than 250 thousand euros and the bank is one of following banks: BFV-SG, BICIS, 
-# BOA Bénin, Banque des MASCAREIGNES, Fondation Grameen, PROPARCO(ARIA), the compensation amount might be higher (group C),
-# with 7% probability.
+# extraction data
+dataset <- datasetRaw[ , c(73, 7, 5, 8, 11, 10, 13, 12, 17, 19, 21)]
+View(dataset)
 
-## Measuring model performance or error
-# corner case: the country "OUGANDA", the banks "ALIOS", "SGBB" and "STANDARD BANK Mauritius Ltd" are not included in the training set,
-# so I exclude them temporarily in order to measure the performance.
-ex_row <- c(13, 29, 30, 40)
-test_mej[ex_row,]
-pre_mej_cla <- predict(rp_mej_cla, test_mej[-ex_row,], type = "class")
+colnames(dataset)<- c("compensation",
+                      "agreementID",
+                      "guaranteeType",
+                      "country",
+                      "primaryBeneficiaryID",
+                      "primaryBeneficiary",
+                      "finalBeneficiaryID",
+                      "finalBeneficiary",
+                      "loanAmount",
+                      "guaranteeAmount",
+                      "exchangeRate")
+
+str(dataset)
+summary(dataset)
+
+# convert data.frame columns from factors to characters
+factorCols <- sapply(dataset, is.factor)
+dataset[factorCols] <- lapply(dataset[factorCols], as.character)
+
+# check missing values
+any(is.na(dataset$compensation))  # TRUE
+
+# count number of NAs
+sum(is.na(dataset$compensation))  # 36
+
+# subset data, keeping only complete cases
+dataset <- dataset[complete.cases(dataset$compensation), ]  # 260 obs.
+
+# supplement missing values
+dataset$primaryBeneficiaryID[dataset$primaryBeneficiary == "BOA Madagascar"] <- "500750"
+dataset$primaryBeneficiaryID[dataset$primaryBeneficiary == "GARRIGUE"] <- "504847"
+dataset$primaryBeneficiaryID[dataset$primaryBeneficiary == "PROPARCO (ARIA)"] <- "NA"
+dataset$primaryBeneficiaryID[dataset$primaryBeneficiary == "SGB"] <- "500838"
+dataset$primaryBeneficiaryID[dataset$primaryBeneficiary == "SGBS"] <- "6511"
+
+# change the value into the thousands.
+dataset$compensation <- dataset$compensation / 1000
+dataset$loanAmount <- dataset$loanAmount / 1000
+dataset$guaranteeAmount <- dataset$guaranteeAmount / 1000
+
+# remove outlier 0 in "compensation"
+dataset <- dataset[!(dataset$compensation == 0), ]  # 166 obs.
+
+#--------------------------------------
+# linear model: linearModel
+#--------------------------------------
+
+# The independent variables are guaranteeType, country, primaryBeneficiary, 
+# loanAmount, guaranteeAmount, pourcentage_garantie, exchangeRate.
+linearModel <- lm(compensation ~ factor(guaranteeType) 
+                 + factor(country)
+                 + factor(primaryBeneficiary)
+                 + loanAmount
+                 + guaranteeAmount
+                 + exchangeRate,
+               data = dataset)
+summary(linearModel)
+
+# According to the summary, R-squared is 0.8982.
+# The following values are statictically significant at different levels:
+#   MAURICE: At 1%.
+#   BOA Bénin: At 1%.
+#   Banque des MASCAREIGNES: At 1%.
+#   MCB Ltd: At 1%.
+#   ALIOS: At 5%.
+#   CREDIT DU SENEGAL: At 10%.
+#   loanAmount: At 10%.
+
+# check if the observations are independent / have no pattern
+plot(linearModel$fitted.values, linearModel$residuals)
+# check if all errors are normally distributed
+qqnorm(linearModel$residuals)
+
+#--------------------------------------
+# Decision trees (CART)
+#--------------------------------------
+
+str(dataset)
+summary(dataset)
+
+compensationGroup <- matrix(0, 166, 1)
+compensationGroup[which(dataset$compensation < 53)] <- "A"
+compensationGroup[which(dataset$compensation >= 200)] <- "C"
+compensationGroup[which(compensationGroup == 0)] <- "B"
+
+# add "compensationGroup" into dataset "dataset"
+dataset$compensationGroup <- compensationGroup
+dataset[1:10, c(1, 12)]
+
+# for each group, calculate number of observations in test set
+
+a <- round(1 / 4 * sum(dataset$compensationGroup == "A"))
+b <- round(1 / 4 * sum(dataset$compensationGroup == "B"))
+c <- round(1 / 4 * sum(dataset$compensationGroup == "C"))
+
+# stratified sampling
+sub <- strata(dataset,
+              stratanames = "compensationGroup",
+              size = c(a,b,c),
+              method = "srswor")
+sub[1:10, ]
+
+trainDataset <- dataset[-sub$ID_unit, ]
+testDataset <- dataset[sub$ID_unit, ]
+
+nrow(trainDataset)  # 125
+nrow(testDataset)  # 41
+
+# Regression Tree
+regrTree <- rpart(compensation ~ guaranteeType
+                    + country
+                    + primaryBeneficiary
+                    + loanAmount,
+                  trainDataset,
+                  method = "anova")
+rpart.plot(regrTree, type = 4)
+
+# Classification Tree
+classModel <- compensationGroup ~ guaranteeType
+                                   + country
+                                   + primaryBeneficiary
+                                   + loanAmount
+classTree <- rpart(classModel, 
+                   trainDataset,
+                   method = "class")
+rpart.plot(classTree, type = 4)
+
+excluded <- c(13, 29, 30, 40)
+predClass <- predict(classTree, testDataset[-excluded, ], type = "class")
 
 # calculate the error rate
-sum(as.numeric(pre_mej_cla != test_mej[-ex_row,]$group_indemnisation))/nrow(test_mej[-ex_row,])
+sum(as.numeric(predClass != testDataset[-excluded, ]$compensationGroup)) / nrow(testDataset[-excluded, ])
 # confusion matrix
-table(test_mej[-ex_row,]$group_indemnisation, pre_mej_cla)
-# thus, the error rate is 13.5%, which means among 37 observations in test_mej[-ex_row,], 5 of them are wrongly predicted
-# the compensation amount: among the wrongly predicted observations, 4 of them are in group B, 1 of them is in group C, 
-# the observations in group A are predicted correctly.
+table(testDataset[-excluded, ]$compensationGroup, predClass)
 
+#--------------------------------------
+# Principal Components Analysis (PCA)
+#--------------------------------------
 
-### Principal Components Analysis (PCA)
-install.packages("FactoMineR")
-library("FactoMineR")
+pcaCols <- c(1,9,10,11)
+pca <- princomp(dataset[ , pcaCols], cor = TRUE)
+summary(pca, loadings = TRUE)
+#
+# Importance of components:
+#                           Comp.1    Comp.2     Comp.3     Comp.4
+# Standard deviation     1.6487296 0.9850779 0.54329705 0.12704503
+# Proportion of Variance 0.6795774 0.2425946 0.07379292 0.00403511
+# Cumulative Proportion  0.6795774 0.9221720 0.99596489 1.00000000
+#
+# Loadings:
+#                  Comp.1 Comp.2 Comp.3 Comp.4
+# compensation      0.537         0.835       
+# loan_amount       0.593        -0.335 -0.730
+# guarantee_amount  0.585        -0.434  0.681
+# exchange_rate    -0.132  0.991
 
-pca_col <- c(1,9,10,11)
-mej_pca <- princomp(mej_reg[, pca_col], cor = TRUE)
-
-summary(mej_pca, loadings = TRUE)
-# since the cumulative proportion is larger than 0.8 for "Comp.2", there are 2 Principle Components.
-# according to the result of "Loadings", we can get the following analysis:
-# F1 = 0.537*X1 + 0.593*X2 + 0.585 * X3 - 0.132 * X4
-# F2 = 0.991 * X4
-
-screeplot(mej_pca, type = "line")
-biplot(mej_pca, choices = 1:2)
+screeplot(pca, type = "line")
+biplot(pca, choices = 1:2)
