@@ -139,11 +139,10 @@ regrTree <- rpart(compensation ~ guaranteeType
 rpart.plot(regrTree, type = 4)
 
 # Classification Tree
-classModel <- compensationGroup ~ guaranteeType
-                                   + country
-                                   + primaryBeneficiary
-                                   + loanAmount
-classTree <- rpart(classModel, 
+classTree <- rpart(compensationGroup ~ guaranteeType
+                    + country
+                    + primaryBeneficiary
+                    + loanAmount, 
                    trainDataset,
                    method = "class")
 rpart.plot(classTree, type = 4)
