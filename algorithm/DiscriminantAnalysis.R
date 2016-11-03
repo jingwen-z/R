@@ -40,5 +40,13 @@ methoLDA
 
 # methoLDA <- lda(trainDataset[ , -12], trainDataset[ , 12])
 
-# data visualisation
 plot(methoLDA)
+
+preLDA <- predict(methoLDA, testDataset)
+preLDA$class
+preLDA$posterior
+
+table(testDataset$nmkat, preLDA$class)
+
+diffLDA <- as.numeric(preLDA$class) != as.numeric(testDataset$nmkat)
+errorLDA <- sum(as.numeric(diffLDA)) / nrow(testDataset)
