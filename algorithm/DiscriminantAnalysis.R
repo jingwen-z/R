@@ -4,10 +4,12 @@
 # install.packages("kknn")
 # install.packages("sampling") 
 # install.packages("MASS") 
+# install.packages("klaR")
 
 library(kknn)
 library(sampling)
 library(MASS)
+library(klaR)
 
 # dataset
 data(miete)
@@ -37,7 +39,6 @@ dim(testDataset)
 methoLDA <- lda(nmkat ~ ., trainDataset)
 names(methoLDA)
 methoLDA
-
 # methoLDA <- lda(trainDataset[ , -12], trainDataset[ , 12])
 
 plot(methoLDA)
@@ -50,3 +51,26 @@ table(testDataset$nmkat, preLDA$class)
 
 diffLDA <- as.numeric(preLDA$class) != as.numeric(testDataset$nmkat)
 errorLDA <- sum(as.numeric(diffLDA)) / nrow(testDataset)
+
+#--------------------------------------
+# Naive Bayesian Classification (NBC)
+#--------------------------------------
+
+methoNBC <- NaiveBayes(nmkat~., trainDataset)
+names(methoNBC)
+# methoNBC <- NaiveBayes(trainDataset[ , -12], trainDataset[ , 12])
+
+methoNBC$apriori
+methoNBC$tables
+
+plot(methoNBC, vars = "wfl", n = 50, col = c(1, "darkgrey", 1, "darkgrey", 1))
+plot(methoNBC, vars = "mvdauer", n = 50, col = c(1, "darkgrey", 1, "darkgrey", 1))
+plot(methoNBC, vars = "nmqm", n = 50, col = c(1, "darkgrey", 1, "darkgrey", 1))
+
+preNBC <- predict(methoNBC, testDataset)
+preNBC
+
+table(testDataset$nmkat, preNBC$class)
+
+diffNBC <- as.numeric(preNBC$class) != as.numeric(testDataset$nmkat)
+errorNBC <- sum(as.numeric(diffNBC)) / nrow(testDataset)
