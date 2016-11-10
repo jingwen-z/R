@@ -90,9 +90,9 @@ summary(linearModel)
 #   loanAmount: At 10%.
 
 # check if the observations are independent / have no pattern
-plot(linearModel$fitted.values, linearModel$residuals)
+plot(linearModel$fitted.values, linearModel$residuals, col = 4)
 # check if all errors are normally distributed
-qqnorm(linearModel$residuals)
+qqnorm(linearModel$residuals, col = 4)
 
 #--------------------------------------
 # Decision trees (CART)
