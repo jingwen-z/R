@@ -2,11 +2,13 @@
 #
 # Uncomment the following lines to install the required packages:
 # install.packages("FactoMineR")
+# install.packages("ggplot2")
 # install.packages("rpart")
 # install.packages("rpart.plot")
 # install.packages("sampling")
 
 library(FactoMineR)
+library(ggplot2)
 library(rpart)
 library(rpart.plot)
 library(sampling)
@@ -56,6 +58,11 @@ dataset$primaryBeneficiaryID[dataset$primaryBeneficiary == "PROPARCO (ARIA)"] <-
 dataset$primaryBeneficiaryID[dataset$primaryBeneficiary == "SGB"] <- "500838"
 dataset$primaryBeneficiaryID[dataset$primaryBeneficiary == "SGBS"] <- "6511"
 
+# change guarantee types into English
+dataset$guaranteeType[dataset$guaranteeType == "AG"] <- "Comprehensive Agreement"
+dataset$guaranteeType[dataset$guaranteeType == "AI"] <- "Single Deal Guarantee"
+dataset$guaranteeType[dataset$guaranteeType == "SP"] <- "Portfolio Guarantee"
+
 # change the value into the thousands.
 dataset$compensation <- dataset$compensation / 1000
 dataset$loanAmount <- dataset$loanAmount / 1000
@@ -63,6 +70,31 @@ dataset$guaranteeAmount <- dataset$guaranteeAmount / 1000
 
 # remove outlier 0 in "compensation"
 dataset <- dataset[!(dataset$compensation == 0), ]  # 166 obs.
+
+#--------------------------------------
+# data visualisation
+#--------------------------------------
+
+guaranteeTypeColors <- c("#FF00FF", "#F4CB42", "#358CBF")
+
+ggplot(dataset, aes(x = compensation, y = country, col = guaranteeType)) +
+  xlab("Compensation") +
+  ylab("Country") +
+  geom_point(position = "jitter") +
+  scale_color_manual(name = "Guarantee Type", values = guaranteeTypeColors)
+
+ggplot(dataset, aes(x = guaranteeType, y = country, col = compensation)) +
+  xlab("Guarantee Type") +
+  ylab("Country") +
+  geom_point(position = "jitter") +
+  scale_color_gradient(name = "Compensation", low = "blue", high = "red")
+
+ggplot(dataset, aes(x = loanAmount, y = compensation)) +
+  xlab("Loan Amount") +
+  ylab("Compensation") +
+  xlim(0, 1375) +
+  geom_point(position = "jitter", color = "#FF0033") +
+  geom_smooth(color = "#3300FF")
 
 #--------------------------------------
 # linear model: linearModel
