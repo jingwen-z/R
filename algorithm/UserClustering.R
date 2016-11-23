@@ -1,0 +1,110 @@
+# INSTALLATION
+#
+# Uncomment the following lines to install the required packages:
+# install.packages("ggplot2")
+# install.packages("gridExtra")
+# install.packages("lubridate")
+# install.packages("RColorBrewer")
+# install.packages("wesanderson")
+
+library(ggplot2)
+library(gridExtra)
+library(lubridate)
+library(RColorBrewer)
+library(wesanderson)
+
+filePath <- "Documents/R/FABERNOVEL/fdm-user-data.csv"
+
+datasetRaw <- read.csv(filePath, header = TRUE, sep = ",", dec = ".")
+
+View(datasetRaw)
+str(datasetRaw)
+summary(datasetRaw)
+
+#--------------------------------------
+# data preprocessing
+#--------------------------------------
+
+datasetRaw$date <- ymd(datasetRaw$date)
+
+# convert data.frame columns from factors to characters
+factorCols <- sapply(datasetRaw, is.factor)
+datasetRaw[factorCols] <- lapply(datasetRaw[factorCols], as.character)
+
+# check missing values
+any(is.na(datasetRaw))
+
+outlierCheck <- function(dt, var) {
+  varName <- eval(substitute(var), eval(dt))
+  na1 <- sum(is.na(varName))
+  mean1 <- mean(varName, na.rm = T)
+  par(mfrow = c(2, 2), oma = c(0, 0, 3, 0))
+  boxplot(varName, main = "With outliers")
+  hist(varName, main = "With outliers", xlab = NA, ylab = NA)
+  outlier <- boxplot.stats(varName)$out
+  meanOutlier <- mean(outlier)
+  varName <- ifelse(varName %in% outlier, NA, varName)
+  boxplot(varName, main="Without outliers")
+  hist(varName, main="Without outliers", xlab = NA, ylab = NA)
+  title("Outlier Check", outer = TRUE)
+  na2 <- sum(is.na(varName))
+  cat("Outliers identified:", na2 - na1, "\n")
+  proportion <- round((na2 - na1) / sum(!is.na(varName))*100, 1)
+  cat("Proportion (%) of outliers:", proportion, "\n")
+  cat("Mean of the outliers:", round(meanOutlier, 2), "\n")
+  mean2 <- mean(varName, na.rm = T)
+  cat("Mean without removing outliers:", round(mean1, 2), "\n")
+  cat("Mean if we removing outliers:", round(mean2, 2), "\n")
+  prompt <- "Do you want to remove outliers and to replace with NA? [yes/no]: "
+  response <- readline(prompt = prompt)
+  if(response == "y" | response == "yes"){
+    dt[as.character(substitute(var))] <- invisible(varName)
+    assign(as.character(as.list(match.call())$dt),
+           dt,
+           envir = .GlobalEnv)
+    cat("Outliers successfully removed", "\n")
+    return(invisible(dt))
+  } else{
+    cat("Nothing changed", "\n")
+    return(invisible(varName))
+  }
+}
+
+outlierCheck(datasetRaw, pageviews)
+
+#--------------------------------------
+# data visualisation
+#--------------------------------------
+
+ggplot(datasetRaw, aes(x = timeOnPage, fill = deviceCategory)) +
+  geom_histogram(position = "dodge", bins = 24) +
+  xlab("Time on page") +
+  ylab("Count") +
+  xlim(-90, 4000) +
+  scale_fill_manual(name = "Device category", 
+                    values=wes_palette(n=3, name="Darjeeling"))
+
+ggplot(datasetRaw, aes(x = hour, y = pageviews, colour = hour, fill = hour)) +
+  stat_summary(fun.y = "sum", geom = "bar", aes(colour = pageviews)) +
+  xlab("Hour") +
+  ylab("Page views") +
+  scale_fill_gradient(name = "Hour", low="red", high="blue")
+
+ggplot(datasetRaw, aes(x = date, y = timeOnPage)) +
+  geom_point(alpha = 0.1, position = "jitter") +
+  facet_grid(. ~ deviceCategory)
+
+deviceCategoryColors <- c("#FFBF34", "#FE7A00", "#FE1300")
+
+generalPlot <- ggplot(datasetRaw, 
+                      aes(x = date, y = pageviews, fill = deviceCategory)) +
+  stat_summary(fun.y = sum, geom = "bar") +
+  theme(legend.position = c(0.1, 0.8)) +
+  scale_fill_manual(values = deviceCategoryColors)
+
+detailPlot <- ggplot(datasetRaw, aes(x = date, y = pageviews)) +
+  stat_summary(fun.y = sum, geom = "bar") +
+  facet_grid(. ~ deviceCategory)
+
+
+grid.arrange(generalPlot, detailPlot, ncol=1)
