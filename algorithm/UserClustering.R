@@ -1,17 +1,15 @@
 # INSTALLATION
 #
 # Uncomment the following lines to install the required packages:
+# install.packages("FactoMineR")
 # install.packages("ggplot2")
 # install.packages("gridExtra")
 # install.packages("lubridate")
-# install.packages("RColorBrewer")
-# install.packages("wesanderson")
 
+library(FactoMineR)
 library(ggplot2)
 library(gridExtra)
 library(lubridate)
-library(RColorBrewer)
-library(wesanderson)
 
 filePath <- "Documents/R/FABERNOVEL/fdm-user-data.csv"
 
@@ -31,8 +29,17 @@ datasetRaw$date <- ymd(datasetRaw$date)
 factorCols <- sapply(datasetRaw, is.factor)
 datasetRaw[factorCols] <- lapply(datasetRaw[factorCols], as.character)
 
+datasetRaw$medium[datasetRaw$medium == "(none)" | datasetRaw$medium == "(not set)"] <- NA
+datasetRaw$regionId[datasetRaw$regionId == "(not set)"] <- NA
+
 # check missing values
 any(is.na(datasetRaw))
+sum(is.na(datasetRaw))
+
+dataset <- datasetRaw[complete.cases(datasetRaw), ] 
+View(dataset)
+str(dataset)
+summary(dataset)
 
 outlierCheck <- function(dt, var) {
   varName <- eval(substitute(var), eval(dt))
@@ -70,41 +77,78 @@ outlierCheck <- function(dt, var) {
   }
 }
 
-outlierCheck(datasetRaw, pageviews)
+outlierCheck(dataset, pageviews)
+par(mfrow = c(1, 1))
 
 #--------------------------------------
 # data visualisation
 #--------------------------------------
 
-ggplot(datasetRaw, aes(x = timeOnPage, fill = deviceCategory)) +
+deviceCategoryColors <- c("#FFBF34", "#FE7A00", "#FE1300")
+
+ggplot(dataset, aes(x = timeOnPage, fill = deviceCategory)) +
   geom_histogram(position = "dodge", bins = 24) +
   xlab("Time on page") +
   ylab("Count") +
   xlim(-90, 4000) +
   scale_fill_manual(name = "Device category", 
-                    values=wes_palette(n=3, name="Darjeeling"))
+                    values = deviceCategoryColors)
 
-ggplot(datasetRaw, aes(x = hour, y = pageviews, colour = hour, fill = hour)) +
+ggplot(dataset, aes(x = hour, y = pageviews, colour = hour, fill = hour)) +
   stat_summary(fun.y = "sum", geom = "bar", aes(colour = pageviews)) +
   xlab("Hour") +
   ylab("Page views") +
-  scale_fill_gradient(name = "Hour", low="red", high="blue")
+  scale_fill_gradient(name = "Hour", low="yellow", high="red")
 
-ggplot(datasetRaw, aes(x = date, y = timeOnPage)) +
-  geom_point(alpha = 0.1, position = "jitter") +
-  facet_grid(. ~ deviceCategory)
-
-deviceCategoryColors <- c("#FFBF34", "#FE7A00", "#FE1300")
-
-generalPlot <- ggplot(datasetRaw, 
+generalPlot <- ggplot(dataset, 
                       aes(x = date, y = pageviews, fill = deviceCategory)) +
   stat_summary(fun.y = sum, geom = "bar") +
-  theme(legend.position = c(0.1, 0.8)) +
+  theme(legend.position = c(0.1, 0.7)) +
+  xlab("Date") +
+  ylab("Page views") +
+  scale_fill_manual(name = "Device", values = deviceCategoryColors)
+
+detailPlot <- ggplot(dataset, aes(x = date, y = pageviews, fill = deviceCategory)) +
+  stat_summary(fun.y = sum, geom = "bar") +
+  facet_grid(. ~ deviceCategory) +
+  theme(legend.position = "none") +
+  xlab("Date") +
+  ylab("Page views") +
   scale_fill_manual(values = deviceCategoryColors)
 
-detailPlot <- ggplot(datasetRaw, aes(x = date, y = pageviews)) +
-  stat_summary(fun.y = sum, geom = "bar") +
-  facet_grid(. ~ deviceCategory)
-
-
 grid.arrange(generalPlot, detailPlot, ncol=1)
+
+#--------------------------------------
+# Principal Components Analysis
+#--------------------------------------
+
+colPCA <- c(2, 7:ncol(dataset))
+dataPCA <- dataset[ , colPCA]
+
+userPCA <- princomp(dataPCA, cor = TRUE)
+summary(userPCA, loadings = TRUE)
+
+screeplot(userPCA,type = "line")
+resultPCA <- PCA(dataPCA)
+
+#--------------------------------------
+# Clustering
+#--------------------------------------
+
+colCL <- c(2, 7:ncol(dataset))
+dataCL <- dataset[ , colCL]
+
+userKMeans <- kmeans(dataCL, centers = 4)
+userKMeans
+
+plot(dataCL$pageviews, 
+     dataCL$timeOnPage, 
+     col = userKMeans$cluster, 
+     xlab = "Page Views", 
+     ylab = "Time on Page")
+
+ggplot(dataCL, aes(x = pageviews, y = timeOnPage, color = userKMeans$cluster)) +
+  geom_point() +
+  xlab("Page Views") +
+  ylab("Time on Page") +
+  scale_color_gradient(name = "Cluster", low="yellow", high="red")
