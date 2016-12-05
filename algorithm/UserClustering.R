@@ -124,6 +124,13 @@ grid.arrange(generalPlot, detailPlot, ncol=1)
 
 colPCA <- c(2, 7:ncol(dataset))
 dataPCA <- dataset[ , colPCA]
+colnames(dataPCA)<- c("Hour",
+                      "Sessions",
+                      "Goals Completions",
+                      "Page Views",
+                      "Time on Page",
+                      "Transactions",
+                      "Transaction Revenue")
 
 userPCA <- princomp(dataPCA, cor = TRUE)
 summary(userPCA, loadings = TRUE)
