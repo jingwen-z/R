@@ -141,12 +141,6 @@ dataCL <- dataset[ , colCL]
 userKMeans <- kmeans(dataCL, centers = 4)
 userKMeans
 
-plot(dataCL$pageviews, 
-     dataCL$timeOnPage, 
-     col = userKMeans$cluster, 
-     xlab = "Page Views", 
-     ylab = "Time on Page")
-
 ggplot(dataCL, aes(x = pageviews, y = timeOnPage, color = userKMeans$cluster)) +
   geom_point() +
   xlab("Page Views") +
