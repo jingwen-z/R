@@ -84,7 +84,7 @@ par(mfrow = c(1, 1))
 # data visualisation
 #--------------------------------------
 
-deviceCategoryColors <- c("#FFBF34", "#FE7A00", "#FE1300")
+deviceCategoryColors <- c("#32B1EF", "#096EB0", "#013F67")
 
 ggplot(dataset, aes(x = timeOnPage, fill = deviceCategory)) +
   geom_histogram(position = "dodge", bins = 24) +
@@ -98,7 +98,7 @@ ggplot(dataset, aes(x = hour, y = pageviews, colour = hour, fill = hour)) +
   stat_summary(fun.y = "sum", geom = "bar", aes(colour = pageviews)) +
   xlab("Hour") +
   ylab("Page views") +
-  scale_fill_gradient(name = "Hour", low="yellow", high="red")
+  scale_fill_gradient(name = "Hour", trans = "reverse")
 
 generalPlot <- ggplot(dataset, 
                       aes(x = date, y = pageviews, fill = deviceCategory)) +
@@ -145,4 +145,4 @@ ggplot(dataCL, aes(x = pageviews, y = timeOnPage, color = userKMeans$cluster)) +
   geom_point() +
   xlab("Page Views") +
   ylab("Time on Page") +
-  scale_color_gradient(name = "Cluster", low="yellow", high="red")
+  scale_color_gradient(name = "Cluster")
