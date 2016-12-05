@@ -186,27 +186,3 @@ predClass <- predict(classTree, testDataset[-excluded, ], type = "class")
 sum(as.numeric(predClass != testDataset[-excluded, ]$compensationGroup)) / nrow(testDataset[-excluded, ])
 # confusion matrix
 table(testDataset[-excluded, ]$compensationGroup, predClass)
-
-#--------------------------------------
-# Principal Components Analysis (PCA)
-#--------------------------------------
-
-pcaCols <- c(1,9,10,11)
-pca <- princomp(dataset[ , pcaCols], cor = TRUE)
-summary(pca, loadings = TRUE)
-#
-# Importance of components:
-#                           Comp.1    Comp.2     Comp.3     Comp.4
-# Standard deviation     1.6487296 0.9850779 0.54329705 0.12704503
-# Proportion of Variance 0.6795774 0.2425946 0.07379292 0.00403511
-# Cumulative Proportion  0.6795774 0.9221720 0.99596489 1.00000000
-#
-# Loadings:
-#                  Comp.1 Comp.2 Comp.3 Comp.4
-# compensation      0.537         0.835       
-# loan_amount       0.593        -0.335 -0.730
-# guarantee_amount  0.585        -0.434  0.681
-# exchange_rate    -0.132  0.991
-
-screeplot(pca, type = "line")
-biplot(pca, choices = 1:2)
