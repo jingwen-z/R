@@ -1,11 +1,13 @@
 # INSTALLATION
 #
 # Uncomment the following lines to install the required packages:
+# install.packages("class")
 # install.packages("kknn")
 # install.packages("sampling") 
 # install.packages("MASS") 
 # install.packages("klaR")
 
+library(class)
 library(kknn)
 library(sampling)
 library(MASS)
@@ -74,3 +76,34 @@ table(testDataset$nmkat, preNBC$class)
 
 diffNBC <- as.numeric(preNBC$class) != as.numeric(testDataset$nmkat)
 errorNBC <- sum(as.numeric(diffNBC)) / nrow(testDataset)
+
+#--------------------------------------
+# k-Nearest Neignbor (kNN)
+#--------------------------------------
+
+fitPreKNN <- knn(trainDataset[ , -12],
+                 testDataset[ , -12],
+                 cl = trainDataset[ , 12])
+fitPreKNN
+
+table(testDataset$nmkat, fitPreKNN)
+
+diffKNN <- as.numeric(as.numeric(fitPreKNN) != as.numeric(testDataset$nmkat))
+errorKNN <- sum(diffKNN) / nrow(testDataset)
+
+# find optimal k value
+errorKNN <- rep(0, 20)
+
+for(i in 1:20){
+  fitPreKNN <- knn(trainDataset[ , -12],
+                   testDataset[ , -12],
+                   cl = trainDataset[ , 12],
+                   k = i)
+  
+  diffKNN[i] <- as.numeric(as.numeric(fitPreKNN) != as.numeric(testDataset$nmkat))
+  errorKNN[i] <- sum(diffKNN[i]) / nrow(testDataset)
+}
+
+errorKNN
+
+plot(errorKNN, type = "l", xlab = "K")
