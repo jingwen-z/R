@@ -78,7 +78,7 @@ diffNBC <- as.numeric(preNBC$class) != as.numeric(testDataset$nmkat)
 errorNBC <- sum(as.numeric(diffNBC)) / nrow(testDataset)
 
 #--------------------------------------
-# k-Nearest Neignbor (kNN)
+# k-Nearest Neighbor (kNN)
 #--------------------------------------
 
 fitPreKNN <- knn(trainDataset[ , -12],
@@ -107,3 +107,19 @@ for(i in 1:20){
 errorKNN
 
 plot(errorKNN, type = "l", xlab = "K")
+
+#--------------------------------------
+# Weighted k-Nearest Neighbor
+#--------------------------------------
+
+fitPreKKNN <- kknn(nmkat ~ ., trainDataset, testDataset[ , -12], k = 5)
+summary(fitPreKKNN)
+
+fit <- fitted(fitPreKKNN)
+fit
+
+table(testDataset$nmkat, fit)
+
+diffKKNN <- as.numeric(as.numeric(fit) != as.numeric(testDataset$nmkat))
+errorKKNN <- sum(diffKKNN) / nrow(testDataset)
+errorKKNN
