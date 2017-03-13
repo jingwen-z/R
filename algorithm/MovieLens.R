@@ -1,5 +1,4 @@
 # Installation
-#
 if (!require("pacman"))
   install.packages("pacman")
 pacman::p_load("class", "sampling")
@@ -11,50 +10,60 @@ library(sampling)
 #
 # Datasets are acquired from website https://grouplens.org/datasets/movielens
 setwd("Documents/R/datasets/ml-100k")
-rating <- read.table("u.data")[ , -4]
-names(rating) <- c("UserID", "MovieID", "Rating")
+ratings <- read.table("u.data")[ , -4]
+names(ratings) <- c("UserID", "MovieID", "Rating")
 
 # Compile the function "MovieLensKNN"
 MovieLensKNN <- function(userID, movieID, n, k) {
-  targetUserIndexes <- which(rating$UserID == userID)
+  targetUserIndexes <- which(ratings$UserID == userID)
   sampleIndexes <- sample(targetUserIndexes, min(length(targetUserIndexes), n))
 
-  sampleMovieIDs <- rating$MovieID[sampleIndexes]
+  sampleMovieIDs <- ratings$MovieID[sampleIndexes]
   targetMovieID <- movieID
 
-  targetMovieIndexes <- which(rating$MovieID == targetMovieID)
-  targetUser <- which(rating$UserID[targetMovieIndexes] == userID)
-  trainingUsers <- rating$UserID[targetMovieIndexes][-targetUser]
+  # Prepare training set (target user excluded)
+  targetMovieIndexes <- which(ratings$MovieID == targetMovieID)
+  targetUser <- which(ratings$UserID[targetMovieIndexes] == userID)
+  trainingUsers <- ratings$UserID[targetMovieIndexes][-targetUser]
 
-  dataMatrix <- matrix(0, 1+length(trainingUsers), 2+length(sampleMovieIDs))
-  dataDF <- data.frame(dataMatrix)
-  names(dataDF) <- c("userID",
-                      paste("targetMovieID-", movieID),
-                      paste("sampleMovieID-", sampleMovieIDs, sep = ""))
+  # Create a dataframe for applying knn:
+  # assignment: preassign values of 0 for all cells
+  # number of rows: trainingUsers' amount plus one line for targetUser
+  # number of columns: sampleMovies' amount plus two columns for UserID and
+  # targetMovie's rating
+  knnDF <- data.frame(matrix(0,
+                             1+length(trainingUsers),
+                             2+length(sampleMovieIDs)))
+  names(knnDF) <- c("userID",
+                    paste("targetMovieID-", movieID),
+                    paste("sampleMovieID-", sampleMovieIDs, sep = ""))
   movies <- c(targetMovieID, sampleMovieIDs)
-  dataDF$userID <- c(userID, trainingUsers)
+  knnDF$userID <- c(userID, trainingUsers)
 
-  for (i in 1:nrow(dataDF)) {
-    dataUsers <- rating[which(rating$UserID == dataDF$userID[i]), ]
+  for (i in 1:nrow(knnDF)) {
+    knnRatings <- ratings[which(ratings$UserID == knnDF$userID[i]), ]
 
     for (j in 1:length(movies)) {
-      note <- dataUsers$MovieID == movies[j]
+      knnMovieLogical <- knnRatings$MovieID == movies[j]
 
-      if (sum(as.numeric(note)) != 0) {
-        dataDF[i, j+1] = dataUsers$Rating[which(note)]
+      if (sum(as.numeric(knnMovieLogical)) != 0) {
+        knnDF[i, j+1] = knnRatings$Rating[which(knnMovieLogical)]
       }
     }
   }
 
-  testDataX <- dataDF[1, c(-1, -2)]
-  testDataY <- dataDF[1, 2]
-  trainingDataX <- dataDF[-1, c(-1, -2)]
-  trainingDataY <- dataDF[-1, 2]
+  testSampleMovieRatings <- knnDF[1, c(-1, -2)]
+  testMovieRating <- knnDF[1, 2]
+  trainingSampleMovieRatings <- knnDF[-1, c(-1, -2)]
+  trainingMovieRating <- knnDF[-1, 2]
 
-  fit <- knn(trainingDataX, testDataX, cl = trainingDataY, k = k)
+  fit <- knn(trainingSampleMovieRatings,
+             testSampleMovieRatings,
+             cl = trainingMovieRating,
+             k = k)
 
-  list("Data Framework:" = dataDF,
-       "True Rating:" = testDataY,
+  list("Dataframe:" = knnDF,
+       "True Rating:" = testMovieRating,
        "Predict Rating" = fit,
        "UserID:" = userID,
        "MovieID:" = movieID)
