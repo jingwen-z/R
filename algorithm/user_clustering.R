@@ -1,11 +1,3 @@
-# INSTALLATION
-#
-# Uncomment the following lines to install the required packages:
-# install.packages("FactoMineR")
-# install.packages("ggplot2")
-# install.packages("gridExtra")
-# install.packages("lubridate")
-
 library(FactoMineR)
 library(ggplot2)
 library(gridExtra)
@@ -45,6 +37,7 @@ outlierCheck <- function(dt, var) {
   varName <- eval(substitute(var), eval(dt))
   na1 <- sum(is.na(varName))
   mean1 <- mean(varName, na.rm = T)
+  
   par(mfrow = c(2, 2), oma = c(0, 0, 3, 0))
   boxplot(varName, main = "With outliers")
   hist(varName, main = "With outliers", xlab = NA, ylab = NA)
@@ -54,6 +47,7 @@ outlierCheck <- function(dt, var) {
   boxplot(varName, main="Without outliers")
   hist(varName, main="Without outliers", xlab = NA, ylab = NA)
   title("Outlier Check", outer = TRUE)
+  
   na2 <- sum(is.na(varName))
   cat("Outliers identified:", na2 - na1, "\n")
   proportion <- round((na2 - na1) / sum(!is.na(varName))*100, 1)
@@ -64,14 +58,15 @@ outlierCheck <- function(dt, var) {
   cat("Mean if we removing outliers:", round(mean2, 2), "\n")
   prompt <- "Do you want to remove outliers and to replace with NA? [yes/no]: "
   response <- readline(prompt = prompt)
-  if(response == "y" | response == "yes"){
+  
+  if(response == "y" | response == "yes") {
     dt[as.character(substitute(var))] <- invisible(varName)
     assign(as.character(as.list(match.call())$dt),
            dt,
            envir = .GlobalEnv)
     cat("Outliers successfully removed", "\n")
     return(invisible(dt))
-  } else{
+  } else {
     cat("Nothing changed", "\n")
     return(invisible(varName))
   }
