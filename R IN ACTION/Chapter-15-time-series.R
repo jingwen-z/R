@@ -1,5 +1,6 @@
 ### Chapter 15: Time series
 
+library(forecast)
 library(stats)
 
 ## 15.1 creating a time-series object in R
@@ -15,3 +16,14 @@ end(tsales)
 frequency(tsales)
 
 tsalesSubset <- window(tsales, start = c(2003, 5), end = c(2004, 6))
+
+# 15.2 smoothing and seasonal decomposition
+# 15.2.1 smoothing with simple moving averages
+opar <- par(no.readonly = TRUE)
+par(mfrow = c(2, 2))
+ylim <- c(min(Nile), max(Nile))
+plot(Nile, main = "Raw time series")
+plot(ma(Nile, 3), main = "Simple Moving Averages (k=3)", ylim = ylim)
+plot(ma(Nile, 7), main = "Simple Moving Averages (k=7)", ylim = ylim)
+plot(ma(Nile, 15), main = "Simple Moving Averages (k=15)", ylim = ylim)
+par(opar)
