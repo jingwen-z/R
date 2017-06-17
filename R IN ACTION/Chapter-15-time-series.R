@@ -27,3 +27,14 @@ plot(ma(Nile, 3), main = "Simple Moving Averages (k=3)", ylim = ylim)
 plot(ma(Nile, 7), main = "Simple Moving Averages (k=7)", ylim = ylim)
 plot(ma(Nile, 15), main = "Simple Moving Averages (k=15)", ylim = ylim)
 par(opar)
+
+# 15.2.2 Seasonal decomposition
+plot(AirPassengers)
+lAirPassengers <- log(AirPassengers)
+plot(lAirPassengers, ylab = "log(AirPassengers)")
+
+fit <- stl(lAirPassengers, s.window = "period")
+plot(fit)
+
+fit$time.series
+
