@@ -29,6 +29,7 @@ plot(ma(Nile, 15), main = "Simple Moving Averages (k=15)", ylim = ylim)
 par(opar)
 
 # 15.2.2 Seasonal decomposition
+# seasonal decompositon using stl()
 plot(AirPassengers)
 lAirPassengers <- log(AirPassengers)
 plot(lAirPassengers, ylab = "log(AirPassengers)")
@@ -37,4 +38,10 @@ fit <- stl(lAirPassengers, s.window = "period")
 plot(fit)
 
 fit$time.series
+exp(fit$time.series)
 
+# month plot & season plot
+par(mfrow = c(2, 1))
+monthplot(AirPassengers, xlab = "", ylab = "")
+seasonplot(AirPassengers, year.labels = T, main = "")
+par(mfrow = c(1, 1))
