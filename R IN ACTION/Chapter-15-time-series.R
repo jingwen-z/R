@@ -45,3 +45,43 @@ par(mfrow = c(2, 1))
 monthplot(AirPassengers, xlab = "", ylab = "")
 seasonplot(AirPassengers, year.labels = T, main = "")
 par(mfrow = c(1, 1))
+
+# 15.3 Exponential forecasting models
+# 15.3.1 Simple exponential smoothing
+fit <- ets(nhtemp, model = "ANN")
+fit
+
+forecast(fit, 1)
+
+plot(forecast(fit, 1), xlab = "Year",
+     ylab = expression(paste("Temperature (", degree*F, ")")),
+     main = "New Haven Annual Mean Temperature")
+
+accuracy(fit)
+
+# 15.3.2 Holt and Holt-Winters exponential smoothing
+fit <- ets(log(AirPassengers), model = "AAA")
+fit
+
+accuracy(fit)
+
+pred <- forecast(fit, 5)
+pred
+
+plot(pred, main = "Forecast for Air Travel",
+     xlab = "Time", ylab = "Log(AirPassengers)")
+
+pred$mean <- exp(pred$mean)
+pred$lower <- exp(pred$lower)
+pred$upper <- exp(pred$upper)
+
+predTable <- cbind(pred$mean, pred$lower, pred$upper)
+dimnames(predTable)[[2]] <- c("mean", "Lo 80", "Lo 95", "Hi 80", "Hi 95")
+predTable
+
+# 15.3.3 The ets() function and automated forecasting
+fit <- ets(JohnsonJohnson)
+fit
+
+plot(forecast(fit), main = "Johnson & Johnson Forecasts",
+     xlab = "Time", ylab = "Quarterly Earnings (Dollars)", flty = 2)
