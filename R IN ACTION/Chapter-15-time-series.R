@@ -2,6 +2,7 @@
 
 library(forecast)
 library(stats)
+library(tseries)
 
 ## 15.1 creating a time-series object in R
 sales <- c(18, 33, 41, 7, 34, 35, 24, 25, 24, 21, 25, 20,
@@ -85,3 +86,37 @@ fit
 
 plot(forecast(fit), main = "Johnson & Johnson Forecasts",
      xlab = "Time", ylab = "Quarterly Earnings (Dollars)", flty = 2)
+
+# 15.4 ARIMA forecasting models
+# Ensuring that the time series is stationary
+plot(Nile)
+ndiffs(Nile)
+
+dNile <- diff(Nile)
+plot(dNile)
+adf.test(dNile)
+
+# Identifying one or more reasonable models
+Acf(dNile)
+Pacf(dNile)
+
+# Fitting the model(s)
+fit <- arima(Nile, order = c(0, 1, 1))
+fit
+accuracy(fit)
+
+# Evaluating model fit
+qqnorm(fit$residuals)
+qqline(fit$residuals)
+Box.test(fit$residuals, type = "Ljung-Box")
+
+# Making forecasts
+forecast(fit, 3)
+plot(forecast(fit, 3), xlab = "Year", ylab = "Annual Flow")
+
+# Automated ARIMA forecasting
+fit <- auto.arima(sunspots)
+fit
+
+forecast(fit, 3)
+accuracy(fit)
