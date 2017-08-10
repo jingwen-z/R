@@ -6,8 +6,6 @@ pacman::p_load("class", "sampling")
 library(class)
 library(sampling)
 
-# Data
-#
 # Datasets are acquired from website https://grouplens.org/datasets/movielens
 setwd("Documents/R/datasets/ml-100k")
 ratings <- read.table("u.data")[ , -4]
@@ -32,8 +30,8 @@ MovieLensKNN <- function(userID, movieID, n, k) {
   # number of columns: sampleMovies' amount plus two columns for UserID and
   # targetMovie's rating
   knnDF <- data.frame(matrix(0,
-                             1+length(trainingUsers),
-                             2+length(sampleMovieIDs)))
+                             1 + length(trainingUsers),
+                             2 + length(sampleMovieIDs)))
   names(knnDF) <- c("userID",
                     paste("targetMovieID-", movieID),
                     paste("sampleMovieID-", sampleMovieIDs, sep = ""))
