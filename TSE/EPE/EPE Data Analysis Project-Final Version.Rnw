@@ -62,7 +62,7 @@ library(tmvtnorm)
 \nbvspace[1]
 \Huge
 {\nbtitlestretch\huge
-EPE Data Analysis Project} 
+EPE Data Analysis Project}
 \nbvspace[1]
 
 \includegraphics{bigstock-Notepad-laptop-and-coffee-cup-46246156+(1).jpg}
@@ -89,7 +89,7 @@ EPE Data Analysis Project}
 \part{Introduction}
 
 \noindent{As a student in M2 ERNA of Toulouse School of Economics, during the last half year of study, I'm really honoured to participate the course 'Econometrics of Program Evaluation'. In this course, I learnt some methods to estimate the effect of an interention on an outcome as the following outline.}
-  
+
   \begin{itemize}
     \item The Two Fundamental Problems of Inference
     \item Observational Methods of Causal Inference
@@ -99,25 +99,25 @@ EPE Data Analysis Project}
     \item Placebo Tests and Power Analysis for Natural Experiments and Observational Studies
     \item Estimating Precision In Group Designs With Autocorrelated Errors
   \end{itemize}\\
-  
+
 \noindent{\textit{\textbf{Methods}}}
 
-\vspace{.5em}  
+\vspace{.5em}
 \noindent{\underline{The Two Fundamental Problems of Inference} indicate the Fundamental Problem of Causal Inference(FPCI) and the Fundamental Problem of Statistical Inference(FPSI). In the lecture \underline{Observational Methods of Causal Inference}, we learnt how to estimate the effect of an intervention on an outcome using observational methods, this method tries to correct for selection bias by accounting for as many observed confounders as possible. There are several ways to leverage on Selection on Observables to build estimators for TT; 'Parametric Observational Method: OLS', 'Nonparametric Observational Method: Matching' and 'Semiparametric Observational Method: Synthetic Control (SCM)'.}
 
-\vspace{.5em}  
+\vspace{.5em}
 \noindent{A \underline{natural experiment} is an empirical study in which individuals (or clusters of individuals) exposed to the experimental and control conditions are determined by nature or by other factors outside the control of the investigators, yet the process governing the exposures arguably resembles random assignment. Thus, natural experiments are observational studies and are not controlled in the traditional sense of a randomized experiment. In the lecture 'Natural Experiments', we learnt how to estimate the effect of an intervention on an outcome using natural experiments, this methods tries to correct for selection bias by finding situations analog to randomized experiments but due to the natural course of events. It covers three ways: Regression Discontinuity Designs (RDD), Difference in Differences (DID) and Instrumental Variables (IV). Natural experiments are most useful when there has been a clearly defined exposure involving a well defined subpopulation (and the absence of exposure in a similar subpopulation) such that changes in outcomes may be plausibly attributed to the exposure.}
 
-\vspace{.5em}  
+\vspace{.5em}
 \noindent{Besides, a \underline{Randomized Controlled Trial} is a type of scientific (often medical) experiment, where the people being studied are randomly allocated one or other of the different treatments under study. In the lecture 'Randomized Controlled Trials', we learnt how to estimate the effect of an intervention on an outcome using randomized experiments. We especially learnt the various types of designs and what can be recovered from them using which technique. RCTs are often used to test the efficacy or effectiveness of various types of medical intervention and may provide information about adverse effects, such as drug reactions.}
 
-\vspace{.5em}  
+\vspace{.5em}
 \noindent{Moreover, we learnt how to choose the size of our sample (mainly in a RCT) and how to gauge the size of sampling noise before conducting a study in the lecture \underline{Power Analysis: Choosing Sample Size and Gauging Sampling Noise Ex Ante}. There are two ways; one is using test statistics, the other is gauging sampling noise or choosing sample size to reach a given sampling noise.}
 
-\vspace{.5em}  
+\vspace{.5em}
 \noindent{By \underline{Placebo Tests and Power Analysis for Natural Experiments and Observational Studies}, we know how to test for the validity and estimate the power of observational studies and natural experiments.}
 
-\vspace{.5em}  
+\vspace{.5em}
 \noindent{Finally, we get how to estimate the precision of an estimator by studying lecture \underline{Estimating Precision In Group Designs With Autocorrelated Errors}, when the treatment has been allocated to groups of observations whose outcomes are correlated.} \\
 
 \noindent{\textit{\textbf{Software}}}
@@ -133,14 +133,14 @@ EPE Data Analysis Project}
 \vspace{.5em}
 \noindent{Since I didn't choose Paul and Cesar's class, I didn't do the report for that course. In this report, I generate data as Mr. Chab??-Ferret did. Then I followed the questions that asked by prof on the moodle and did analysis with 'The Two Fundamental Problems of Inference', the method 'Observational Methods of Causal Inference' and the method 'Regression Discontinuity Designs(RDD)' of 'Natural Experiments'.}
 
-\vspace{.5em}  
+\vspace{.5em}
 \noindent{In this project, I firstly generated data, then I used different methods to analyse and estimate the effect of an interention on an outcome. I will explaine the result with graphs and text in the following part.}
 
 
 \part{Data Analysis in different methods}
 
   \chapter{The Two Fundamental Problems of Inference}
-  
+
 \nbvspace[0.5]
 In this chapter, we studied the two fundamentals problems that we face when estimating the effect of an intervention on an outcome. We are also going to study the properties of two intuitive estimators. The plan of this chapter is:
 
@@ -153,76 +153,82 @@ In this chapter, we studied the two fundamentals problems that we face when esti
 
 \clearpage
 
-    \section{The Fundamental Problem of Causal Inference}  
+    \section{The Fundamental Problem of Causal Inference}
       \subsection{Generate data with selection rule $D_i = \uns{y_i^B\leq\bar{y}}$}
 I generated data with following codes
 
-<<param,eval=TRUE,echo=TRUE,results='hide'>>=
-param <- c(7,.77,.1,1700,0.5,0.1,0.05,0.07,0.05,0.01)
-names(param) <- c("barmu","sigma2mu","sigma2U","barY","rho","theta",
-                  "sigma2epsilon","sigma2eta","delta","baralpha")
+<<param, eval = TRUE, echo = TRUE, results = "hide">>=
+param <- c(7, .77, .1, 1700, 0.5, 0.1, 0.05, 0.07, 0.05, 0.01)
+names(param) <- c("barmu", "sigma2mu", "sigma2U", "barY", "rho", "theta",
+                  "sigma2epsilon", "sigma2eta", "delta", "baralpha")
 @
 
-<<delta.y.tt,eval=TRUE,echo=TRUE,results='hide'>>=
+<<delta.y.tt, eval = TRUE, echo = TRUE, results = "hide">>=
 delta.y.tt <- function(param){
-  return(param["baralpha"]+param["theta"]*param["barmu"]-param["theta"]*
-           ((param["sigma2mu"]*dnorm((log(param["barY"])-param["barmu"])/
-              (sqrt(param["sigma2mu"]+param["sigma2U"]))))/
-                (sqrt(param["sigma2mu"]+param["sigma2U"])*
-                   pnorm((log(param["barY"])-param["barmu"])/
-                     (sqrt(param["sigma2mu"]+param["sigma2U"]))))))
+  return(param["baralpha"] + param["theta"] * param["barmu"]-param["theta"] *
+           ( (param["sigma2mu"] * dnorm( (log(param["barY"])-param["barmu"]) /
+              (sqrt(param["sigma2mu"] + param["sigma2U"]) )) ) /
+                (sqrt(param["sigma2mu"] + param["sigma2U"]) *
+                   pnorm((log(param["barY"]) - param["barmu"]) /
+                     (sqrt(param["sigma2mu"] + param["sigma2U"])) ) )) )
 }
 @
 
-<<data.FPCI,eval=TRUE,echo=TRUE,results='hide'>>=
+<<data.FPCI, eval = TRUE, echo = TRUE, results = "hide">>=
 set.seed(2345)
-NC <-2000
-mu <- rnorm(NC,param["barmu"],sqrt(param["sigma2mu"]))
-UB <- rnorm(NC,0,sqrt(param["sigma2U"]))
-yB <- mu + UB 
-Ds <- rep(0,NC)
-Ds[yB<=log(param["barY"])] <- 1 
-epsilon <- rnorm(NC,0,sqrt(param["sigma2epsilon"]))
-eta<- rnorm(NC,0,sqrt(param["sigma2eta"]))
-U0 <- param["rho"]*UB + epsilon
-y0 <- mu +  U0 + param["delta"]
-alpha <- param["baralpha"]+  param["theta"]*mu + eta
-y1 <- y0+alpha
+NC <- 2000
+mu <- rnorm(NC, param["barmu"], sqrt(param["sigma2mu"]))
+UB <- rnorm(NC, 0, sqrt(param["sigma2U"]))
+yB <- mu + UB
+Ds <- rep(0, NC)
+Ds[yB <= log(param["barY"])] <- 1
+epsilon <- rnorm(NC, 0, sqrt(param["sigma2epsilon"]))
+eta<- rnorm(NC, 0, sqrt(param["sigma2eta"]))
+U0 <- param["rho"] * UB + epsilon
+y0 <- mu + U0 + param["delta"]
+alpha <- param["baralpha"] + param["theta"] * mu + eta
+y1 <- y0 + alpha
 Y0 <- exp(y0)
 Y1 <- exp(y1)
-y <- y1*Ds+y0*(1-Ds)
-Y <- Y1*Ds+Y0*(1-Ds)
+y <- y1 * Ds + y0 * (1 - Ds)
+Y <- Y1 * Ds + Y0 * (1 - Ds)
 @
 \clearpage
 
       \subsection{Plot potential outcomes and observed outcomes}
-<<Pot.obs.out.FPCI,eval=TRUE,fig.cap='Potential outcomes and observed outcomes',fig.subcap=c('Potential outcomes','Observed outcomes'),fig.align='center',out.width='.5\\linewidth',echo=FALSE,results='hide',fig.pos='htbp'>>=
-col.obs <- 'black'
-col.unobs <- 'red'
+<<Pot.obs.out.FPCI, eval = TRUE, fig.cap = "Potential outcomes and observed outcomes", fig.subcap = c("Potential outcomes", "Observed outcomes"), fig.align = "center", out.width = ".5\\linewidth", echo = FALSE, results = "hide", fig.pos = "htbp">>=
+col.obs <- "black"
+col.unobs <- "red"
 
-plot(yB[Ds==0],y0[Ds==0],pch=1,xlim=c(4,11),ylim=c(4,11),xlab="yB",ylab="Outcomes")
-points(yB[Ds==1],y1[Ds==1],pch=3)
-points(yB[Ds==0],y1[Ds==0],pch=3,col=col.unobs)
-points(yB[Ds==1],y0[Ds==1],pch=1,col=col.unobs)
-abline(v=log(param["barY"]),col=col.unobs)
-legend(4,11,c('y0|D=0','y1|D=1','y0|D=1','y1|D=0'),pch=c(1,3,1,3),col=c(col.obs,col.obs,col.unobs,col.unobs),ncol=2)
+plot(yB[Ds == 0], y0[Ds == 0], pch = 1,
+     xlim = c(4, 11), ylim = c(4, 11),
+     xlab = "yB", ylab = "Outcomes")
+points(yB[Ds == 1], y1[Ds == 1], pch = 3)
+points(yB[Ds == 0], y1[Ds == 0], pch = 3, col = col.unobs)
+points(yB[Ds == 1], y0[Ds == 1], pch = 1, col = col.unobs)
+abline(v = log(param["barY"]), col = col.unobs)
+legend(4, 11, c("y0|D=0", "y1|D=1", "y0|D=1", "y1|D=0"),
+       pch = c(1, 3, 1, 3), col = c(col.obs, col.obs, col.unobs, col.unobs),
+       ncol = 2)
 
-plot(yB[Ds==0],y0[Ds==0],pch=1,xlim=c(4,11),ylim=c(4,11),xlab="yB",ylab="Outcomes")
-points(yB[Ds==1],y1[Ds==1],pch=3)
-legend(4,11,c('y|D=0','y|D=1'),pch=c(1,3))
-abline(v=log(param["barY"]),col=col.unobs)
-@      
-
-      \subsection{Individual level treatment effects in the sample}
-      
-In order to compute individual level treatment effects in the sample, I use the formula: \\ \\ 
-\centerline{$\it{\Delta_i^Y =Y_i^1 -Y^0_i}$} \\
-
-<<ind.tt.NC,eval=TRUE,echo=FALSE>>=
-it<- y1-y0
+plot(yB[Ds == 0], y0[Ds == 0], pch = 1,
+     xlim = c(4, 11), ylim = c(4, 11),
+     xlab = "yB", ylab = "Outcomes")
+points(yB[Ds == 1], y1[Ds == 1], pch = 3)
+legend(4, 11, c("y|D=0", "y|D=1"), pch = c(1, 3))
+abline(v = log(param["barY"]), col = col.unobs)
 @
 
-\noindent{Because of the large amount of data, here I just show the first 20 and the last 20 individual level treatment effects as following, the completed individual level treatment effects are in 'Annex'.} \\ 
+      \subsection{Individual level treatment effects in the sample}
+
+In order to compute individual level treatment effects in the sample, I use the formula: \\ \\
+\centerline{$\it{\Delta_i^Y =Y_i^1 -Y^0_i}$} \\
+
+<<ind.tt.NC, eval = TRUE, echo = FALSE>>=
+it <- y1 - y0
+@
+
+\noindent{Because of the large amount of data, here I just show the first 20 and the last 20 individual level treatment effects as following, the completed individual level treatment effects are in 'Annex'.} \\
 
 \noindent{\textcolor{gray}{\Sexpr{it[1:20]} \\ ... \\ \Sexpr{it[1980:NC]}}}
 
@@ -232,8 +238,8 @@ it<- y1-y0
 
 \textit{Q: Compute the average treatment effect on the treated in the sample by taking the average of the individual level treatment effects of the treated.}
 
-<<avg.tt,eval=TRUE,echo=FALSE>>=
-avg.tt<-mean(it)
+<<avg.tt, eval = TRUE, echo = FALSE>>=
+avg.tt <- mean(it)
 @
 
 \vspace{.5em}
@@ -243,8 +249,8 @@ avg.tt<-mean(it)
 According to the course, we learnt the theoretical average treatment effect with the following formula:\\
 \centerline{$\it\Delta_{TT}^y =\bar{\alpha}+\theta\bar{\mu} -\theta\displaystyle\frac{\sigma^2_{\mu}}{\sqrt{\sigma^2_{\mu}+\sigma^2_{U}}}\frac{\displaystyle\phi\left(\frac{\bar{y}-\bar{\mu}}{\sqrt{\sigma^2_{\mu}+\sigma^2_{U}}}\right)}{\displaystyle\Phi\left(\frac{\bar{y}-\bar{\mu}}{\sqrt{\sigma^2_{\mu}+\sigma^2_{U}}}\right)}}$} \\
 
-<<theo.avg.tt,eval=TRUE,echo=FALSE>>=
-theo.avg.tt<-delta.y.tt(param)
+<<theo.avg.tt, eval = TRUE, echo = FALSE>>=
+theo.avg.tt <- delta.y.tt(param)
 @
 
 \vspace{.5em}
@@ -265,7 +271,7 @@ According to the course, we get that \\ \\
 \centerline{$\it{\Delta^Y_{WW} = \Delta^Y_{TT} + \Delta^Y_{SB}}$, \ \ so $\it{\Delta^Y_{SB} = \Delta^Y_{WW} - \Delta^Y_{TT}}$.} \\
 
 <<SB,eval=TRUE,echo=FALSE>>=
-SB<-abs(WW.esti-avg.tt)
+SB <- abs(WW.esti-avg.tt)
 @
 
 \noindent{With the $\it{\Delta^Y_{TT}}$ and $\it{\Delta^Y_{WW}}$ that I got before, I can get the Selecton Bias is $\bm{\Sexpr{SB}}$.}
@@ -312,7 +318,7 @@ TB<-BA.esti-avg.tt
 \clearpage
 
   \section{The Fundamental Problem of Statistical Inference}
-    
+
     \subsection{Generate data with selection rule $D_i = \uns{V_i\leq\bar{y}}$}
 I generated data with following codes
 
@@ -327,9 +333,9 @@ set.seed(2345)
 NS <-1500
 mus <- rnorm(NS,paramS["barmu"],sqrt(paramS["sigma2mu"]))
 UBs <- rnorm(NS,0,sqrt(paramS["sigma2U"]))
-V <- mus + UBs 
+V <- mus + UBs
 Dss <- rep(0,NS)
-Dss[V<=log(paramS["barY"])] <- 1 
+Dss[V<=log(paramS["barY"])] <- 1
 epsilons <- rnorm(NS,0,sqrt(paramS["sigma2epsilon"]))
 etas<- rnorm(NS,0,sqrt(paramS["sigma2eta"]))
 U0s <- paramS["rho"]*UBs + epsilons
@@ -369,7 +375,7 @@ In order to compute individual level treatment effects in the sample, I use the 
 its<- y1s-y0s
 @
 
-\noindent{Because of the large amount of data, here I just show the first 20 and the last 20 individual level treatment effects as following, the completed individual level treatment effects are in 'Annex'.} \\ 
+\noindent{Because of the large amount of data, here I just show the first 20 and the last 20 individual level treatment effects as following, the completed individual level treatment effects are in 'Annex'.} \\
 
 \noindent{\textcolor{gray}{\Sexpr{its[1:20]} \\ ... \\ \Sexpr{its[1480:NS]}}}
 
@@ -418,7 +424,7 @@ betaOLS<-(sum(a*b)/NS)/(sum(b^2)/NS)
 \clearpage
 
       \subsection{Estimate the effect of sampling noise on WW with 99\% confidence}
-      
+
 \textit{Q: Use the CLT formula to estimate the effect of sampling noise on WW with 99\% confidence. For this, estimate the variances of the outcomes of the treated and of the untreated in the sample. Do you find a result similar to mine?}
 
 \vspace{.5em}
@@ -452,11 +458,11 @@ monte.carlo.ww <- function(s,N,param){
   set.seed(s)
   mu <- rnorm(N,param["barmu"],sqrt(param["sigma2mu"]))
   UB <- rnorm(N,0,sqrt(param["sigma2U"]))
-  yB <- mu + UB 
+  yB <- mu + UB
   YB <- exp(yB)
   Ds <- rep(0,N)
   V <- rnorm(N,param["barmu"],sqrt(param["sigma2mu"]+param["sigma2U"]))
-  Ds[V<=log(param["barY"])] <- 1 
+  Ds[V<=log(param["barY"])] <- 1
   epsilon <- rnorm(N,0,sqrt(param["sigma2epsilon"]))
   eta<- rnorm(N,0,sqrt(param["sigma2eta"]))
   U0 <- param["rho"]*UB + epsilon
@@ -539,7 +545,7 @@ ggplot(precision, aes(x=as.factor(N), y=TT)) +
   geom_errorbar(aes(ymin=TT-precision/2, ymax=TT+precision/2), width=.2,position=position_dodge(.9),color='red') +
   geom_errorbar(aes(ymin=TT-precision.CLT.1/2, ymax=TT+precision.CLT.1/2), width=.2,position=position_dodge(.9),color='blue') +
   geom_errorbar(aes(ymin=TT-precision.CLT.mean/2, ymax=TT+precision.CLT.mean/2), width=.2,position=position_dodge(.9),color='green') +
-  xlab("Sample Size") 
+  xlab("Sample Size")
 @
 
 \noindent{According to this graph, we observe that the result is similar to the one of prof. It indicates that the sampling noise of the WW estimator decreases with increasing of sample size.}
@@ -549,7 +555,7 @@ ggplot(precision, aes(x=as.factor(N), y=TT)) +
       \subsection{Estimate sampling noise with a confidence of 95\%}
 
 \textit{Q: Estimate sampling noise using the same formula but for a confidence of 95\%. Has sampling noise increased or decreased?}
-      
+
 <<tilde.epsilon.WW.95,eval=TRUE,echo=FALSE>>=
 tilde.epsilon.WW.95<-qnorm((0.95+1)/2)*(1/NS)*sqrt((var1/proba1)+(var0/(1-proba1)))
 @
@@ -687,7 +693,7 @@ N.12<-(1/(0.002087^2))*(qnorm((0.95+1)/2))^2*((varyB1/proba1)+(varyB0/(1-proba1)
 
 
   \chapter{Observational Methods of Causal Inference}
-  
+
 \nbvspace[0.5]
 In this chapter, we studied how to estimate the effect of an intervention on an outcome using observational methods, that is methods that try to correct for selection bias by accounting for as many observed confounders as possible. The plan of this chapter is:
 
@@ -699,7 +705,7 @@ In this chapter, we studied how to estimate the effect of an intervention on an 
 \nbvspace[2]
 
 \clearpage
-  
+
     \section{Parametric Observational Methods: OLS}
       \subsection{Compute the OLS estimators and compare with the theoretical TT}
 
@@ -714,10 +720,10 @@ set.seed(2345)
 NO <-1500
 muo <- rnorm(NO,param["barmu"],sqrt(param["sigma2mu"]))
 UBo <- rnorm(NO,0,sqrt(param["sigma2U"]))
-yBo <- muo + UBo 
+yBo <- muo + UBo
 YBo <- exp(yBo)
 Dso <- rep(0,NO)
-Dso[YBo<=param["barY"]] <- 1 
+Dso[YBo<=param["barY"]] <- 1
 epsilono <- rnorm(NO,0,sqrt(param["sigma2epsilon"]))
 etao<- rnorm(NO,0,sqrt(param["sigma2eta"]))
 U0o <- param["rho"]*UBo + epsilono
@@ -795,7 +801,7 @@ text(x=c(delta.y.tt(param),ww.ols),y=c(adj),labels=c('TT',expression(hat('E'))),
 
 \noindent{\textbf{Selection on Observables}}\\
 \noindent{We assume that there exists a known set of observable covariates $X_i$ such that:} \\ \\
-\centerline{$\it{\esp{Y_i^0|X_i,D_i=1} = \esp{Y_i^0|X_i,D_i=0}}$} \\ 
+\centerline{$\it{\esp{Y_i^0|X_i,D_i=1} = \esp{Y_i^0|X_i,D_i=0}}$} \\
 
 \noindent{And \textbf{Parametric Functional Form}}
 
@@ -863,10 +869,10 @@ monte.carlo.ols <- function(s,N,param){
   set.seed(s)
   mu <- rnorm(N,param["barmu"],sqrt(param["sigma2mu"]))
   UB <- rnorm(N,0,sqrt(param["sigma2U"]))
-  yB <- mu + UB 
+  yB <- mu + UB
   YB <- exp(yB)
   Ds <- rep(0,N)
-  Ds[YB<=param["barY"]] <- 1 
+  Ds[YB<=param["barY"]] <- 1
   epsilon <- rnorm(N,0,sqrt(param["sigma2epsilon"]))
   eta<- rnorm(N,0,sqrt(param["sigma2eta"]))
   U0 <- param["rho"]*UB + epsilon
@@ -943,7 +949,7 @@ ggplot(precision.ols, aes(x=as.factor(N), y=TT)) +
   geom_errorbar(aes(ymin=TT-HC1/2, ymax=TT+HC1/2), width=.2,position=position_dodge(.9),color='yellow') +
   geom_errorbar(aes(ymin=TT-HC2/2, ymax=TT+HC2/2), width=.2,position=position_dodge(.9),color='orange') +
   geom_errorbar(aes(ymin=TT-HC3/2, ymax=TT+HC3/2), width=.2,position=position_dodge(.9),color='purple') +
-  xlab("Sample Size") 
+  xlab("Sample Size")
 @
 
 \noindent{It indicates that the precision of the OLS estimator with 99\% confidence increases with sample size.}
@@ -978,11 +984,11 @@ set.seed(2345)
 NO <-1500
 muo <- rnorm(NO,param["barmu"],sqrt(param["sigma2mu"]))
 UBo <- rnorm(NO,0,sqrt(param["sigma2U"]))
-yBo <- muo + UBo 
+yBo <- muo + UBo
 YBo <- exp(yBo)
 Dsc <- rep(0,NO)
 Vo <- rnorm(NO,0,sqrt(param["sigma2mu"]+param["sigma2U"]))
-Dsc[yBo+Vo<=log(param["barY"])] <- 1 
+Dsc[yBo+Vo<=log(param["barY"])] <- 1
 epsilono <- rnorm(NO,0,sqrt(param["sigma2epsilon"]))
 etao<- rnorm(NO,0,sqrt(param["sigma2eta"]))
 U0o <- param["rho"]*UBo + epsilono
@@ -1052,7 +1058,7 @@ llr <- function(y,x,gridx,bw,kernel){
     }
   }
   K.vec <- Vectorize(K)
-  y0.hat <- rep(0,length(gridx))  
+  y0.hat <- rep(0,length(gridx))
   for (i in (1:length(gridx))){
     x.i <- gridx[i]-x
     weights.i <- K.vec((x.i)/bw)
@@ -1064,7 +1070,7 @@ llr <- function(y,x,gridx,bw,kernel){
 
 kernel <- 'gaussian'
 bw <- 1
-y0.llr <- llr(yc[Dsc==0],yBo[Dsc==0],yBo[Dsc==1],bw=bw,kernel=kernel)    
+y0.llr <- llr(yc[Dsc==0],yBo[Dsc==0],yBo[Dsc==1],bw=bw,kernel=kernel)
 @
 
 <<plot.LLR.step.0-1,dependson='LLR',eval=TRUE,echo=FALSE,results='hide',fig.cap='LLR Matching step by step',fig.subcap=c('Step 0','Step 1'),fig.align='center',out.width='.43\\textwidth',echo=FALSE,results='hide',fig.pos='htbp'>>=
@@ -1173,15 +1179,15 @@ monte.carlo.llr.trim <- function(s,N,param,t,bw,kernel){
   set.seed(s)
   mu <- rnorm(N,param["barmu"],sqrt(param["sigma2mu"]))
   UB <- rnorm(N,0,sqrt(param["sigma2U"]))
-  yB <- mu + UB 
+  yB <- mu + UB
   YB <- exp(yB)
   Ds <- rep(0,N)
   V <- rnorm(N,0,sqrt(param["sigma2mu"]+param["sigma2U"]))
-  Ds[yB+V<=log(param["barY"])] <- 1 
+  Ds[yB+V<=log(param["barY"])] <- 1
   epsilon <- rnorm(N,0,sqrt(param["sigma2epsilon"]))
   eta<- rnorm(N,0,sqrt(param["sigma2eta"]))
   U0 <- param["rho"]*UB + epsilon
-  y0 <- mu +  U0 + param["delta"] 
+  y0 <- mu +  U0 + param["delta"]
   alpha <- param["baralpha"]+  param["theta"]*mu + eta
   y1 <- y0+alpha
   Y0 <- exp(y0)
@@ -1228,27 +1234,27 @@ for (i in 1:length(simuls.llr.trim)){
 
 
   \chapter{Natural Experiments}
-  
+
 In this chapter, we learnt 3 methods of Natural Experiments: Regression Discontinuity Designs (RDD), Difference in Differences (DID) and Instrumental Variables (IV). In this project, I only used Regression Discontinuity Designs(RDD) to do the analysis.
-  
+
     \section{Regression Discontinuity Designs(RDD)}
 
-In statistics, econometrics, political science, epidemiology, and related disciplines, a regression discontinuity design (RDD) is a quasi-experimental pretest-posttest design that elicits the causal effects of interventions by assigning a cutoff or threshold above or below which an intervention is assigned. By comparing observations lying closely on either side of the threshold, it is possible to estimate the local Average treatment effect in environments in which randomization was unfeasible. 
+In statistics, econometrics, political science, epidemiology, and related disciplines, a regression discontinuity design (RDD) is a quasi-experimental pretest-posttest design that elicits the causal effects of interventions by assigning a cutoff or threshold above or below which an intervention is assigned. By comparing observations lying closely on either side of the threshold, it is possible to estimate the local Average treatment effect in environments in which randomization was unfeasible.
 
-\vspace{.5em}     
+\vspace{.5em}
 \noindent{RDD uses situations where there is a discontinuity in the probability of receiving the treatment. If there is also a discontinuity in outcomes, it is interpreted as the effect of the treatment.}
 
-\vspace{.5em} 
+\vspace{.5em}
 We distinguish two RD Designs:
   \begin{itemize}
     \item Sharp Designs (probability transitions from 0 to 1)
     \item Fuzzy Designs (probability transitions from values strictly between 0 and 1)
-  \end{itemize}  
-  
-\vspace{.5em} 
+  \end{itemize}
+
+\vspace{.5em}
 \noindent{The identification of causal effects hinges on the crucial assumption that there is indeed a sharp cut-off, around which there is a discontinuity in the probability of assignment from 0 to 1. In reality, however, cut-offs are often not strictly implemented (e.g. exercised discretion for students who just fell short of passing the threshold) and the estimates will hence be biased.}
 
-\vspace{.5em} 
+\vspace{.5em}
 \noindent{In contrast to the sharp regression discontinuity design, a fuzzy regression discontinuity design (FRDD) does not require a sharp discontinuity in the probability of assignment but is applicable as long as the probability of assignment is different. The intuition behind it is related to the instrumental variable strategy and intention to treat.}
 
       \subsection{Sharp RDD}
@@ -1344,7 +1350,7 @@ delta.y.rddols <- y1.bary.pred-y0.bary.pred
 According to R, I get $\esph{y^1_i|y^B_i=\bar{y}}=$\Sexpr{y1.bary.pred} and $\esph{y_i^0|y_i^B=\bar{y}}=$\Sexpr{y0.bary.pred}, \\
 \indent{so the estimated TT is $\hat{\Delta^{y}_{RDDOLS}}=$\Sexpr{delta.y.rddols}.}
 
-\vspace{.5em} 
+\vspace{.5em}
 Then I calculate $\bm{TT(z)}$ with the following formula: \\
 
 \centerline{$\it{\Delta^y_{TT}(\bar{z}) = \bar{\alpha} + \theta\bar{\mu}+\theta\displaystyle\frac{\sigma^2_{\mu}}{\sigma^2_{\mu}+\sigma^2_{U}}(\bar{y}-\bar{\mu})}$} \\
@@ -1355,10 +1361,10 @@ delta.y.tt.z <- function(param){
 }
 @
 
-\vspace{.5em} 
+\vspace{.5em}
 So $\bm{TT(z)=\Sexpr{delta.y.tt.z(param)}}$.
 
-\vspace{.5em} 
+\vspace{.5em}
 Moreover, I show the graph of the results of RDD using OLS as following:
 
 <<plot.RDD.sharp.ols,eval=TRUE,echo=FALSE,results='hide',fig.cap='Sharp RDD Using OLS',fig.align='center',out.width='.65\\textwidth',fig.pos='htbp'>>=
@@ -1381,10 +1387,10 @@ set.seed(2345)
 N <-1500
 mu <- rnorm(N,param["barmu"],sqrt(param["sigma2mu"]))
 UB <- rnorm(N,0,sqrt(param["sigma2U"]))
-yB <- mu + UB 
+yB <- mu + UB
 YB <- exp(yB)
 Ds <- rep(0,N)
-Ds[YB<=param["barY"]] <- 1 
+Ds[YB<=param["barY"]] <- 1
 epsilon <- rnorm(N,0,sqrt(param["sigma2epsilon"]))
 eta<- rnorm(N,0,sqrt(param["sigma2eta"]))
 U0 <- param["rho"]*UB + epsilon
@@ -1437,7 +1443,7 @@ llr <- function(y,x,gridx,bw,kernel){
     }
   }
   K.vec <- Vectorize(K)
-  y0.hat <- rep(0,length(gridx))  
+  y0.hat <- rep(0,length(gridx))
   for (i in (1:length(gridx))){
     x.i <- gridx[i]-x
     weights.i <- K.vec((x.i)/bw)
@@ -1462,8 +1468,8 @@ MSE.grid <- seq(0.1,1,by=.1)
 MSE.llr.0 <- sapply(MSE.grid,MSE.llr,y=y,D=Ds,x=yB,kernel=kernel,d=0)
 MSE.llr.1 <- sapply(MSE.grid,MSE.llr,y=y,D=Ds,x=yB,kernel=kernel,d=1)
 
-y0.llr <- llr(y[Ds==0],yB[Ds==0],yB[Ds==0],bw=MSE.grid[MSE.llr.0==min(MSE.llr.0)],kernel=kernel)    
-y1.llr <- llr(y[Ds==1],yB[Ds==1],yB[Ds==1],bw=MSE.grid[MSE.llr.1==min(MSE.llr.1)],kernel=kernel)    
+y0.llr <- llr(y[Ds==0],yB[Ds==0],yB[Ds==0],bw=MSE.grid[MSE.llr.0==min(MSE.llr.0)],kernel=kernel)
+y1.llr <- llr(y[Ds==1],yB[Ds==1],yB[Ds==1],bw=MSE.grid[MSE.llr.1==min(MSE.llr.1)],kernel=kernel)
 @
 
 <<plot.rdd.llr.cv,eval=TRUE,echo=FALSE,results='hide',fig.align='center',out.width='.55\\textwidth',out.height='.55\\textwidth',fig.width=6,fig.height=6,fig.pos='htbp'>>=
@@ -1522,11 +1528,11 @@ set.seed(2345)
 NO <-1500
 muo <- rnorm(NO,param["barmu"],sqrt(param["sigma2mu"]))
 UBo <- rnorm(NO,0,sqrt(param["sigma2U"]))
-yBo <- muo + UBo 
+yBo <- muo + UBo
 YBo <- exp(yBo)
 Dsc <- rep(0,NO)
 Vo <- rnorm(NO,0,sqrt(param["sigma2mu"]+param["sigma2U"]))
-Dsc[yBo+Vo<=log(param["barY"])] <- 1 
+Dsc[yBo+Vo<=log(param["barY"])] <- 1
 epsilono <- rnorm(NO,0,sqrt(param["sigma2epsilon"]))
 etao<- rnorm(NO,0,sqrt(param["sigma2eta"]))
 U0o <- param["rho"]*UBo + epsilono
@@ -1549,8 +1555,8 @@ Z <- ifelse(yBo<=log(param['barY']),1,0)
 MSE.pr.llr.0 <- sapply(MSE.grid,MSE.llr,y=Dsc,D=Z,x=yBo,kernel=kernel,d=0)
 MSE.pr.llr.1 <- sapply(MSE.grid,MSE.llr,y=Dsc,D=Z,x=yBo,kernel=kernel,d=1)
 
-Pr.D0.llr <- llr(Dsc[Z==0],yBo[Z==0],yBo[Z==0],bw=MSE.grid[MSE.pr.llr.0==min(MSE.pr.llr.0)],kernel=kernel)    
-Pr.D1.llr <- llr(Dsc[Z==1],yBo[Z==1],yBo[Z==1],bw=MSE.grid[MSE.pr.llr.1==min(MSE.pr.llr.1)],kernel=kernel)    
+Pr.D0.llr <- llr(Dsc[Z==0],yBo[Z==0],yBo[Z==0],bw=MSE.grid[MSE.pr.llr.0==min(MSE.pr.llr.0)],kernel=kernel)
+Pr.D1.llr <- llr(Dsc[Z==1],yBo[Z==1],yBo[Z==1],bw=MSE.grid[MSE.pr.llr.1==min(MSE.pr.llr.1)],kernel=kernel)
 @
 
 <<rdd.fuzzy.local.iv,eval=FALSE,echo=FALSE,results='hide'>>=
@@ -1568,7 +1574,7 @@ Z.h <- Z[log(param['barY'])-bw.f<yBo & yBo<log(param['barY'])+bw.f]
 reg.fuzzy.rdd.local.iv <- ivreg(y.h  ~ Ds.h + yB.l + yB.r | Z.h + yB.l + yB.r)
 delta.rdd.fuzzy.il <- reg.fuzzy.rdd.local.iv$coef[2]
 @
-The optimal bandwidth is \bm{0.2}. 
+The optimal bandwidth is \bm{0.2}.
 % It's really strange that when I typed "\bm{\Sexpr{bw.f}}", there was a fault shown in log:
 % "Error in eval(expr, envir, enclos): object 'bw.f' nor found".
 % Thus I had to type "0.2" directly.
@@ -1609,8 +1615,8 @@ mtext("D",side=4,line=3)
 MSE.llr.0.f <- sapply(MSE.grid,MSE.llr,y=yc,D=Z,x=yBo,kernel=kernel,d=0)
 MSE.llr.1.f <- sapply(MSE.grid,MSE.llr,y=yc,D=Z,x=yBo,kernel=kernel,d=1)
 
-y.Z0.llr <- llr(yc[Z==0],yBo[Z==0],yBo[Z==0],bw=MSE.grid[MSE.llr.0==min(MSE.llr.0.f)],kernel=kernel)    
-y.Z1.llr <- llr(yc[Z==1],yBo[Z==1],yBo[Z==1],bw=MSE.grid[MSE.llr.1==min(MSE.llr.1.f)],kernel=kernel)    
+y.Z0.llr <- llr(yc[Z==0],yBo[Z==0],yBo[Z==0],bw=MSE.grid[MSE.llr.0==min(MSE.llr.0.f)],kernel=kernel)
+y.Z1.llr <- llr(yc[Z==1],yBo[Z==1],yBo[Z==1],bw=MSE.grid[MSE.llr.1==min(MSE.llr.1.f)],kernel=kernel)
 @
 
 <<plot.fuzzy.rdd.3,dependson='LLR.fuzzy.pscore',eval=FALSE,echo=FALSE,results='hide',fig.cap='Fuzzy RDD',fig.align='center',out.width='.5\\textwidth',out.height='.5\\textwidth',fig.width=8,fig.height=8,fig.pos='htbp'>>=
@@ -1681,7 +1687,7 @@ text(x=c(delta.y.tt.z(param),delta.rdd.fuzzy.il),y=c(adj),labels=c('TT(z)',expre
 \vspace{.5em}
 \noindent{Finally, in Chapter 3, I chose one method of Natural Experiments, Regression Discontinuity Designs(RDD), to do the analysis. Furthermore, We distinguished two RD Designs during the class, Sharp RDD (probability transitions from 0 to 1) and Fuzzy RDD (probability transitions from values strictly between 0 and 1). In this section, I used Cross Validation to choose the bandwidth.}
 
-\vspace{.5em}  
+\vspace{.5em}
 \noindent{Moreover, I should also use other methods that been taught in the class to do the analysis afterwords, and try to use the real data as well. So that I can understand the application of the theritical knowledge even better.}
 
 
