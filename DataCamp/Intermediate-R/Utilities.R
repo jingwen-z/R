@@ -84,7 +84,7 @@ now <- Sys.time()
 # See what now looks like under the hood
 unclass(now)
 
-############# Create and format dates #############
+########### Create and format dates ###########
 # Definition of character strings representing dates
 str1 <- "May 23, '96"
 str2 <- "2012-03-15"
@@ -100,7 +100,7 @@ format(date1, "%A")
 format(date2, "%d")
 format(date3, "%b %Y")
 
-############# Create and format times #############
+########### Create and format times ###########
 # Definition of character strings representing times
 str1 <- "May 23, '96 hours:23 minutes:01 seconds:45"
 str2 <- "2012-3-12 14:23:08"
