@@ -18,7 +18,8 @@ factor_animals_vector
 
 # Temperature
 temperature_vector <- c("High", "Low", "High","Low", "Medium")
-factor_temperature_vector <- factor(temperature_vector, order = TRUE, levels = c("Low", "Medium", "High"))
+factor_temperature_vector <- factor(temperature_vector, order = TRUE,
+                                    levels = c("Low", "Medium", "High"))
 factor_temperature_vector
 
 ############# Factor levels #############
@@ -31,7 +32,6 @@ factor_survey_vector <- factor(survey_vector)
 
 # Specify the levels of factor_survey_vector
 levels(factor_survey_vector) <- c("Female", "Male")
-
 factor_survey_vector
 
 ############# Summarizing a factor #############
@@ -50,8 +50,8 @@ summary(factor_survey_vector)
 ############# Battle of the sexes #############
 # Build factor_survey_vector with clean levels
 survey_vector <- c( "M", "F", "F", "M", "M" )
-factor_survey_vector <- factor( survey_vector )
-levels( factor_survey_vector ) <- c( "Female", "Male" )
+factor_survey_vector <- factor(survey_vector)
+levels(factor_survey_vector) <- c("Female", "Male")
 
 # Male
 male <- factor_survey_vector[1] 
@@ -64,10 +64,11 @@ male > female
 
 ############# Ordered factors #############
 # Create speed_vector
-speed_vector <- c("fast","slow","slow","fast","insane")
+speed_vector <- c("fast", "slow", "slow", "fast", "insane")
 
 # Convert speed_vector to ordered factor vector
-factor_speed_vector <- factor(speed_vector, ordered = TRUE, levels = c("slow","fast","insane"))
+factor_speed_vector <- factor(speed_vector, ordered = TRUE,
+                              levels = c("slow", "fast", "insane"))
 
 # Print factor_speed_vector
 factor_speed_vector
@@ -76,7 +77,8 @@ summary(factor_speed_vector)
 ############# Comparing ordered factors #############
 # Create factor_speed_vector
 speed_vector <- c("fast", "slow", "slow", "fast", "insane")
-factor_speed_vector <- factor(speed_vector, ordered = TRUE, levels = c("slow", "fast", "insane"))
+factor_speed_vector <- factor(speed_vector, ordered = TRUE,
+                              levels = c("slow", "fast", "insane"))
 
 # Factor value for second data analyst
 da2 <- factor_speed_vector[2]
