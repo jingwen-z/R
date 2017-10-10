@@ -32,3 +32,8 @@ redundant <- colSums(subsetMat, na.rm = T) >= 1
 which(redundant)
 
 rulesSurvived.pruned <- rulesSurvived.sorted[!redundant]
+
+## visualizing association rules
+plot(rulesSurvived)
+plot(rulesSurvived, method = "graph", control = list(type = "items"))
+plot(rulesSurvived, method = "paracoord", control = list(reorder = T))
