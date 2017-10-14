@@ -1,7 +1,8 @@
 library(arules)
 library(arulesViz)
 
-## resource: http://www.rdatamining.com/examples/association-rules
+## example 1
+# resource: http://www.rdatamining.com/examples/association-rules
 
 str(titanic.raw)
 
@@ -37,3 +38,63 @@ rulesSurvived.pruned <- rulesSurvived.sorted[!redundant]
 plot(rulesSurvived)
 plot(rulesSurvived, method = "graph", control = list(type = "items"))
 plot(rulesSurvived, method = "paracoord", control = list(reorder = T))
+
+
+## example 2 - Association Mining (Market Basket Analysis)
+# resource: http://r-statistics.co/Association-Mining-With-R.html
+
+data(Groceries)
+
+# transactions data
+class(Groceries)
+inspect(head(Groceries, 3))
+size(head(Groceries))
+LIST(head(Groceries, 3))
+
+# see the most frequent items
+frequentItems <- eclat(Groceries, parameter = list(supp = 0.07, maxlen = 15))
+inspect(frequentItems)
+
+itemFrequencyPlot(Groceries, topN=10, type="absolute", main="Item Frequency")
+
+# get the product recommendation rules
+rules <- apriori (Groceries, parameter = list(supp = 0.001, conf = 0.5))
+
+rulesConf <- sort (rules, by = "confidence", decreasing = T)
+inspect(head(rulesConf))
+
+rulesLift <- sort (rules, by = "lift", decreasing = T)
+inspect(head(rulesLift))
+
+# control the number of rules in output
+rules3Outputs <- apriori(Groceries,
+                         parameter = list(supp = 0.001, conf = 0.5, maxlen = 3))
+# to get 'strong' rules, increase the value of 'conf' parameter
+# to get 'longer' rules, increase 'maxlen'
+
+# remove redundant rules
+subsetRules <- which(colSums(is.subset(rules, rules)) > 1)
+length(subsetRules)
+rules <- rules[-subsetRules]
+
+# find rules related to given item/s
+# find what factors influenced purchase of product X
+rulesWholeMilk <- apriori(data = Groceries,
+                          parameter = list(supp = 0.001, conf = 0.08),
+                          appearance = list(default = "lhs", rhs = "whole milk"),
+                          control = list(verbose = F))
+
+rulesWholeMilkConf <- sort(rulesWholeMilk, by = "confidence", decreasing = T)
+inspect(head(rulesWholeMilkConf))
+
+# find out what products were purchased after/along with product X
+rulesAssociatedWholeMilk <-
+  apriori(data = Groceries,
+          parameter = list(supp = 0.001, conf = 0.15, minlen = 2),
+          appearance = list(default = "rhs", lhs = "whole milk"),
+          control = list(verbose = F))
+
+rulesAssociatedWholeMilkConf <- sort(rulesAssociatedWholeMilk,
+                                     by = "confidence",
+                                     decreasing = T)
+inspect(head(rulesAssociatedWholeMilkConf))
