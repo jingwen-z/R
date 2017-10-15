@@ -1,5 +1,8 @@
 library(arules)
 library(arulesViz)
+library(igraph)
+library(visNetwork)
+
 
 ## example 1
 # resource: http://www.rdatamining.com/examples/association-rules
@@ -98,3 +101,51 @@ rulesAssociatedWholeMilkConf <- sort(rulesAssociatedWholeMilk,
                                      by = "confidence",
                                      decreasing = T)
 inspect(head(rulesAssociatedWholeMilkConf))
+
+## example 3
+# resource: https://rpubs.com/ajaydecis/rassociation
+
+data("Groceries")
+Groceries
+
+head(Groceries)
+Groceries[1:6]
+inspect(Groceries[1:6])
+
+itemFrequencyPlot(Groceries, topN = 20, type = "absolute")
+
+rulesAll <- apriori(Groceries, parameter = list(supp = 0.001, conf = 0.8))
+rulesAll
+inspect(rulesAll[1:5])
+
+# convert the rules into a data frame
+as(rulesAll, "data.frame")
+
+plot(rulesAll[1:5])
+plot(rulesAll[1:5], method = "graph", interactive = F)
+# plot(rulesAll[1:15], method = "graph", interactive = T)
+
+subrules <- head(sort(rulesAll, by = "lift"), 10)
+plot(subrules, method = "graph")
+
+graphDF <- get.data.frame(plot(subrules, method = "graph"), what = "both")
+
+visNetwork(
+  nodes <- data.frame(id = graphDF$vertices$name,
+                      value = graphDF$vertices$support,
+                      title = ifelse(graphDF$vertices$label == "",
+                                     graphDF$vertices$name,
+                                     graphDF$vertices$label),
+                      graphDF$vertices),
+  edges <- graphDF$edges
+) %>%
+  visOptions(highlightNearest = TRUE)
+
+plot(subrules, method = "grouped")
+plot(subrules, method = "matrix")
+
+plot(rulesAll[1:15], method = "matrix3D")
+plot(rulesAll[1:15], method = "matrix3D", measure = "lift")
+
+plot(rulesAll, measure = c("support", "lift"), shading = "confidence")
+plot(subrules, method = "paracoord")
