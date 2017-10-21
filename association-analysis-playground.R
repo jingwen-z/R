@@ -54,6 +54,8 @@ inspect(head(Groceries, 3))
 size(head(Groceries))
 LIST(head(Groceries, 3))
 
+summary(Groceries)
+
 # see the most frequent items
 frequentItems <- eclat(Groceries, parameter = list(supp = 0.07, maxlen = 15))
 inspect(frequentItems)
@@ -68,6 +70,24 @@ inspect(head(rulesConf))
 
 rulesLift <- sort (rules, by = "lift", decreasing = T)
 inspect(head(rulesLift))
+
+# viz
+plot(rules, control = list(jitter = 2), shading = "lift")
+plot(rules, method = "grouped", control = list(k = 15))
+
+subrules <- head(sort(rules, by = "lift"), 10)
+plot(subrules, method = "graph")
+graphDF <- get.data.frame(plot(subrules, method = "graph"), what = "both")
+visNetwork(
+  nodes <- data.frame(id = graphDF$vertices$name,
+                      value = graphDF$vertices$support,
+                      title = ifelse(graphDF$vertices$label == "",
+                                     graphDF$vertices$name,
+                                     graphDF$vertices$label),
+                      graphDF$vertices),
+  edges <- graphDF$edges
+) %>%
+  visOptions(highlightNearest = TRUE)
 
 # control the number of rules in output
 rules3Outputs <- apriori(Groceries,
