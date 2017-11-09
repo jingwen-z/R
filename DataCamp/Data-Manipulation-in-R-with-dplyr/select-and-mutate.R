@@ -1,4 +1,4 @@
-## The five verbs and select in more detail
+## select
 # Choosing is not losing! The select verb
 # Print out a tbl with the four columns of hflights related to delay
 select(hflights, ActualElapsedTime, AirTime, ArrDelay, DepDelay )
@@ -29,8 +29,16 @@ ex3r <- hflights[c("TailNum", "TaxiIn", "TaxiOut")]
 ex3d <- select(hflights, contains("TailNum"), starts_with("Taxi"))
 
 
-## The second of five verbs: mutate
+## mutate
 # Mutating is creating
 g1 <- mutate(hflights, ActualGroundTime = ActualElapsedTime - AirTime)
 g2 <- mutate(g1, GroundTime = TaxiIn + TaxiOut)
 g3 <- mutate(g2, AverageSpeed = Distance / AirTime * 60)
+
+
+# Add multiple variables using mutate
+m1 <- mutate(hflights, loss = ArrDelay - DepDelay, loss_ratio = loss / DepDelay)
+m2 <- mutate(hflights,
+             TotalTaxi = TaxiIn + TaxiOut,
+             ActualGroundTime = ActualElapsedTime - AirTime,
+             Diff = TotalTaxi - ActualGroundTime)
