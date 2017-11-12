@@ -1,3 +1,5 @@
+library(dplyrs)
+
 ## filter
 # Logical operators
 # All flights that traveled 3000 miles or more
@@ -32,3 +34,23 @@ select(c2, Date, DepTime, ArrTime, TailNum)
 # How many weekend flights flew a distance of more than 1000 miles
 # but had a total taxiing time below 15 minutes?
 filter(hflights, DayOfWeek %in% c(6,7), Distance > 1000, TaxiIn + TaxiOut < 15)
+
+## arrange
+# Arranging your data
+dtc <- filter(hflights, Cancelled == 1, !is.na(DepDelay))
+
+# Arrange dtc by departure delays
+arrange(dtc, DepDelay)
+
+# Arrange dtc so that cancellation reasons are grouped
+arrange(dtc, CancellationCode)
+
+# Arrange dtc according to carrier and departure delays
+arrange(dtc, UniqueCarrier, DepDelay)
+
+# Reverse the order of arranging
+# Arrange according to carrier and decreasing departure delays
+arrange(hflights, UniqueCarrier, desc(DepDelay))
+
+# Arrange flights by total delay (normal order).
+arrange(hflights, DepDelay + ArrDelay)
