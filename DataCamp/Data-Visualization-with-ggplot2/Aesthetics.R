@@ -1,9 +1,6 @@
 ####### Visible Aesthetics #######
 
-### All about aesthetics ###
-## These are the aesthetics we can consider within aes() in this chapter:
-## x, y, color, fill, size, alpha, labels and shape.
-
+### All about aesthetics
 ## part 1
 # Map cyl to y
 ggplot(mtcars, aes(x = mpg, y = cyl)) +
@@ -51,8 +48,8 @@ ggplot(mtcars, aes(x = wt, y = mpg, shape = cyl)) +
 ggplot(mtcars, aes(x = wt, y = mpg, label = cyl)) +
   geom_text()
 
-### All about attributes ###
 
+### All about attributes
 ## part 1
 # Define a hexadecimal color
 my_color <- "#123456"
@@ -92,17 +89,18 @@ ggplot(mtcars, aes(x = mpg, y = qsec, col = factor(cyl), shape = factor(am))) +
   geom_point()
 
 # Add mapping: (hp/wt) onto size
-ggplot(mtcars, aes(x = mpg, y = qsec,
-                   col = factor(cyl),
-                   shape = factor(am),
-                   size = (hp/wt))) +
+ggplot(mtcars,
+       aes(x = mpg,
+           y = qsec,
+           col = factor(cyl),
+           shape = factor(am),
+           size = (hp/wt))) +
   geom_point()
 
 
 ####### Modifying Aesthetics #######
 
-### Position ###
-# The base layer, cyl.am, is available for you
+### Position
 # Add geom (position = "stack" by default)
 cyl.am + geom_bar(position = "stack")
 
@@ -136,7 +134,7 @@ ggplot(mtcars, aes(x = mpg, y = group)) +
 
 ####### Aesthetics Best Practices #######
 
-### Overplotting 1 - Point shape and transparency ###
+### Overplotting 1 - Point shape and transparency
 # Basic scatter plot: wt on x-axis and mpg on y-axis; map cyl to col
 ggplot(mtcars, aes(x = wt, y = mpg, col = cyl)) +
   geom_point(size = 4)
@@ -149,7 +147,8 @@ ggplot(mtcars, aes(x = wt, y = mpg, col = cyl)) +
 ggplot(mtcars, aes(x = wt, y = mpg, col = cyl)) +
   geom_point(size = 4, alpha = 0.6)
 
-### Overplotting 2 - alpha with large datasets ###
+
+### Overplotting 2 - alpha with large datasets
 # Scatter plot: carat (x), price (y), clarity (col)
 ggplot(diamonds, aes(x = carat, y = price, col = clarity)) +
   geom_point()
