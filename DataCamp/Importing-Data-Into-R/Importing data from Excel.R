@@ -1,17 +1,13 @@
-######################################## The readxl package ########################################
-
-################# List the sheets of an Excel file #################
-# Load the readxl package
 library(readxl)
+library(XLConnect)
 
-# "latitude.xlsx" gives information on the latitude of different countries for two different points in time (Source: Gapminder).
+###### The readxl package ######
 
+### List the sheets of an Excel file ###
 # Print out the names of both spreadsheets
 excel_sheets("latitude.xlsx")
 
-################# Import an Excel sheet #################
-# The readxl package is already loaded
-
+### Import an Excel sheet ###
 # Read the first sheet of latitude.xlsx: latitude_1
 latitude_1 <- read_excel("latitude.xlsx", sheet = 1)
 
@@ -24,37 +20,33 @@ lat_list <- list(latitude_1, latitude_2)
 # Display the structure of lat_list
 str(lat_list)
 
-################# Reading a workbook #################
+### Reading a workbook ###
 # Read all Excel sheets with lapply(): lat_list
 lat_list <- lapply(excel_sheets("latitude.xlsx"), read_excel, path = "latitude.xlsx")
 
 # Display the structure of lat_list
 str(lat_list)
 
-################# The col_names argument #################
-# Import the the first Excel sheet of latitude_nonames.xlsx (R gives names): latitude_3
+### The col_names argument ###
 latitude_3 <- read_excel("latitude_nonames.xlsx", sheet = 1, col_names = FALSE)
 
-# Import the the first Excel sheet of latitude_nonames.xlsx (specify col_names): latitude_4
-latitude_4 <- read_excel("latitude_nonames.xlsx", sheet = 1, col_names = c("country", "latitude"))
+latitude_4 <- read_excel("latitude_nonames.xlsx", sheet = 1,
+                         col_names = c("country", "latitude"))
 
-# Print the summary of latitude_3
 summary(latitude_3)
-
-# Print the summary of latitude_4
 summary(latitude_4)
 
-################# The skip argument #################
+### The skip argument ###
 # Import the second sheet of latitude.xlsx, skipping the first 21 rows: latitude_sel
 latitude_sel <- read_excel("latitude.xlsx", sheet = 2, col_names = FALSE, skip = 21)
 
 # Print out the first observation from latitude_sel
 latitude_sel[1, ]
 
-######################################## The gdata package ########################################
+###### The gdata package ######
 
-################# Import a local file #################
-# Load the gdata package 
+### Import a local file ###
+# Load the gdata package
 library(gdata)
 
 # Import the second sheet of urbanpop.xls: urban_pop
@@ -63,19 +55,17 @@ urban_pop <- read.xls("urbanpop.xls", sheet = "1967-1974")
 # Print the first 11 observations using head()
 head(urban_pop, 11)
 
-################# read.xls() wraps around read.table() #################
-# Column names for urban_pop
+### read.xls() wraps around read.table() ###
 columns <- c("country", paste0("year_", 1967:1974))
 
 # Finish the read.xls call: skip the first 50 rows of the sheet.
-urban_pop <- read.xls("urbanpop.xls", sheet = 2, 
-                      skip = 50, header = FALSE, stringsAsFactors = FALSE,
+urban_pop <- read.xls("urbanpop.xls", sheet = 2,
+                      skip = 50, header = FALSE,
+                      stringsAsFactors = FALSE,
                       col.names = columns)
-
-# Print first 10 observation of urban_pop
 head(urban_pop, 10)
 
-################# Work that Excel data! #################
+### Work that Excel data! ###
 # Add code to import data from all three sheets in urbanpop.xls
 path <- "urbanpop.xls"
 urban_sheet1 <- read.xls(path, sheet = 1, stringsAsFactors = FALSE)
@@ -91,37 +81,31 @@ urban_clean <- na.omit(urban)
 # Print out a summary of urban_clean
 summary(urban_clean)
 
-######################################## The XLConnect package ########################################
+###### The XLConnect package ######
 
-################# Import a workbook #################
-# latitude.xlsx is available in your working directory
-
-# Load the XLConnect package
-library(XLConnect)
-
+### Import a workbook ###
 # Build connection to latitude.xlsx: my_book
 my_book <- loadWorkbook("latitude.xlsx")
 
 # Print out the class of my_book
 class(my_book)
 
-################# List and read Excel sheets #################
+### List and read Excel sheets ###
 # List the sheets in my_book
 getSheets(my_book)
 
 # Import the second sheet in my_book
 readWorksheet(my_book, sheet = 2)
 
-################# Add and populate worksheets #################
+### Add and populate worksheets ###
 # Build connection to latitude.xlsx
-library(XLConnect)
 my_book <- loadWorkbook("latitude.xlsx")
 
 # Create data frame: summ
 dims1 <- dim(readWorksheet(my_book, 1))
 dims2 <- dim(readWorksheet(my_book, 2))
-summ <- data.frame(sheets = getSheets(my_book), 
-                   nrows = c(dims1[1], dims2[1]), 
+summ <- data.frame(sheets = getSheets(my_book),
+                   nrows = c(dims1[1], dims2[1]),
                    ncols = c(dims1[2], dims2[2]))
 
 # Add a worksheet to my_book, named "data_summary"
