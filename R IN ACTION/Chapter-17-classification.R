@@ -1,4 +1,4 @@
-### Chapiter 17:  Classification
+### Chapiter 17: Classification
 
 library(rpart)
 library(rpart.plot)
@@ -7,8 +7,8 @@ library(rpart.plot)
 loc <- "http://archive.ics.uci.edu/ml/machine-learning-databases/"
 ds <- "breast-cancer-wisconsin/breast-cancer-wisconsin.data"
 url <- paste(loc, ds, sep = "")
-  
-breast <- read.table(url, sep = ",", header = F, na.strings = "?")  
+
+breast <- read.table(url, sep = ",", header = F, na.strings = "?")
 names(breast) <- c("ID", "clumpThickness", "sizeUniformity", "shapeUniformity",
                    "maginalAdhesion", "singleEpithelialCellSize", "bareNuclei",
                    "blandChromatin", "normalNucleoli", "mitosis", "class")
@@ -24,6 +24,17 @@ df.validate <- df[-train, ]
 
 table(df.train$class)
 table(df.validate$class)
+
+## 17.2 Logistic regression
+fit.logit <- glm(class ~ ., data = df.train, family = binomial())
+summary(fit.logit)
+
+prob <- predict(fit.logit, df.validate, type = "response")
+logit.pred <- factor(prob > .5, levels = c(FALSE, TRUE),
+                     labels = c("benign", "malignant"))
+logit.perf <- table(df.validate$class, logit.pred,
+                    dnn = c("Actual", "Predicted"))
+logit.perf
 
 ## 17.3 Decision trees
 # Classical decision trees
