@@ -1,6 +1,6 @@
-################################ Relational Operators ################################ 
+####### Relational Operators #######
 
-############# Equality #############
+### Equality ###
 # Comparison of logicals
 TRUE == FALSE
 
@@ -13,7 +13,7 @@ TRUE == FALSE
 # Compare a logical with a numeric
 TRUE == 1
 
-############# Greater and less than #############
+### Greater and less than ###
 # Comparison of numerics
 -6 * 5 + 2 >= -10 + 1
 
@@ -23,7 +23,7 @@ TRUE == 1
 # Comparison of logicals
 TRUE > FALSE
 
-############# Compare vectors #############
+### Compare vectors ###
 # The linkedin and facebook vectors have already been created for you
 linkedin <- c(16, 9, 13, 5, 2, 17, 14)
 facebook <- c(17, 7, 5, 16, 8, 13, 14)
@@ -37,9 +37,9 @@ linkedin <= 5
 # LinkedIn more popular than Facebook
 linkedin > facebook
 
-################################ Logical Operators ################################ 
+####### Logical Operators #######
 
-############# & and | #############
+### & and | ###
 # The linkedin and last variable are already defined for you
 linkedin <- c(16, 9, 13, 5, 2, 17, 14)
 last <- tail(linkedin, 1)
@@ -59,9 +59,7 @@ linkedin >= 12 | facebook >= 12
 # When is views between 11 (exclusive) and 14 (inclusive)?
 views > 11 & views <= 14
 
-############# Blend it all together #############
-# li_df is pre-loaded in your workspace
-
+### Blend it all together ###
 # Select the second column, named day2, from li_df: second
 second <- li_df$day2
 
@@ -71,12 +69,9 @@ extremes <- second > 25 | second < 5
 # Count the number of TRUEs in extremes
 sum(extremes)
 
-# Solve it with a one-liner
-sum(extremes)
+####### Conditional Statements #######
 
-################################ Conditional Statements ################################ 
-
-############# The if statement #############
+### The if statement ###
 # Variables related to your last day of recordings
 medium <- "LinkedIn"
 num_views <- 17
@@ -91,7 +86,7 @@ if (num_views > 15) {
     print("You're popular!")
 }
 
-############# Add an else #############
+### Add an else ###
 # Variables related to your last day of recordings
 medium <- "LinkedIn"
 num_views <- 14
@@ -110,7 +105,7 @@ if (num_views > 15) {
   print("Try to be more visible!")
 }
 
-############# Customize further: else if #############
+### Customize further: else if ###
 # Variables related to your last day of recordings
 medium <- "LinkedIn"
 num_views <- 14
@@ -119,7 +114,6 @@ num_views <- 14
 if (medium == "LinkedIn") {
   print("Showing LinkedIn information")
 } else if (medium == "Facebook") {
-  # Add code to print correct string when condition is TRUE
   print("Showing Facebook information")
 } else {
   print("Unknown medium")
@@ -129,13 +123,12 @@ if (medium == "LinkedIn") {
 if (num_views > 15) {
   print("You're popular!")
 } else if (num_views > 10) {
-  # Add code to print correct string when condition is TRUE
   print("Your number of views is average")
 } else {
   print("Try to be more visible!")
 }
 
-############# Take control! #############
+### Take control! ###
 # Variables related to your last day of recordings
 li <- 15
 fb <- 9
@@ -149,5 +142,4 @@ if (li >= 15 & fb >= 15) {
   sms <- li + fb
 }
 
-# Print the resulting sms to the console
 sms
