@@ -1,6 +1,8 @@
-############################## Introduction to Functions ############################## 
+library(ggplot2)
 
-############# Function documentation #############
+####### Introduction to Functions #######
+
+### Function documentation ###
 # Consult the documentation on the mean() function
 ?mean
 help(mean)
@@ -8,11 +10,10 @@ help(mean)
 # Inspect the arguments of the mean() function
 args(mean)
 
-############# Use a function #############
-# The linkedin and facebook vectors have already been created for you
 linkedin <- c(16, 9, 13, 5, 2, 17, 14)
 facebook <- c(17, 7, 5, 16, 8, 13, 14)
 
+### Use a function ###
 # Calculate average number of views
 avg_li <- mean(linkedin)
 avg_fb <- mean(facebook)
@@ -25,9 +26,8 @@ avg_fb
 avg_sum <- mean(linkedin + facebook)
 
 # Calculate the trimmed mean of the sum
-avg_sum_trimmed <-mean(linkedin + facebook,trim = 0.2)
+avg_sum_trimmed <-mean(linkedin + facebook, trim = 0.2)
 
-# Inspect both new variables
 avg_sum
 avg_sum_trimmed
 
@@ -37,32 +37,28 @@ mean(linkedin)
 # Advanced average of linkedin
 mean(linkedin, na.rm = TRUE)
 
-############# Functions inside functions #############
-# The linkedin and facebook vectors have already been created for you
-linkedin <- c(16, 9, 13, 5, NA, 17, 14)
-facebook <- c(17, NA, 5, 16, 8, 13, 14)
-
+### Functions inside functions ###
 # Calculate the mean absolute deviation
 mean(abs(linkedin - facebook), na.rm = TRUE)
 
-############################## Writing Functions ##############################
+####### Writing Functions #######
 
-############# Write your own function #############
+### Write your own function ###
 # Create a function pow_two()
 pow_two <- function(x) {
     x^2
 }
 
-# Use the function 
+# Use the function
 pow_two(12)
 
 # Create a function sum_abs()
-sum_abs <- function(a,b) {
+sum_abs <- function(a, b) {
     abs(a) + abs(b)
 }
 
 # Use the function
-sum_abs(-2,3)
+sum_abs(-2, 3)
 
 # Define the function hello()
 hello <- function() {
@@ -76,13 +72,13 @@ hello()
 # Finish the pow_two() function
 pow_two <- function(x, print_info = TRUE) {
   y <- x ^ 2
-  if(print_info == TRUE) {
-  print(paste(x, "to the power two equals", y))
+  if (print_info == TRUE) {
+    print(paste(x, "to the power two equals", y))
   }
   return(y)
 }
 
-############# R you functional? #############
+### R you functional? ###
 # Define the interpret function
 interpret <- function(num_views) {
   if (num_views > 15) {
@@ -94,7 +90,6 @@ interpret <- function(num_views) {
   }
 }
 
-# Call the interpret function twice
 interpret(linkedin[1])
 interpret(facebook[2])
 
@@ -114,11 +109,11 @@ interpret <- function(num_views) {
 # return_sum: return total number of views on popular days?
 interpret_all <- function(views, return_sum = TRUE) {
   count <- 0
-  
+
   for (v in views) {
     count <- count + interpret(v)
   }
-  
+
   if (return_sum == TRUE) {
     return(count)
   } else {
@@ -130,9 +125,9 @@ interpret_all <- function(views, return_sum = TRUE) {
 interpret_all(linkedin)
 interpret_all(facebook)
 
-############################## R Packages ##############################
+####### R Packages #######
 
-############# Load an R Package #############
+### Load an R Package ###
 # The mtcars vectors have already been prepared for you
 wt <- mtcars$wt
 hp <- mtcars$hp
@@ -141,13 +136,7 @@ hp <- mtcars$hp
 search()
 
 # Try the qplot() function with wt and hp
-qplot(wt,hp)
-
-# Load the ggplot2 package
-library(ggplot2)
-
-# Retry the qplot() function
-qplot(wt,hp)
+qplot(wt, hp)
 
 # Check out the currently attached packages again
 search()
