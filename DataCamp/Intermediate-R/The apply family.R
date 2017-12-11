@@ -1,6 +1,6 @@
-######################################### lapply #########################################
+####### lapply #######
 
-############# Use lapply with a built-in R function #############
+### Use lapply with a built-in R function ###
 # The vector pioneers has already been created for you
 pioneers <- c("GAUSS:1777", "BAYES:1702", "PASCAL:1623", "PEARSON:1857")
 
@@ -8,19 +8,17 @@ pioneers <- c("GAUSS:1777", "BAYES:1702", "PASCAL:1623", "PEARSON:1857")
 split_math <- strsplit(pioneers, split = ":")
 
 # Convert to lowercase strings: split_low
-split_low <- lapply(split_math,tolower)
-
-# Take a look at the structure of split_low
+split_low <- lapply(split_math, tolower)
 str(split_low)
 
-############# Use lapply with your own function #############
+### Use lapply with your own function ###
 # Write function select_first()
 select_first <- function(x) {
   x[1]
 }
 
 # Apply select_first() over split_low: names
-names <- lapply(split_low,select_first)
+names <- lapply(split_low, select_first)
 
 # Write function select_second()
 select_second <- function(y) {
@@ -28,9 +26,9 @@ select_second <- function(y) {
 }
 
 # Apply select_second() over split_low: years
-years <- lapply(split_low,select_second)
+years <- lapply(split_low, select_second)
 
-############# lapply and anonymous functions #############
+### lapply and anonymous functions ###
 # Definition of split_low
 pioneers <- c("GAUSS:1777", "BAYES:1702", "PASCAL:1623", "PEARSON:1857")
 split <- strsplit(pioneers, split = ":")
@@ -40,15 +38,15 @@ split_low <- lapply(split, tolower)
 function(x) {
   x[1]
 }
-names <- lapply(split_low, function(x) { x[1] } )
+names <- lapply(split_low, function(x) {x[1]} )
 
 # Transform: use anonymous function inside lapply
 function(x) {
   x[2]
 }
-years <- lapply(split_low, function(x) { x[2] } )
+years <- lapply(split_low, function(x) {x[2]} )
 
-############# Use lapply with additional arguments #############
+### Use lapply with additional arguments ###
 # Generic select function
 select_el <- function(x, index) {
   x[index]
@@ -56,29 +54,29 @@ select_el <- function(x, index) {
 
 # Use lapply() twice on split_low: names and years
 names <- lapply(split_low, select_el, index = 1)
-years <- lapply(split_low,select_el, index = 2)
+years <- lapply(split_low, select_el, index = 2)
 
-######################################### sapply #########################################
+####### sapply #######
 
-############# How to use sapply #############
+### How to use sapply ###
 # temp has already been defined in the workspace
 temp
 # Use lapply() to find each day's minimum temperature
-lapply(temp,min)
+lapply(temp, min)
 
 # Use sapply() to find each day's minimum temperature
-sapply(temp,min)
+sapply(temp, min)
 
 # Use lapply() to find each day's maximum temperature
-lapply(temp,max)
+lapply(temp, max)
 
 # Use sapply() to find each day's maximum temperature
-sapply(temp,max)
+sapply(temp, max)
 
-############# sapply with your own function #############
+### sapply with your own function ###
 # Finish function definition of extremes_avg
 extremes_avg <- function(x) {
-  ( min(x) + max(x) ) / 2
+  (min(x) + max(x)) / 2
 }
 
 # Apply extremes_avg() over temp using sapply()
@@ -87,7 +85,7 @@ sapply(temp, extremes_avg)
 # Apply extremes_avg() over temp using lapply()
 lapply(temp, extremes_avg)
 
-############# sapply with function returning vector #############
+### sapply with function returning vector ###
 # Create a function that returns min and max of a vector: extremes
 extremes <- function(x) {
   c(min = min(x), max = max(x))
@@ -114,7 +112,7 @@ freezing_l <- lapply(temp, below_zero)
 # Are freezing_s and freezing_l identical?
 identical(freezing_s, freezing_l)
 
-############# sapply with functions that return NULL #############
+### sapply with functions that return NULL ###
 # Definition of print_info()
 print_info <- function(x) {
   cat("The average temperature is", mean(x), "\n")
@@ -126,11 +124,9 @@ lapply(temp, print_info)
 # Apply print_info() over temp using sapply()
 sapply(temp, print_info)
 
-######################################### vapply #########################################
+####### vapply #######
 
-############# Use vapply #############
-# temp is already available in the workspace
-
+### Use vapply ###
 # Definition of basics()
 basics <- function(x) {
   c(min = min(x), mean = mean(x), max = max(x))
@@ -147,7 +143,7 @@ basics <- function(x) {
 # Fix the error:
 vapply(temp, basics, numeric(4))
 
-############# From sapply to vapply #############
+### From sapply to vapply ###
 # Convert to vapply() expression
 sapply(temp, max)
 vapply(temp, max, numeric(1))
