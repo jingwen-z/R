@@ -1,22 +1,18 @@
-################### Useful Functions ###################
+###### Useful Functions ######
 
-########## Mathematical utilities ##########
+### Mathematical utilities ###
 errors <- c(1.9, -2.6, 4.0, -9.5, -3.4, 7.3)
 
 # Sum of absolute rounded values of errors
 sum(abs(round(errors)))
 
-########## Find the error ##########
 vec1 <- c(1.5, 2.5, 8.4, 3.7, 6.3)
 vec2 <- rev(vec1)
 
-# Fix the error
 mean(c(abs(vec1), abs(vec2)))
+rep(seq(from = 1, to = 7, by = 2), times = 7)
 
-# Fix me: seq(rep(1, 7, by = 2), times = 7)
-rep( seq(from = 1, to = 7, by = 2), times = 7 )
-
-########## Data Utilities ##########
+### Data Utilities ###
 linkedin <- list(16, 9, 13, 5, 2, 17, 14)
 facebook <- list(17, 7, 5, 16, 8, 13, 14)
 
@@ -29,19 +25,18 @@ social_vec <- append(li_vec, fb_vec)
 # Sort social_vec
 sort(as.numeric(social_vec), decreasing = TRUE)
 
-########## Beat Gauss using R ##########
+### Beat Gauss using R ###
 # Create first sequence: seq1
 seq1 <- seq(1, 500, by = 3)
 
 # Create second sequence: seq2
 seq2 <- seq(1200, 900, by = -7)
 
-# Calculate total sum of the sequences
 sum(seq1, seq2)
 
-################### Regular Expressions ###################
+###### Regular Expressions ######
 
-########## grepl & grep ##########
+### grepl & grep ###
 emails <- c("john.doe@ivyleague.edu", "education@world.gov",
             "dalai.lama@peace.org", "invalid.edu",
             "quant@bigdatacollege.edu", "cookie.monster@sesame.tv")
@@ -57,7 +52,6 @@ emails[hits]
 
 # Use grepl() to match for .edu addresses more robustly
 grepl("@.*\\.edu$", emails )
-# grepl("@.*.edu$", emails )
 
 # Use grep() to match for .edu addresses more robustly, save result to hits
 hits <- grep("@.*\\.edu$", emails)
@@ -65,14 +59,13 @@ hits <- grep("@.*\\.edu$", emails)
 # Subset emails using hits
 emails[hits]
 
-########## sub & gsub ##########
+### sub & gsub ###
 # Use sub() to convert the email domains to datacamp.edu
 sub("@.*\\.edu$", "@datacamp.edu", emails)
 
-################### Times and Dates ###################
+###### Times and Dates ######
 
-########## Right here, right now ##########
-# Get the current date: today
+### Right here, right now ###
 today <- Sys.Date()
 
 # See what today looks like under the hood
@@ -84,7 +77,7 @@ now <- Sys.time()
 # See what now looks like under the hood
 unclass(now)
 
-########### Create and format dates ###########
+### Create and format dates ###
 # Definition of character strings representing dates
 str1 <- "May 23, '96"
 str2 <- "2012-03-15"
@@ -100,7 +93,7 @@ format(date1, "%A")
 format(date2, "%d")
 format(date3, "%b %Y")
 
-########### Create and format times ###########
+### Create and format times ###
 # Definition of character strings representing times
 str1 <- "May 23, '96 hours:23 minutes:01 seconds:45"
 str2 <- "2012-3-12 14:23:08"
@@ -111,9 +104,9 @@ time2 <- as.POSIXct(str2)
 
 # Convert times to formatted strings
 format(time1, "%M")
-format(time2, "%I:%M %p")  #!!!!!!!
+format(time2, "%I:%M %p")
 
-########## Calculations with Dates ##########
+### Calculations with Dates ###
 # Difference between last and first pizza day
 day5 - day1
 
@@ -126,20 +119,14 @@ day_diff <- diff(pizza)
 # Average period between two consecutive pizza days
 mean(day_diff)
 
-########## Calculations with Times ##########
+### Calculations with Times ###
 # Calculate the difference between login and logout: time_online
 time_online <- logout - login
 
-# Inspect the variable time_online
-time_online
-
-# Calculate the total time online
 sum(time_online)
-
-# Calculate the average time online
 mean(time_online)
 
-########## Time is of the essence ##########
+### Time is of the essence ###
 # Convert astro to vector of Date objects: astro_dates
 astro_dates <- as.Date(astro, "%d-%b-%Y")
 
@@ -147,4 +134,4 @@ astro_dates <- as.Date(astro, "%d-%b-%Y")
 meteo_dates <- as.Date(meteo, "%B%d, %y")
 
 # Calculate the maximum absolute difference between astro_dates and meteo_dates
-max( abs(astro_dates - meteo_dates) )
+max(abs(astro_dates - meteo_dates))
