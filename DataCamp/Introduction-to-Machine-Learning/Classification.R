@@ -28,7 +28,7 @@ sum( diag(conf) ) / sum(conf)
 set.seed(1)
 tree <- rpart(Survived ~ ., train,
               method = "class",
-              control = rpart.control(cp=0.00001))
+              control = rpart.control(cp = 0.00001))
 
 # Draw the complex tree
 fancyRpartPlot(tree)
@@ -59,7 +59,6 @@ acc_i <- sum(diag(conf_i)) / sum(conf_i)
 fancyRpartPlot(tree_g)
 fancyRpartPlot(tree_i)
 
-# Print out acc_g and acc_i
 acc_g
 acc_i
 
@@ -95,7 +94,6 @@ knn_test$Age <- (knn_test$Age - min_age) / (max_age - min_age)
 set.seed(1)
 
 pred <- knn(train = knn_train, test = knn_test, cl = train_labels, k = 5)
-
 conf <- table(test_labels, pred)
 conf
 
@@ -112,9 +110,7 @@ for (k in range) {
 }
 
 plot(range, accs, xlab = "k")
-
 which.max(accs)
-
 
 ########## The ROC curve ##########
 
@@ -126,7 +122,7 @@ tree <- rpart(income ~ ., train, method = "class")
 all_probs <- predict(tree, test, type = "prob")
 all_probs
 
-probs <- all_probs[ , 2]
+probs <- all_probs[, 2]
 
 # Make a prediction object: pred
 pred <- prediction(probs, test$income)
@@ -138,7 +134,7 @@ plot(perf)
 ##### The area under the curve (AUC) #####
 set.seed(1)
 tree <- rpart(income ~ ., train, method = "class")
-probs <- predict(tree, test, type = "prob")[,2]
+probs <- predict(tree, test, type = "prob")[, 2]
 
 pred <- prediction(probs, test$income)
 perf <- performance(pred, "auc")
