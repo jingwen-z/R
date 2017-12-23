@@ -9,22 +9,7 @@ model <- train(
   preProcess = "medianImpute"
 )
 
-# Print model to console
 model
-
-# Generalized Linear Model 
-#
-# 699 samples
-#   9 predictor
-#   2 classes: 'benign', 'malignant' 
-#
-# Pre-processing: median imputation (9) 
-# Resampling: Cross-Validated (10 fold) 
-# Summary of sample sizes: 628, 629, 629, 630, 629, 629, ... 
-# Resampling results:
-# 
-#   ROC        Sens       Spec     
-#   0.9921039  0.9694203  0.9541667
 
 ####### KNN imputation #######
 
@@ -37,23 +22,7 @@ model2 <- train(
   preProcess = "knnImpute"
 )
 
-# Print model to console
 model2
-
-# Generalized Linear Model 
-#
-# 699 samples
-#   9 predictor
-#   2 classes: 'benign', 'malignant' 
-#
-# Pre-processing: nearest neighbor imputation (9), centered (9), scaled (9) 
-# Resampling: Cross-Validated (10 fold) 
-# Summary of sample sizes: 629, 629, 629, 629, 629, 629, ... 
-# Resampling results:
-#
-#   ROC        Sens       Spec  
-#   0.9906636  0.9716425  0.9295
-
 
 ####### Multiple preprocessing methods #######
 
@@ -66,13 +35,7 @@ model1 <- train(
   preProcess = "medianImpute"
 )
 
-# Print model1
 model1
-
-# Resampling results:
-#
-#   ROC        Sens       Spec     
-#   0.9923337  0.9694686  0.9376667
 
 # Fit glm with median imputation and standardization: model2
 model2 <- train(
@@ -82,18 +45,9 @@ model2 <- train(
   preProcess = c("medianImpute", "center", "scale")
 )
 
-# Print model2
 model2
 
-# Resampling results:
-#
-#   ROC        Sens      Spec     
-#   0.9915092  0.969372  0.9458333
-
 ####### Handling low-information predictors #######
-
-# Q: What's the best reason to remove near zero variance predictors from your data before building a model?
-# A: To reduce model-fitting time without reducing model accuracy.
 
 ### Remove near zero variance predictors ###
 # Identify near zero variance predictors: remove
@@ -102,25 +56,17 @@ remove <- nearZeroVar(bloodbrain_x, names = TRUE, freqCut = 2, uniqueCut = 20)
 # Remove from data: bloodbrain_x_small
 bloodbrain_x_small <- bloodbrain_x[ , setdiff(colnames(bloodbrain_x), remove)]
 
-# we can also use the preProcess argument in caret to remove near-zero variance predictors
-# Set the preProcess argument equal to "nzv".
-
 ### Fit model on reduced blood-brain data ###
 # Fit model on reduced data: model
 model <- train(x = bloodbrain_x_small, y = bloodbrain_y, method = "glm")
 
 # Print model to console
 model
-# Resampling results:
-#
-#   RMSE      Rsquared 
-#   1.687734  0.1004408
 
 
 ####### Principle components analysis (PCA) #######
 
 ### Using PCA as an alternative to nearZeroVar() ###
-
 # Fit glm model using PCA: model
 model <- train(
   x = bloodbrain_x, y = bloodbrain_y,
@@ -129,11 +75,3 @@ model <- train(
 
 # Print model to console
 model
-# Resampling results:
-#
-#   RMSE       Rsquared 
-#   0.6093006  0.4348215
-
-## The PCA model's accuracy is slightly higher than the nearZeroVar() model 
-## from the previous exercise. PCA is generally a better method for handling 
-## low-information predictors than throwing them out entirely.
