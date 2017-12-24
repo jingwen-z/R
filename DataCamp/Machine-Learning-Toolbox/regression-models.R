@@ -16,7 +16,6 @@ sqrt(mean((error)^2))  # 1129.843
 ####### Introducing out-of-sample error measures #######
 
 ### Randomly order the data frame ###
-# Set seed
 set.seed(42)
 
 # use the sample() function to shuffle the row indices of the diamonds dataset
@@ -24,7 +23,7 @@ set.seed(42)
 rows <- sample(nrow(diamonds))
 
 # Randomly order data
-diamonds <- diamonds[rows,]
+diamonds <- diamonds[rows, ]
 
 ### Try an 80/20 split ###
 # Determine row to split on: split
@@ -48,10 +47,7 @@ p <- predict(model, test)
 error <- p - test$price
 
 # Calculate RMSE
-sqrt(mean(error^2))  # 1136.596
-
-## Computing the error on the training set is risky 
-## because the model may overfit the data used to train it.
+sqrt(mean(error^2))
 
 ####### Cross-validation #######
 
@@ -66,7 +62,6 @@ model <- train(
   )
 )
 
-# Print model to console
 model
 
 ### 5-fold cross-validation ###
@@ -80,7 +75,6 @@ model <- train(
   )
 )
 
-# Print model to console
 model
 
 ### 5 x 5-fold cross-validation ###
@@ -94,7 +88,6 @@ model <- train(
   )
 )
 
-# Print model to console
 model
 
 ### Making predictions on new data ###
