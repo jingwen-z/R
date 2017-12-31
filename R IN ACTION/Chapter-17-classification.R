@@ -1,5 +1,7 @@
 ### Chapiter 17: Classification
 
+library(party)
+library(partykit)
 library(rpart)
 library(rpart.plot)
 
@@ -54,3 +56,13 @@ dtree.pred <- predict(dtree.pruned, df.validate, type = "class")
 dtree.perf <- table(df.validate$class, dtree.pred,
                     dnn = c("Actual", "Predicted"))
 dtree.perf
+
+# Conditional inference trees
+fit.ctree <- ctree(class~., data = df.train)
+plot(fit.ctree, main = "Conditional Inference Tree")
+
+ctree.pred <- predict(fit.ctree, df.validate, type = "response")
+ctree.perf <- table(df.validate$class,
+                    ctree.pred,
+                    dnn = c("Actual", "Predicted"))
+ctree.perf
