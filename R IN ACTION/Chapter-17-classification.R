@@ -77,3 +77,17 @@ svm.pred <- predict(fit.svm, na.omit(df.validate))
 svm.perf <- table(na.omit(df.validate)$class,
                   svm.pred, dnn = c("Actual", "Predicted"))
 svm.perf
+
+# Tuning an RBF support vector machine
+set.seed(1234)
+tuned <- tune.svm(class~., data = df.train,
+                  gamma = 10^(-6:1),
+                  cost = 10^(-10:10))
+tuned
+
+fit.svmRBF <- svm(class~., data = df.train, gamma = 0.01, cost = 1)
+svmRBF.pred <- predict(fit.svmRBF, na.omit(df.validate))
+svmRBF.perf <- table(na.omit(df.validate)$class,
+                     svmRBF.pred,
+                     dnn = c("Actual", "Predicted"))
+svmRBF.perf
