@@ -1,5 +1,6 @@
 ### Chapiter 17: Classification
 
+library(e1071)
 library(party)
 library(partykit)
 library(rpart)
@@ -66,3 +67,13 @@ ctree.perf <- table(df.validate$class,
                     ctree.pred,
                     dnn = c("Actual", "Predicted"))
 ctree.perf
+
+## 17.5 Support vector machines
+set.seed(1234)
+fit.svm <- svm(class~., data = df.train)
+fit.svm
+
+svm.pred <- predict(fit.svm, na.omit(df.validate))
+svm.perf <- table(na.omit(df.validate)$class,
+                  svm.pred, dnn = c("Actual", "Predicted"))
+svm.perf
